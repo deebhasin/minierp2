@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import './screens/formscreen.dart';
+import './screens/viewscreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (ctx) => FormScreen(),
+        'viewscreen': (ctx) => ViewScreen(),
       },
     );
   }
