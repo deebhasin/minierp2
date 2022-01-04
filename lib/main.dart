@@ -5,6 +5,8 @@ import 'package:logging/logging.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 
+import './screens/formscreen.dart'
+
 void main() {
   runApp( MyApp());
 }
@@ -126,12 +128,12 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
+        // This trailing comma makes auto-formatting nicer for build methods.
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      initialRoute: '/',
+      routes: {
+        '/':(ctx) => FormScreen(),
+      },
     );
   }
 }
