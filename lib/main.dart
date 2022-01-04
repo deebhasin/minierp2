@@ -1,18 +1,28 @@
+import 'package:desktop_window/desktop_window.dart';
+import 'package:erpapp/providers/app_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
+import 'package:overlay_support/overlay_support.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp( MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+   MyApp({Key? key}) : super(key: key);
 
-
+  final Logger log = Logger("MINIERP2");
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+    log.info("MiniERP2 app initiated: Please fasten your seatbelts");
+    return OverlaySupport(
+        child: MultiProvider(
+        providers: AppProvider.get(),
+    child: MaterialApp(
+
+      title: 'Mini ERP 2',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -25,7 +35,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),),),
     );
   }
 }
@@ -63,6 +73,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void initState()  {
+    _setScreenSize();
+    super.initState();
+  }
+
+  _setScreenSize() async {
+    await DesktopWindow.setFullScreen(true);
+  }
+
+  @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
@@ -71,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
