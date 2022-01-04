@@ -1,30 +1,20 @@
-import 'package:desktop_window/desktop_window.dart';
-import 'package:erpapp/providers/app_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
-import 'package:overlay_support/overlay_support.dart';
-import 'package:provider/provider.dart';
 
 import './screens/formscreen.dart';
 
 void main() {
-  runApp( MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-   MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
-  final Logger log = Logger("MINIERP2");
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    log.info("MiniERP2 app initiated: Please fasten your seatbelts");
-    return OverlaySupport(
-        child: MultiProvider(
-        providers: AppProvider.get(),
-    child: MaterialApp(
-
-      title: 'Mini ERP 2',
+    return MaterialApp(
+      title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
         //
