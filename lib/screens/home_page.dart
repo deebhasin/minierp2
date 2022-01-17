@@ -6,7 +6,7 @@ import '/screens/viewscreen.dart';
 class HomePage extends StatelessWidget {
 
   Future<Widget> getData() {
-    return Future.delayed(Duration(seconds: 2), () {
+    return Future.delayed(Duration(seconds: 3), () {
       return ViewScreen();
       // throw Exception("Custom Error");
     });

@@ -1,3 +1,4 @@
+import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 
 class ViewScreen extends StatelessWidget {
@@ -5,6 +6,7 @@ class ViewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _setDesktopFullScreen();
     return const Center(
       child: Text(
         "Welcome To View Screen",
@@ -14,5 +16,9 @@ class ViewScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  _setDesktopFullScreen() {
+     DesktopWindow.setFullScreen(true);
   }
 }
