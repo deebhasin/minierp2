@@ -18,7 +18,7 @@ class KSidebarRow extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             KText(text: text),
-            KText(text: ">"),
+            const KText(text: ">"),
           ],
         ),
       ),

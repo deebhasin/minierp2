@@ -24,7 +24,41 @@ class Sidebar extends StatelessWidget {
               child: Image.asset(
                   "asset/images/minierp_logo.png",
                 fit: BoxFit.fill,
-                width: 100,
+                // width: 100,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                width: 150,
+                height: 40,
+                child: ElevatedButton(
+                    onPressed: (){},
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.add),
+                        Text(
+                          "New",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.transparent,
+                    side: const BorderSide(
+                      width: 2,
+                        color: Colors.white,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+
+                ),
               ),
             ),
             const KSidebarRow(text: "Dashboard"),

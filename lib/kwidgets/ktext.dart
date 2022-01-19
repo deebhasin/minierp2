@@ -8,7 +8,7 @@ class KText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: TextStyle(
+      style: const TextStyle(
         color: Colors.white,
         fontSize: 20,
 

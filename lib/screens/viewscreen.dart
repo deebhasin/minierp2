@@ -10,7 +10,7 @@ class ViewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     _setDesktopFullScreen();
     return Column(
-      children: [
+      children: const [
       //   Divider(
       //     thickness: 1,
       //     color: Colors.black45,
