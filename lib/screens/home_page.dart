@@ -17,6 +17,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(),
       body: FutureBuilder<Widget>(
         future: getData(), // a previously-obtained Future<String> or null
         builder: (ctx, snapshot) {
