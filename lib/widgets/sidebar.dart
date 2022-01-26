@@ -14,7 +14,7 @@ class Sidebar extends StatelessWidget {
       margin: EdgeInsets.zero,
       width: sidebarWidth.toDouble(),
       height: MediaQuery.of(context).size.height,
-      color: Color.fromRGBO(63, 64, 66, 1),
+      color: const Color.fromRGBO(63, 64, 66, 1),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -61,7 +61,7 @@ class Sidebar extends StatelessWidget {
                 ),
               ),
             ),
-            const KSidebarRow(text: "Dashboard"),
+            const KSidebarRow(text: "Dashboard", isSelected: true,),
             const KSidebarRow(text: "Challan"),
             const KSidebarRow(text: "Invoice"),
             const KSidebarRow(text: "Payments"),

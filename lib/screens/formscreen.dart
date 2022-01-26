@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class FormScreen extends StatelessWidget {
-  FormScreen();
+FormScreen();
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
-  }
+@override
+Widget build(BuildContext context) {
+return Scaffold();
+}
 }
