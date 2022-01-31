@@ -9,6 +9,7 @@ import '../widgets/secondtabbankaccounts.dart';
 
 class SecondTab extends StatefulWidget {
   final int sidebar;
+  static List<String> cardList = ["Alpha", "Beta", "Gamma", "Delta", "Pi"];
   const SecondTab({Key? key, required this.sidebar}) : super(key: key);
 
   @override
@@ -16,16 +17,23 @@ class SecondTab extends StatefulWidget {
 }
 
 class _SecondTabState extends State<SecondTab> {
+  void removeItemFromList(String listitem){
+    setState(() {
+      SecondTab.cardList.removeWhere((item) => item == listitem);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return ListView(
       // physics: const NeverScrollableScrollPhysics(),
       children: [
-        const KListTile(),
-        const KListTile(),
-        const KListTile(),
-        const KListTile(),
-        const KListTile(),
+        // for(var item in cardList) const KListTile(listText: item),
+        ...SecondTab.cardList.map((item) => KListTile(listText: item, removeItemFromList: (item) => removeItemFromList(item))).toList(),
+        // const KListTile(),
+        // const KListTile(),
+        // const KListTile(),
+        // const KListTile(),
+        // const KListTile(),
         SizedBox(
           width: KTabBar.sizedBoxWidth, //(MediaQuery.of(context).size.width - widget.sidebar) * 0.85,
           child: Padding(

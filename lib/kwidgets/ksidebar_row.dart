@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import './ktext.dart';
-import '../widgets/sidebar.dart';
 
 class KSidebarRow extends StatelessWidget {
   final String text;

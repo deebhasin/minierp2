@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/secondtab.dart';
+
 class KListTile extends StatelessWidget {
-  const KListTile({Key? key}) : super(key: key);
+  final String listText;
+  final Function removeItemFromList;
+  const KListTile({Key? key, required this.listText, required this.removeItemFromList}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +29,12 @@ class KListTile extends StatelessWidget {
               ),
               backgroundColor: Colors.blue,
             ),
-            title: const Text(
-              "Alpha",
-              style: TextStyle(color: Colors.black,),
+            title: Text(
+              listText,
+              style: const TextStyle(color: Colors.black,),
             ),
             trailing: IconButton(
-              onPressed: (){},
+              onPressed: () => removeItemFromList(listText),
               icon: const Icon(
                   Icons.cancel,
                 color: Colors.black26,
