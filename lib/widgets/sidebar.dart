@@ -3,16 +3,118 @@ import 'package:flutter/material.dart';
 import '../kwidgets/ksidebar_row.dart';
 
 
-class Sidebar extends StatelessWidget {
+class Sidebar extends StatefulWidget {
   final int sidebarWidth;
+  final Function setDisplayPage;
   const Sidebar({Key? key,
-    this.sidebarWidth = 50}) : super(key: key);
+    this.sidebarWidth = 50,
+    required this.setDisplayPage}) : super(key: key);
+
+  @override
+  State<Sidebar> createState() => _SidebarState();
+}
+
+class _SidebarState extends State<Sidebar> {
+  bool dashboardSelected = true;
+  bool challanSelected = false;
+  bool invoiceSelected = false;
+  bool paymentsSelected = false;
+  bool customersSelected = false;
+  bool organizationSelected = false;
+  bool reportsSelected = false;
+  menuSelected(String selectionText){
+    widget.setDisplayPage(selectionText);
+    setState(() {
+      switch(selectionText){
+        case "Dashboard":
+          {
+            dashboardSelected = true;
+            challanSelected = false;
+            invoiceSelected = false;
+            paymentsSelected = false;
+            customersSelected = false;
+            organizationSelected = false;
+            reportsSelected = false;
+          }
+          break;
+        case "Challan":
+          {
+            dashboardSelected = false;
+            challanSelected = true;
+            invoiceSelected = false;
+            paymentsSelected = false;
+            customersSelected = false;
+            organizationSelected = false;
+            reportsSelected = false;
+          }
+          break;
+        case "Invoice":
+          {
+            dashboardSelected = false;
+            challanSelected = false;
+            invoiceSelected = true;
+            paymentsSelected = false;
+            customersSelected = false;
+            organizationSelected = false;
+            reportsSelected = false;
+          }
+          break;
+        case "Payments":
+          {
+            dashboardSelected = false;
+            challanSelected = false;
+            invoiceSelected = false;
+            paymentsSelected = true;
+            customersSelected = false;
+            organizationSelected = false;
+            reportsSelected = false;
+          }
+          break;
+        case "Customers":
+          {
+            dashboardSelected = false;
+            challanSelected = false;
+            invoiceSelected = false;
+            paymentsSelected = false;
+            customersSelected = true;
+            organizationSelected = false;
+            reportsSelected = false;
+          }
+          break;
+        case "Organization":
+          {
+            dashboardSelected = false;
+            challanSelected = false;
+            invoiceSelected = false;
+            paymentsSelected = false;
+            customersSelected = false;
+            organizationSelected = true;
+            reportsSelected = false;
+          }
+          break;
+        case "Reports":
+          {
+            dashboardSelected = false;
+            challanSelected = false;
+            invoiceSelected = false;
+            paymentsSelected = false;
+            customersSelected = false;
+            organizationSelected = false;
+            reportsSelected = true;
+          }
+          break;
+      // default: ;
+      }
+    });
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.zero,
-      width: sidebarWidth.toDouble(),
+      width: widget.sidebarWidth.toDouble(),
       height: MediaQuery.of(context).size.height,
       color: const Color.fromRGBO(63, 64, 66, 1),
       child: Padding(
@@ -61,13 +163,34 @@ class Sidebar extends StatelessWidget {
                 ),
               ),
             ),
-            const KSidebarRow(text: "Dashboard", isSelected: true,),
-            const KSidebarRow(text: "Challan"),
-            const KSidebarRow(text: "Invoice"),
-            const KSidebarRow(text: "Payments"),
-            const KSidebarRow(text: "Customers"),
-            const KSidebarRow(text: "Organization"),
-            const KSidebarRow(text: "Reports"),
+            InkWell(
+              onTap: () => menuSelected("Dashboard"),
+                child: KSidebarRow(text: "Dashboard", isSelected: dashboardSelected,),
+            ),
+            InkWell(
+              onTap: () => menuSelected("Challan"),
+                child: KSidebarRow(text: "Challan", isSelected: challanSelected,),
+            ),
+            InkWell(
+              onTap: () => menuSelected("Invoice"),
+              child: KSidebarRow(text: "Invoice", isSelected: invoiceSelected,),
+            ),
+            InkWell(
+              onTap: () => menuSelected("Payments"),
+              child: KSidebarRow(text: "Payments", isSelected: paymentsSelected,),
+            ),
+            InkWell(
+              onTap: () => menuSelected("Customers"),
+              child: KSidebarRow(text: "Customers", isSelected: customersSelected,),
+            ),
+            InkWell(
+              onTap: () => menuSelected("Organization"),
+              child: KSidebarRow(text: "Organization", isSelected: organizationSelected,),
+            ),
+            InkWell(
+              onTap: () => menuSelected("Reports"),
+              child: KSidebarRow(text: "Reports", isSelected: reportsSelected,),
+            ),
           ],
           ),
       ),

@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (ctx) => HomePage(),
         // '/': (ctx) => _loadFlag ? const LoadScreen(): const ViewScreen(),
-        'viewscreen': (ctx) => ViewScreen(),
+        'viewscreen': (ctx) => const ViewScreen(),
       },
 
       // home: loadFlag ? const LoadScreen(): const ViewScreen(),

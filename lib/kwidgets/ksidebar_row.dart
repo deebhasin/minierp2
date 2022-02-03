@@ -17,15 +17,12 @@ class KSidebarRow extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: InkWell(
-          onTap: (){},
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              KText(text: text),
-              const KText(text: ">"),
-            ],
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            KText(text: text),
+            const KText(text: ">"),
+          ],
         ),
       ),
     );

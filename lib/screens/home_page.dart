@@ -23,7 +23,7 @@ class HomePage extends StatelessWidget {
         builder: (ctx, snapshot) {
           if(snapshot.connectionState == ConnectionState.done){
             if(snapshot.hasData){
-              return ViewScreen();
+              return const ViewScreen();
             }
           }
           return LoadScreen();
