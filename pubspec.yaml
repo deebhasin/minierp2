@@ -35,6 +35,7 @@ dependencies:
   desktop_window: ^0.4.0
   intl: ^0.17.0
   charts_flutter: ^0.12.0
+  dropdown_search: ^2.0.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -67,3 +68,6 @@ flutter:
     - asset/images/main_load_image.png
     - asset/images/minierp_logo.png
     - asset/images/company_logo.jpg
+    - asset/images/back_arrow.png
+    - asset/images/clock_16.png
+    - asset/images/clock_32.png

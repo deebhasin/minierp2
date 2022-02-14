@@ -6,6 +6,10 @@ class ViewChallan extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      // decoration: BoxDecoration(
+      //   border:Border.all(color: Colors.red),
+      // ),
       child: Center(
         child: Text("Disco"),
       ),

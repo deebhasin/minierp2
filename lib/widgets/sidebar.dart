@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../kwidgets/ksidebar_row.dart';
+import 'createchallan.dart';
 
 
 class Sidebar extends StatefulWidget {
@@ -108,6 +109,15 @@ class _SidebarState extends State<Sidebar> {
     });
   }
 
+  void popup(){
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context){
+          return const CreateChallan();
+        }
+    );
+  }
 
 
   @override
@@ -135,7 +145,7 @@ class _SidebarState extends State<Sidebar> {
                 width: 150,
                 height: 40,
                 child: ElevatedButton(
-                    onPressed: (){},
+                    onPressed: popup,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
