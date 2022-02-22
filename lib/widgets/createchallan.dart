@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../kwidgets/kvariables.dart';
 import '../kwidgets/ktextfield.dart';
 import '../kwidgets/kdropdown.dart';
-import '../kwidgets/kdropdownfield.dart';
+// import '../kwidgets/kdropdownfield.dart';
 import '../kwidgets/ktablecellheader.dart';
 import '../kwidgets/ktablecell.dart';
 
@@ -30,7 +30,7 @@ class _CreateChallanState extends State<CreateChallan> {
     const double inputComponentWidth = 200;
     const String email = "billing@ituple.com";
     const String billingAddress = "Mr. Avtar\nI Provide Solution India\nIprovide House, Opp. Indian Oil Petrol Pump, Near Omaxe City,\nNH-2";
-    const String customerName = "I Provide Soluiton India";
+    const String customerName = "I Provide Solution India";
     const String placeOfSupply = "Haryana";
     const String status = "Pending";
     const String estimateDate = "03/02/2022";
@@ -146,7 +146,7 @@ class _CreateChallanState extends State<CreateChallan> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const KDropdown(dropDownList: customerList, label: "Customer", initialValue: customerName, width: 250,),
-                            Container(
+                            SizedBox(
                               width: 300,
                               // height: 10,
                               child: Row(
@@ -160,7 +160,7 @@ class _CreateChallanState extends State<CreateChallan> {
                                     ),
                                   ),
                                   // SizedBox(width: 10,),
-                                  KDropDownField(dropDownList: statusList, label: "", initialValue: status, height: 20, width: 100,),
+                                  KDropdown(dropDownList: statusList, label: "", initialValue: status, height: 20, width: 100,),
                                 ],
                               ),
                             ),
@@ -231,7 +231,7 @@ class _CreateChallanState extends State<CreateChallan> {
                       children: [
                         KTextField(label: "Billing address", initialValue: billingAddress, width: 150, multiLine: 6,),
                         const SizedBox(height: 10,),
-                        KDropDownField(dropDownList: stateList, label: "Place of Supply", initialValue: placeOfSupply, height: 20, width: 100,),
+                        KDropdown(dropDownList: stateList, label: "Place of Supply", initialValue: placeOfSupply, height: 20, width: 100,),
                       ],
                     ),
                     const SizedBox(width: 20,),
@@ -275,7 +275,7 @@ class _CreateChallanState extends State<CreateChallan> {
                                     "Amounts Are ",
                                     style: TextStyle(fontSize: 11),
                                   ),
-                                KDropDownField(dropDownList: amountTypeList,width: 110, initialValue: amountType, label: ""),
+                                KDropdown(dropDownList: amountTypeList,width: 110, initialValue: amountType, label: ""),
                               ],
                             ),
                           ),
@@ -337,7 +337,7 @@ class _CreateChallanState extends State<CreateChallan> {
                       ),
                     ),
                     const SizedBox(height: 20,),
-                    Container(
+                    SizedBox(
                       width: containerWidth * 0.95,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -377,11 +377,11 @@ class _CreateChallanState extends State<CreateChallan> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text(subtotal.toString(), style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
+                                  Text(subtotal.toString(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
                                   const SizedBox(height: 20,),
-                                  Text(total.toString(), style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
+                                  Text(total.toString(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
                                   const SizedBox(height: 20,),
-                                  Text(challantotal.toString(), style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
+                                  Text(challantotal.toString(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
                                 ],
                               ),
                               const SizedBox(width: 10,),
@@ -404,7 +404,7 @@ class _CreateChallanState extends State<CreateChallan> {
               //         child: Row(
               //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
               //           children: [
-              //             const KDropDownField(dropDownList: customerList, label: "Customer", width: 150,),
+              //             const KDropdown(dropDownList: customerList, label: "Customer", width: 150,),
               //             KTextField(label: "Email", width: 150,),
               //           ],
               //         ),

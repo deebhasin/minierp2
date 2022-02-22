@@ -1,11 +1,13 @@
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import '../widgets/company_logo_name.dart';
 import '../widgets/top_nav.dart';
 import '../kwidgets/ktabbar.dart';
 import '../widgets/footer.dart';
 import '../screens/viewchallan.dart';
+import '../screens/viewcustomers.dart';
 
 import '../widgets/sidebar.dart';
 
@@ -40,6 +42,31 @@ class _ViewScreenState extends State<ViewScreen> {
           {
             displayWidget = const ViewChallan();
           }
+          break;
+        // case "Invoice" :
+        //   {
+        //     displayWidget = const ViewChallan();
+        //   }
+          break;
+        // case "Payments" :
+        //   {
+        //     displayWidget = const ViewChallan();
+        //   }
+          break;
+        case "Customers" :
+          {
+            displayWidget = const ViewCustomers();
+          }
+          break;
+        // case "Organization" :
+        //   {
+        //     displayWidget = const ViewChallan();
+        //   }
+          break;
+        // case "Reports" :
+        //   {
+        //     displayWidget = const ViewChallan();
+        //   }
           break;
         default: displayWidget = Center(
           child: Text(

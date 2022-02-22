@@ -169,7 +169,6 @@ class _SidebarState extends State<Sidebar> {
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-
                 ),
               ),
             ),

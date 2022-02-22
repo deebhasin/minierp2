@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
-import '../widgets/displaydropdownmenu.dart';
-
 
 class KDropdown extends StatefulWidget {
   final List<String> dropDownList;
@@ -51,7 +49,7 @@ class _KDropdownState extends State<KDropdown> {
             border: Border.all(color: Colors.grey),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(0),
+            padding: const EdgeInsets.fromLTRB(10,0,0,0),
             child: DropdownSearch(
               dialogMaxWidth: widget.width + widget.height,
               showSearchBox: true,
@@ -69,10 +67,10 @@ class _KDropdownState extends State<KDropdown> {
               items: widget.dropDownList,
               dropdownSearchDecoration: const InputDecoration(
                 border: InputBorder.none,
-                icon: Icon(
-                    Icons.keyboard_arrow_down,
-                  size: 23,
-                ),
+                // icon: Icon(
+                //     Icons.keyboard_arrow_down,
+                //   size: 23,
+                // ),
               ),
             ),
           ),
