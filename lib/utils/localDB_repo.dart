@@ -32,7 +32,7 @@ class LocalDBRepo {
 			version: 1,
 			onOpen: (db) {
 				_db = db;
-				print("Opening the existing DB");
+				print("Opening the existing DB $path");
 				getLocalDBTableList();
 			},
 			onCreate: (Database db, int version) async {
@@ -222,8 +222,8 @@ class LocalDBRepo {
 			"city TEXT,"
 			"state TEXT,"
 			"GST TEXT,"
-			"PAN TEXT"
-
+			"PAN TEXT,"
+			"logo TEXT"
 			")");
 
 		await db.execute("CREATE TABLE CUSTOMER ("
