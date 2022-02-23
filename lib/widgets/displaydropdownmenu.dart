@@ -56,6 +56,7 @@ class _DisplayDropdownMenuState extends State<DisplayDropdownMenu> {
           ),
         ),
         child: ListView.builder(
+          shrinkWrap: true,
           itemCount: widget.dropDownList.length,
             itemBuilder: (context, index) => InkWell(
               onTap: () => updateSelection(widget.dropDownList[index], index),

@@ -2,6 +2,7 @@ import 'package:erpapp/kwidgets/kdropdownfield.dart';
 import 'package:erpapp/kwidgets/ktextfield.dart';
 import 'package:flutter/material.dart';
 
+import 'kdropdown.dart';
 import 'kvariables.dart';
 
 
@@ -31,7 +32,7 @@ class KTableCell extends StatelessWidget {
       parameter = Text( parameterValue, style: const TextStyle(fontSize: 11),);
       break;
       case 3: cellWidth = width * 0.18;
-      parameter = KDropDownField(dropDownList: dropdownList, label: "");
+      parameter = KDropdown(dropDownList: dropdownList, label: "");
       isLeftAlign = true;
       break;
       case 4: cellWidth = width * 0.13;
@@ -68,7 +69,7 @@ class KTableCell extends StatelessWidget {
       parameter = Text( parameterValue, style: const TextStyle(fontSize: 11),         );
       break;
       case 9: cellWidth = width * 0.12;
-      parameter = KDropDownField(dropDownList: dropdownList, label: "");
+      parameter = KDropdown(dropDownList: dropdownList, label: "");
       isLeftAlign = true;
       break;
       case 10: cellWidth = width * 0.03;

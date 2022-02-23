@@ -25,6 +25,7 @@ class _SecondTabState extends State<SecondTab> {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      shrinkWrap: true,
       // physics: const NeverScrollableScrollPhysics(),
       children: [
         // for(var item in cardList) const KListTile(listText: item),

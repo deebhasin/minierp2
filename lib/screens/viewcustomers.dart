@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../kwidgets/kcreatebutton.dart';
+import '../kwidgets/ktablecellheader.dart';
 
 
-class ViewCustomers extends StatefulWidget {
-  const ViewCustomers({Key? key}) : super(key: key);
+class ViewCustomers extends StatelessWidget {
+  final double width;
+  ViewCustomers({Key? key,
+    required this.width}) : super(key: key);
 
-  @override
-  _ViewCustomersState createState() => _ViewCustomersState();
-}
-
-class _ViewCustomersState extends State<ViewCustomers> {
   @override
   Widget build(BuildContext context) {
+    double containerWidth = width * 0.95;
     return Column(
       children: [
         const KCreateButton(),
@@ -31,7 +30,23 @@ class _ViewCustomersState extends State<ViewCustomers> {
           ],
         ),
         const Divider(),
-
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              KTableCellHeader(header: "#", context: context, cellWidth: containerWidth *.03,),
+              KTableCellHeader(header: "Company Name", context: context, cellWidth: containerWidth * 0.18,),
+              KTableCellHeader(header: "Contact Person", context: context, cellWidth: containerWidth * 0.14,),
+              KTableCellHeader(header: "Mobile", context: context, cellWidth: containerWidth * 0.1,),
+              KTableCellHeader(header: "Address", context: context, cellWidth: containerWidth * 0.14,),
+              // KTableCellHeader(header: "Pin", context: context, cellWidth: containerWidth * 0.05,),
+              KTableCellHeader(header: "City", context: context, cellWidth: containerWidth * .1,),
+              KTableCellHeader(header: "State", context: context, cellWidth: containerWidth * 0.1,),
+              // KTableCellHeader(header: "State Code", context: context, cellWidth: containerWidth * 0.05,),
+              KTableCellHeader(header: "GST Number", context: context, cellWidth: containerWidth * 0.1,),
+              KTableCellHeader(header: "Credit Period", context: context, cellWidth: containerWidth *.1,),
+              KTableCellHeader(header: "Status", context: context, cellWidth: containerWidth *.05, isLastPos: true,),
+            ],
+        ),
       ],
     );
   }

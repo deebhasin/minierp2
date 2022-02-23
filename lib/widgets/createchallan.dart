@@ -270,8 +270,8 @@ class _CreateChallanState extends State<CreateChallan> {
                             width: containerWidth * 0.95,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                  const Text(
+                              children: const [
+                                  Text(
                                     "Amounts Are ",
                                     style: TextStyle(fontSize: 11),
                                   ),
@@ -292,16 +292,16 @@ class _CreateChallanState extends State<CreateChallan> {
                         children: [
                           Row(
                             children: [
-                              KTableCellHeader(pos: 1, header: "", context: context),
-                              KTableCellHeader(pos: 2, header: "#", context: context),
-                              KTableCellHeader(pos: 3, header: "PRODUCT/SERVICE", context: context),
-                              KTableCellHeader(pos: 4, header: "HSN/SAC", context: context),
-                              KTableCellHeader(pos: 5, header: "DESCRIPTION", context: context),
-                              KTableCellHeader(pos: 6, header: "QTY", context: context),
-                              KTableCellHeader(pos: 7, header: "RATE", context: context),
-                              KTableCellHeader(pos: 8, header: "AMOUNT (\u{20B9})", context: context),
-                              KTableCellHeader(pos: 9, header: "TAX", context: context),
-                              KTableCellHeader(pos: 10, header: "", context: context),
+                              KTableCellHeader(header: "", context: context, crossAxisAlignment: CrossAxisAlignment.end,cellWidth: containerWidth * 0.03,),
+                              KTableCellHeader(header: "#", context: context, crossAxisAlignment: CrossAxisAlignment.end,cellWidth: containerWidth * 0.04,),
+                              KTableCellHeader(header: "PRODUCT/SERVICE", context: context, crossAxisAlignment: CrossAxisAlignment.end,cellWidth: containerWidth * 0.18,),
+                              KTableCellHeader(header: "HSN/SAC", context: context, crossAxisAlignment: CrossAxisAlignment.end,cellWidth: containerWidth * 0.13,),
+                              KTableCellHeader(header: "DESCRIPTION", context: context, crossAxisAlignment: CrossAxisAlignment.end,cellWidth: containerWidth * 0.18,),
+                              KTableCellHeader(header: "QTY", context: context, crossAxisAlignment: CrossAxisAlignment.start,cellWidth: containerWidth * 0.08,),
+                              KTableCellHeader(header: "RATE", context: context, crossAxisAlignment: CrossAxisAlignment.start,cellWidth: containerWidth * 0.08,),
+                              KTableCellHeader(header: "AMOUNT (\u{20B9})", context: context, crossAxisAlignment: CrossAxisAlignment.start,cellWidth: containerWidth * 0.12,),
+                              KTableCellHeader(header: "TAX", context: context, crossAxisAlignment: CrossAxisAlignment.start,cellWidth: containerWidth * 0.12,),
+                              KTableCellHeader(header: "", context: context, crossAxisAlignment: CrossAxisAlignment.end,cellWidth: containerWidth * 0.03, isLastPos: true,),
                             ],
                           ),
                           Row(

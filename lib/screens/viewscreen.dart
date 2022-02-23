@@ -40,7 +40,7 @@ class _ViewScreenState extends State<ViewScreen> {
           break;
         case "Challan" :
           {
-            displayWidget = const ViewChallan();
+            displayWidget = ViewChallan(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
           }
           break;
         // case "Invoice" :
@@ -55,7 +55,7 @@ class _ViewScreenState extends State<ViewScreen> {
           break;
         case "Customers" :
           {
-            displayWidget = const ViewCustomers();
+            displayWidget = ViewCustomers(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
           }
           break;
         // case "Organization" :
