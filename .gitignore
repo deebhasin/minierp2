@@ -25,3 +25,12 @@ doc/api/
 /.idea/
 .flutter-plugins
 .flutter-plugins-dependencies
+.flutter-plugins
+.flutter-plugins-dependencies
+.idea/libraries/Dart_Packages.xml
+.idea/libraries/Dart_SDK.xml
+.idea/libraries/Flutter_Plugins.xml
+erpapp.iml
+.idea/libraries/Flutter_Plugins.xml
+macos/Flutter/GeneratedPluginRegistrant.swift
+.flutter-plugins-dependencies
