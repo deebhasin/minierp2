@@ -72,9 +72,6 @@ class _CreateChallanState extends State<CreateChallan> {
       "Exempted from Tax",
     ];
 
-
-
-
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
@@ -168,7 +165,7 @@ class _CreateChallanState extends State<CreateChallan> {
                         ),
                         Column(
                           children: [
-                            KTextField(label: "Email", initialValue: email, width: 150,),
+                            // KTextField(label: "Email", initialValue: email, width: 150,),
                             Container(
                               padding: EdgeInsets.zero,
                               width: 150,
@@ -229,7 +226,7 @@ class _CreateChallanState extends State<CreateChallan> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        KTextField(label: "Billing address", initialValue: billingAddress, width: 150, multiLine: 6,),
+                        // KTextField(label: "Billing address", initialValue: billingAddress, width: 150, multiLine: 6,),
                         const SizedBox(height: 10,),
                         KDropdown(dropDownList: stateList, label: "Place of Supply", initialValue: placeOfSupply, height: 20, width: 100,),
                       ],
@@ -239,16 +236,16 @@ class _CreateChallanState extends State<CreateChallan> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        KTextField(label: "Estimate Date", initialValue: estimateDate, width: 150,),
+                        // KTextField(label: "Estimate Date", initialValue: estimateDate, width: 150,),
                         const SizedBox(height: 30,),
-                        KTextField(label: "LUT No.", width: 150,),
+                        // KTextField(label: "LUT No.", width: 150,),
                       ],
                     ),
                     const SizedBox(width: 90,),
-                    KTextField(label: "Expiration Date", width: 150,),
+                    // KTextField(label: "Expiration Date", width: 150,),
 
                     const SizedBox(width: 430,),
-                    KTextField(label: "Challan no.", initialValue: estimateNo, width: 150,),
+                    // KTextField(label: "Challan no.", initialValue: estimateNo, width: 150,),
                   ],
                 ),
               ),
@@ -357,7 +354,7 @@ class _CreateChallanState extends State<CreateChallan> {
                                   ],
                                 ),
                                 const SizedBox(height: 10,),
-                                KTextField(label: "Message displayed on estimate", width: 200, multiLine: 4, ),
+                                // KTextField(label: "Message displayed on estimate", width: 200, multiLine: 4, ),
                               ],
                             ),
                           ),

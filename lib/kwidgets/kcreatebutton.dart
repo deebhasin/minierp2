@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class KCreateButton extends StatelessWidget {
   final Color buttonColor = Colors.blue;
-  const KCreateButton({Key? key}) : super(key: key);
+  final callFunction;
+  const KCreateButton({Key? key, required this.callFunction}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +11,7 @@ class KCreateButton extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         ElevatedButton(
-          onPressed: (){},
+          onPressed: callFunction,
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(50, 40),
             primary: Colors.transparent,

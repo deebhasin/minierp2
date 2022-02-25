@@ -11,7 +11,6 @@ class KText extends StatelessWidget {
       style: const TextStyle(
         color: Colors.white,
         fontSize: 20,
-
       ),
     );
   }

@@ -1,5 +1,5 @@
 class Customer{
-  int id;
+  int? id;
   String name;
   String contact;
   String address;
@@ -9,9 +9,9 @@ class Customer{
   String stateCode;
   String gst;
   int creditPeriod;  // NUMBER OF DAYS
-  bool active;
+  bool isActive;
   Customer({
-    required this.id,
+    this.id,
     required this.name,
     this.contact = "",
     this.address = "",
@@ -21,6 +21,6 @@ class Customer{
     this.stateCode = "",
     this.gst = "",
     this.creditPeriod = 0,
-    this.active = true,
+    this.isActive = true,
   });
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/createchallan.dart';
 import '../kwidgets/kcreatebutton.dart';
 import '../kwidgets/ktablecellheader.dart';
 
@@ -12,9 +13,20 @@ class ViewChallan extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double containerWidth = width * 0.95;
+
+    void createChallan(){
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context){
+            return const CreateChallan();
+          }
+      );
+    }
+
     return Column(
       children: [
-        const KCreateButton(),
+        KCreateButton(callFunction: createChallan,),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [

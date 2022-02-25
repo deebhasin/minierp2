@@ -1,52 +1,34 @@
-import 'package:erpapp/domain/organization.dart';
-import 'package:erpapp/providers/org_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../kwidgets/kcreatebutton.dart';
 import '../kwidgets/ktablecellheader.dart';
+import '../widgets/createcustomer.dart';
 
 
 class ViewCustomers extends StatelessWidget {
   final double width;
-
   ViewCustomers({Key? key,
     required this.width}) : super(key: key);
 
+
+
   @override
   Widget build(BuildContext context) {
-    // late OrgProvider _orgProvider;
-    late Organization _org;
-
-    return Consumer<OrgProvider>(builder: (ctx, provider, child) {
-      return FutureBuilder(
-        future: provider.getOrganization(),
-        builder: (context, AsyncSnapshot<Organization> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(body: const CircularProgressIndicator());
-          } else {
-            if (snapshot.hasError) {
-//                  if (snapshot.error is ConnectivityError) {
-//                    return NoConnectionScreen();
-//                  }
-              return Center(child: Text("An error occured"));
-            } else if (snapshot.hasData) {
-              _org = snapshot.data!;
-              print("in customer ${_org.name}");
-              return body(context);
-            } else
-              return Container();
-          }
-        },
-      );
-    });
-  }
-
-  Widget body(BuildContext context) {
     double containerWidth = width * 0.95;
+
+    void createCustomer(){
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context){
+            return const CreateCustomer();
+          }
+      );
+    }
+
     return Column(
       children: [
-        const KCreateButton(),
+        KCreateButton(callFunction: createCustomer,),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
