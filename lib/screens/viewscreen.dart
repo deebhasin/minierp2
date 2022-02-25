@@ -1,6 +1,9 @@
 import 'package:desktop_window/desktop_window.dart';
+import 'package:erpapp/domain/organization.dart';
+import 'package:erpapp/providers/org_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/company_logo_name.dart';
 import '../widgets/top_nav.dart';
@@ -20,12 +23,43 @@ class ViewScreen extends StatefulWidget {
 }
 
 class _ViewScreenState extends State<ViewScreen> {
+
+  late OrgProvider _orgProvider;
+  late Organization _org;
   String displayPage = "Dashboard";
+  static const int _sidebarWidth = 200;
   @override
   Widget build(BuildContext context) {
-    const int _sidebarWidth = 200;
-    const String _companyName = "iTuple Technologies Pvt. Ltd.";
-    const String _companyLogo = "asset/images/company_logo.jpg";
+
+
+    return Consumer<OrgProvider>(builder: (ctx, provider, child) {
+      return FutureBuilder(
+        future: provider.getOrganization(),
+        builder: (context, AsyncSnapshot<Organization> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(body: const CircularProgressIndicator());
+          } else {
+            if (snapshot.hasError) {
+//                  if (snapshot.error is ConnectivityError) {
+//                    return NoConnectionScreen();
+//                  }
+              return Center(child: Text("An error occured"));
+            } else if (snapshot.hasData) {
+              _org = snapshot.data!;
+              return body();
+            } else
+              return Container();
+          }
+        },
+      );
+    });
+  }
+
+
+
+Widget body() {
+     String _companyName = _org.name;
+     String _companyLogo = _org.logo;
     _setDesktopFullScreen();
 
     Widget dynamicPage(){
@@ -110,7 +144,7 @@ class _ViewScreenState extends State<ViewScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const TopNavBar(sidebar: _sidebarWidth),
-                  const CompanyLogoName(sidebarWidth: _sidebarWidth, companyLogo: _companyLogo, companyName: _companyName),
+                   CompanyLogoName(sidebarWidth: _sidebarWidth, companyLogo: _companyLogo, companyName: _companyName),
                   // KTabBar(sidebar: _sidebarWidth,),
                   dynamicPage(),
 

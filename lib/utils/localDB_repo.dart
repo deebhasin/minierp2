@@ -7,6 +7,15 @@ import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class LocalDBRepo {
+
+	// Making this class Singleton
+	static final LocalDBRepo _singleton = LocalDBRepo._internal();
+
+	factory LocalDBRepo() {
+		return _singleton;
+	}
+	LocalDBRepo._internal();
+
 	late Database _db;
 
 	Database get db {
@@ -15,8 +24,8 @@ class LocalDBRepo {
 
 	final Logger _log = Logger("LocalDBRepo");
 
-	Future<void> init({bool forceRebuild = false}) async {
-
+	Future<bool> init({bool forceRebuild = false}) async {
+		bool newDB = false;
 		if (Platform.isWindows || Platform.isLinux) {
 			// Initialize FFI
 			sqfliteFfiInit();
@@ -25,7 +34,7 @@ class LocalDBRepo {
 		}
 
 		String path = await _getDBDirectoryPath();
-		if(forceRebuild) deleteDb(path);
+		if(forceRebuild) await deleteDb(path);
 
 		await openDatabase(
 			path,
@@ -40,14 +49,13 @@ class LocalDBRepo {
 				_db = db;
 				await createTables(db);
 				await getLocalDBTableList();
-
-				await insertOrganization("iTuple Technologies Pvt Ltd",  "Unitech Cyberpark", 122001,  "GGN",  'asset/images/company_logo.jpg');
+				newDB = true;
 			},
 
 		);
 		// deleteDb(path);
 
-		// return true;
+		return newDB;
 	}
 
 	Future<void> deleteDb(String path) async {
@@ -214,7 +222,7 @@ class LocalDBRepo {
 			")");
 
 		await db.execute("CREATE TABLE ORGANIZATION ("
-			"key TEXT PRIMARY KEY,"
+			"id INTEGER PRIMARY KEY,"
 			"name TEXT,"
 			"Contact_person TEXT,"
 			"address TEXT,"
