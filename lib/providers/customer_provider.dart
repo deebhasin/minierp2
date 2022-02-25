@@ -1,67 +1,64 @@
-
-
-
-
-
-
 import 'package:erpapp/domain/customer.dart';
+import 'package:erpapp/utils/localDB_repo.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-
+import 'package:sqflite/sqflite.dart';
 
 class CustomerProvider with ChangeNotifier {
+  Customer? customer;
+  late List<Customer> customerList;
 
-	Customer? customer;
-	late List<Customer> customerList;
+  Future<Customer?> getCustomer(int id) async {
+    if (customer != null) {
+      return customer;
+    }
 
+    try {
+      // customer = fetch query here
 
+    } on Exception catch (e, s) {
+      handleException("Error while fetching customer $e", e, s);
+    }
 
-	Future<Customer?> getCustomer() async {
-		if (customer != null ) {
-			return customer;
-		}
+    return customer;
+  }
 
-		try {
-			// customer = await CustomerRepo().getProfile();
+  Future<int> createCustomer(Customer customer) async {
+    int id = 0;
+    try {
+      id = await LocalDBRepo().db.insert('CUSTOMER',
+          {'name': customer.name, "contact": customer.contact, 'address': customer.address},
+          conflictAlgorithm: ConflictAlgorithm.replace);
 
+      print("Inserted new customer with id $id and name ${customer.name}");
 
-		} on Exception catch (e, s) {
-			handleException("Error while fetching customer $e", e, s);
+    } on Exception catch (e, s) {
+      handleException("Error while fetching customer $e", e, s);
+    }
 
-		}
+    return id;
+  }
 
-		return customer;
-	}
+  Future<List<Customer>> getCustomerList() async {
+    if (customerList != null) {
+      return customerList;
+    }
 
+    try {
+      // Query here
 
-	Future<List<Customer>> getCustomerList() async {
-		if (customerList != null ) {
-			return customerList;
-		}
+    } on Exception catch (e, s) {
+      handleException("Error while fetching customer $e", e, s);
+    }
 
-		try {
-			// customerList = await CustomerRepo().getProfile();
+    return customerList;
+  }
 
+  void handleException(String message, Exception exception, StackTrace st) {
+    print("Error $message $exception $st");
+  }
 
-		} on Exception catch (e, s) {
-			handleException("Error while fetching customer $e", e, s);
-
-		}
-
-		return customerList;
-	}
-
-
-
-
-
-
-	void handleException(String message, Exception exception, StackTrace st) {
-		print("Error $message $exception $st");
-	}
-
-	void reset() {
-		customer = null;
-	}
+  void reset() {
+    customer = null;
+  }
 }

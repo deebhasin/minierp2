@@ -1,5 +1,7 @@
 import 'package:erpapp/domain/customer.dart';
+import 'package:erpapp/providers/customer_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../kwidgets/ktextfield.dart';
 import '../kwidgets/kvariables.dart';
@@ -56,6 +58,8 @@ class _CreateCustomerState extends State<CreateCustomer> {
           gst: gstController.text,
           creditPeriod: int.parse(creditPeriodController.text),
         );
+
+        Provider.of<CustomerProvider>(context, listen: false).createCustomer(customer);
       }
       else{
         print("Validation Failed");
