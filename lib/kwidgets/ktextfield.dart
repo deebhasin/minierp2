@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:form_field_validator/form_field_validator.dart' as v;
+import 'package:form_field_validator/form_field_validator.dart';
 
 
 class KTextField extends StatefulWidget {
@@ -10,6 +12,8 @@ class KTextField extends StatefulWidget {
   final String initialValue;
   final bool isDisabled;
   final TextEditingController controller;
+  final bool isValidate;
+  final FieldValidator? validator;
 
   KTextField({Key? key,
     required this.label,
@@ -18,7 +22,10 @@ class KTextField extends StatefulWidget {
     this.multiLine = 1,
     this.initialValue = "",
     this.isDisabled = false,
-    required this.controller}) : super(key: key){
+    required this.controller,
+    this.isValidate = false,
+    this.validator = null,
+  }) : super(key: key){
     height *= multiLine;
     if (label == "Email"){
       isEmail = true;
@@ -34,33 +41,19 @@ class KTextField extends StatefulWidget {
 
 class _KTextFieldState extends State<KTextField> {
   String _errormsg = "";
+  String? _validatorError;
   bool _isError = false;
 
   String? checkValidation(String? value){
     setState(() {
-      if(widget.label != "PIN" && widget.label != "Credit Period") {
-        if (value == null || value.isEmpty) {
-          _errormsg = '${widget.label} cannot be blank';
-        }
-        // return null;
+      print("${widget.label}");
+      _validatorError = widget.validator?.call(value);
+      if(_validatorError != null){
+        _errormsg = _validatorError!;
+        _isError = true;
       }
-      else if (value == null || value.isEmpty) {
-        _errormsg = '${widget.label} cannot be blank';
-        }
-        else if(int.tryParse(value) == null){
-        _errormsg = 'Please enter numeric value';
-        }
-        else {
-          return null;
-        }
-        if(_errormsg != ""){
-          _isError = true;
-        }
-        if(widget.label == "Customer Id"){
-          _isError = false;
-          _errormsg = "";
-        }
-      });
+      print(_validatorError);
+    });
     return null;
   }
 
@@ -120,6 +113,7 @@ class _KTextFieldState extends State<KTextField> {
                 readOnly: widget.isDisabled,
                 controller: widget.controller,
                 validator: (value) => checkValidation(value),
+                // validator: widget.validator,
                 // initialValue: initialValue,
                 style: const TextStyle(fontSize: 14),
                 textAlignVertical: TextAlignVertical.center,

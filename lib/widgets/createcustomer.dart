@@ -1,10 +1,11 @@
-import 'package:erpapp/domain/customer.dart';
-import 'package:erpapp/providers/customer_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
 
 import '../kwidgets/ktextfield.dart';
 import '../kwidgets/kvariables.dart';
+import '../domain/customer.dart';
+import '../providers/customer_provider.dart';
 
 class CreateCustomer extends StatefulWidget {
   const CreateCustomer({Key? key}) : super(key: key);
@@ -28,7 +29,20 @@ class _CreateCustomerState extends State<CreateCustomer> {
     final stateController = TextEditingController();
     final stateCodeController = TextEditingController();
     final gstController = TextEditingController();
-    final creditPeriodController = TextEditingController();
+    final creditPeriodController = TextEditingController(text: "60");
+    final companyNameValidator = MultiValidator([
+      RequiredValidator(errorText: 'Company Name is required'),
+      MinLengthValidator(8, errorText: 'Company Name must be at least 8 digits long'),
+      // PatternValidator(r'(?=.*?[#?!@$%^&*-])', errorText: 'passwords must have at least one special character')
+    ]);
+    final pinValidator = MultiValidator([
+      PatternValidator(RegExp(r'[0-9]'), errorText: "PIN should be number"),
+    ]);
+    final gstValidator = RequiredValidator(errorText: 'GST is required');
+    final creditPeriodValidator = MultiValidator([
+      RequiredValidator(errorText: 'Credit Period is required'),
+      PatternValidator(RegExp(r'\d+'), errorText: "Credit Period should be number"),
+    ]);
 
     void resetForm(){
       setState(() {
@@ -58,13 +72,15 @@ class _CreateCustomerState extends State<CreateCustomer> {
           gst: gstController.text,
           creditPeriod: int.parse(creditPeriodController.text),
         );
-
         Provider.of<CustomerProvider>(context, listen: false).createCustomer(customer);
+        Navigator.of(context).pop();
       }
       else{
         print("Validation Failed");
       }
     }
+
+
 
 
     return AlertDialog(
@@ -124,7 +140,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
-                  child: KTextField(label: "Company name", width: 250,controller: companyController,),
+                  child: KTextField(label: "Company name *", width: 250,controller: companyController, isValidate: true, validator: companyNameValidator,),
                 ),
                 Container(
                   child: KTextField(label: "Contact Person", width: 250, controller: contactPersonController,),
@@ -144,7 +160,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      KTextField(label: "PIN", width: 250, controller: pinController,),
+                      KTextField(label: "PIN", width: 250, controller: pinController, validator: pinValidator,),
                       SizedBox(height: 8,),
                       KTextField(label: "City", width: 250, controller: cityController,),
                       SizedBox(height: 8,),
@@ -161,10 +177,10 @@ class _CreateCustomerState extends State<CreateCustomer> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
-                  child: KTextField(label: "GST Number", width: 250, controller: gstController,),
+                  child: KTextField(label: "GST Number *", width: 250, controller: gstController, validator: gstValidator,),
                 ),
                 Container(
-                  child: KTextField(label: "Credit Period", width: 250, controller: creditPeriodController,),
+                  child: KTextField(label: "Credit Period *", width: 250, controller: creditPeriodController, validator: creditPeriodValidator,),
                 ),
               ],
             ),

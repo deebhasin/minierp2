@@ -27,7 +27,17 @@ class CustomerProvider with ChangeNotifier {
     int id = 0;
     try {
       id = await LocalDBRepo().db.insert('CUSTOMER',
-          {'name': customer.name, "contact": customer.contact, 'address': customer.address},
+          {'name': customer.name,
+            "contact": customer.contact,
+            'address': customer.address,
+            'PIN': customer.pin,
+            'city': customer.city,
+            'state': customer.state,
+            'state_cd': customer.stateCode,
+            'GST': customer.gst,
+            'credit_period': customer.creditPeriod,
+            'active': customer.isActive,
+          },
           conflictAlgorithm: ConflictAlgorithm.replace);
 
       print("Inserted new customer with id $id and name ${customer.name}");

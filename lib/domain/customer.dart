@@ -9,7 +9,7 @@ class Customer{
   String stateCode;
   String gst;
   int creditPeriod;  // NUMBER OF DAYS
-  bool isActive;
+  int isActive;
   Customer({
     this.id,
     required this.name,
@@ -21,6 +21,6 @@ class Customer{
     this.stateCode = "",
     this.gst = "",
     this.creditPeriod = 0,
-    this.isActive = true,
+    this.isActive = 1,
   });
 }
