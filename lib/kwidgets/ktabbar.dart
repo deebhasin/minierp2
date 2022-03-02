@@ -36,7 +36,7 @@ class _KTabBarState extends State<KTabBar> with SingleTickerProviderStateMixin {
       children: [
         Container(
           margin: const EdgeInsets.fromLTRB(0, 5, 10, 0),
-          // height: 30,
+          // height: 300,
           width: (MediaQuery.of(context).size.width - widget.sidebar) *0.243,
           // decoration: BoxDecoration(
           //   border: Border.all(color: Colors.red),
@@ -78,7 +78,7 @@ class _KTabBarState extends State<KTabBar> with SingleTickerProviderStateMixin {
         Column(
           children: [
             SizedBox(
-              height: 650,
+              height: 600,
               // width: (MediaQuery.of(context).size.width - widget.sidebar) * 0.85,
               width: KTabBar.sizedBoxWidth,
               // decoration: BoxDecoration(

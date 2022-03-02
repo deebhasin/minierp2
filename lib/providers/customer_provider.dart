@@ -7,21 +7,88 @@ import 'package:sqflite/sqflite.dart';
 class CustomerProvider with ChangeNotifier {
   Customer? customer;
   late List<Customer> customerList;
+  late List<Map<String, Object?>> customerListFetched;
 
-  Future<Customer?> getCustomer(int id) async {
-    if (customer != null) {
-      return customer;
+  //
+
+  Future<Customer> getCustomer() async {
+     late Customer cust;
+    // if(customer  == null) {
+      try {
+        print("Gettin new Cust from DB**********");
+        List<Map<String, dynamic>> dataMap = await LocalDBRepo().db.query('CUSTOMER');
+
+        String id = "";
+        String name = "";
+        String contact =  "";
+        String address = "";
+        String pin = "0";
+        String city = "";
+        String state = "";
+        String stateCode = "";
+        String gst = "";
+        String creditPeriod = "0";
+        String isActive = "0";
+
+        if(dataMap[0]["id"] != null){
+          id = dataMap[0]["id"].toString();
+        }
+        if(dataMap[0]["name"] != null){
+          name = dataMap[0]["name"];
+        }
+        if(dataMap[0]["contact"] != null){
+          contact = dataMap[0]["contact"];
+        }
+        if(dataMap[0]["address"] != null){
+          address = dataMap[0]["address"];
+        }
+        if(dataMap[0]["pin"] != null){
+          pin = dataMap[0]["pin"].toString();
+        }
+        if(dataMap[0]["city"] != null){
+          city = dataMap[0]["city"];
+        }
+        if(dataMap[0]["state"] != null){
+          state = dataMap[0]["state"];
+        }
+        if(dataMap[0]["stateCode"] != null){
+          stateCode = dataMap[0]["stateCode"];
+        }
+        if(dataMap[0]["gst"] != null){
+          gst = dataMap[0]["gst"];
+        }
+        if(dataMap[0]["creditPeriod"] != null){
+          creditPeriod = dataMap[0]["creditPeriod"].toString();
+        }
+        if(dataMap[0]["isActive"] != null){
+          isActive = dataMap[0]["isActive"].toString();
+        }
+
+        if(dataMap != null){
+          cust =
+              Customer(
+                id: int.parse(id),
+                name: name,
+                contact: contact,
+                address: address,
+                pin: int.parse(pin),
+                city: city,
+                state: state,
+                stateCode: stateCode,
+                gst: gst,
+                creditPeriod: int.parse(creditPeriod),
+                isActive: int.parse(isActive),
+              );
+          // customer = cust;
+        }
+      } on Exception catch (e, s) {
+        handleException("Error while fetching customer $e", e, s);
+
+      }
+    // }
+    print(cust.name);
+    return cust;
     }
-
-    try {
-      // customer = fetch query here
-
-    } on Exception catch (e, s) {
-      handleException("Error while fetching customer $e", e, s);
-    }
-
-    return customer;
-  }
 
   Future<int> createCustomer(Customer customer) async {
     int id = 0;
@@ -49,18 +116,37 @@ class CustomerProvider with ChangeNotifier {
     return id;
   }
 
+  // Future<List<Customer>> getCustomerList() async {
+
   Future<List<Customer>> getCustomerList() async {
-    if (customerList != null) {
-      return customerList;
-    }
+    // if (customerList != null) {
+    //   return customerList;
+    // }
 
     try {
-      // Query here
-
+      customerListFetched = await LocalDBRepo().db.query("CUSTOMER");
+      customerListFetched.forEach((row) {
+        // print(row["name"]);
+        customerList.add(
+          Customer(
+            id: int.parse(row["id"].toString()),
+            name: row["name"].toString(),
+            contact: row["contact"].toString(),
+            address: row["address"].toString(),
+            pin: int.parse(row["PIN"].toString()),
+            city: row["city"].toString(),
+            state: row["state"].toString(),
+            stateCode: row["state_cd"].toString(),
+            gst: row["GST"].toString(),
+            creditPeriod: int.parse(row["credit_period"].toString()),
+            isActive: int.parse(row["active"].toString()),
+          )
+        );
+      });
     } on Exception catch (e, s) {
       handleException("Error while fetching customer $e", e, s);
     }
-
+    customerList = customerList.toList();
     return customerList;
   }
 
@@ -69,6 +155,6 @@ class CustomerProvider with ChangeNotifier {
   }
 
   void reset() {
-    customer = null;
+    // customer = null;
   }
 }

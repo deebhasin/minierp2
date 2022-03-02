@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/erpapp.iml" filepath="$PROJECT_DIR$/erpapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/erpapp_android.iml" filepath="$PROJECT_DIR$/android/erpapp_android.iml" />
     </modules>
   </component>
 </project>

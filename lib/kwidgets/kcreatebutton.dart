@@ -11,7 +11,7 @@ class KCreateButton extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         ElevatedButton(
-          onPressed: callFunction,
+          onPressed: () => callFunction(context),
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(50, 40),
             primary: Colors.transparent,
