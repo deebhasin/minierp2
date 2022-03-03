@@ -8,23 +8,36 @@ import '../domain/customer.dart';
 import '../providers/customer_provider.dart';
 
 
-class ViewCustomers extends StatelessWidget {
+class ViewCustomers extends StatefulWidget {
   final double width;
   late double containerWidth;
-  late Customer customer;
+
   ViewCustomers({Key? key,
     required this.width}) : super(key: key){
     containerWidth = width * 0.95;
   }
+
+  @override
+  State<ViewCustomers> createState() => _ViewCustomersState();
+}
+
+class _ViewCustomersState extends State<ViewCustomers> {
+  late List<Customer> customer;
 
   void createCustomer(BuildContext context){
     showDialog(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context){
-          return const CreateCustomer();
+          return CreateCustomer(refreshViewCustomer: refreshViewCustomer,);
         }
     );
+  }
+
+  void refreshViewCustomer(){
+    setState(() {
+
+    });
   }
 
   @override
@@ -32,7 +45,7 @@ class ViewCustomers extends StatelessWidget {
     return Consumer<CustomerProvider>(builder: (ctx, provider, child) {
       return FutureBuilder(
         future: provider.getCustomer(),
-        builder: (context, AsyncSnapshot<Customer> snapshot) {
+        builder: (context, AsyncSnapshot<List<Customer>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator();
           } else {
@@ -40,20 +53,57 @@ class ViewCustomers extends StatelessWidget {
 //                  if (snapshot.error is ConnectivityError) {
 //                    return NoConnectionScreen();
 //                  }
-              return Center(child: Text("An error occured. $snapshot"));
+              return Center(child: Text("An error occured.\n$snapshot"));
+            // return noData(context);
             } else if (snapshot.hasData) {
               customer = snapshot.data!;
               // customer.forEach((row) => print(row));
               // return displayCustomer(context);
-              return displayCustomer(context);
+              return _displayCustomer(context);
             } else
-              return Container();
+              return noData(context);
           }
         },
       );
     });
   }
-    Widget displayCustomer(BuildContext context) {
+
+  Widget noData(context){
+    return Column(
+      children: [
+        KCreateButton(callFunction: createCustomer,),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text(
+              "Customer",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                letterSpacing: 2,
+                textBaseline: TextBaseline.alphabetic,
+              ),
+            ),
+          ],
+        ),
+        const Divider(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Customer does Not Exist",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+    Widget _displayCustomer(BuildContext context) {
       return Column(
         children: [
           KCreateButton(callFunction: createCustomer,),
@@ -77,79 +127,85 @@ class ViewCustomers extends StatelessWidget {
             children: [
               KTableCellHeader(header: "#",
                 context: context,
-                cellWidth: containerWidth * .03,),
+                cellWidth: widget.containerWidth * .03,),
               KTableCellHeader(header: "Company Name",
                 context: context,
-                cellWidth: containerWidth * 0.18,),
+                cellWidth: widget.containerWidth * 0.18,),
               KTableCellHeader(header: "Contact Person",
                 context: context,
-                cellWidth: containerWidth * 0.14,),
+                cellWidth: widget.containerWidth * 0.14,),
               KTableCellHeader(header: "Mobile",
                 context: context,
-                cellWidth: containerWidth * 0.1,),
+                cellWidth: widget.containerWidth * 0.1,),
               KTableCellHeader(header: "Address",
                 context: context,
-                cellWidth: containerWidth * 0.14,),
+                cellWidth: widget.containerWidth * 0.14,),
               // KTableCellHeader(header: "Pin", context: context, cellWidth: containerWidth * 0.05,),
-              KTableCellHeader(header: "City",
+              KTableCellHeader(header: "PIN",
                 context: context,
-                cellWidth: containerWidth * .1,),
+                cellWidth: widget.containerWidth * .1,),
               KTableCellHeader(header: "State",
                 context: context,
-                cellWidth: containerWidth * 0.1,),
+                cellWidth: widget.containerWidth * 0.1,),
               // KTableCellHeader(header: "State Code", context: context, cellWidth: containerWidth * 0.05,),
               KTableCellHeader(header: "GST Number",
                 context: context,
-                cellWidth: containerWidth * 0.1,),
+                cellWidth: widget.containerWidth * 0.1,),
               KTableCellHeader(header: "Credit Period",
                 context: context,
-                cellWidth: containerWidth * .1,),
+                cellWidth: widget.containerWidth * .08,),
               KTableCellHeader(header: "Status",
                 context: context,
-                cellWidth: containerWidth * .05,
+                cellWidth: widget.containerWidth * .07,
                 isLastPos: true,),
             ],
           ),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              KTableCellHeader(header: customer.id.toString(),
-                context: context,
-                cellWidth: containerWidth * .03,),
-              KTableCellHeader(header: customer.name,
-                context: context,
-                cellWidth: containerWidth * 0.18,),
-              KTableCellHeader(header: customer.contact,
-                context: context,
-                cellWidth: containerWidth * 0.14,),
-              KTableCellHeader(header: customer.address,
-                context: context,
-                cellWidth: containerWidth * 0.1,),
-              KTableCellHeader(header: customer.pin.toString(),
-                context: context,
-                cellWidth: containerWidth * 0.14,),
-              // KTableCellHeader(header: "Pin", context: context, cellWidth: containerWidth * 0.05,),
-              KTableCellHeader(header: customer.city,
-                context: context,
-                cellWidth: containerWidth * .1,),
-              KTableCellHeader(header: customer.state,
-                context: context,
-                cellWidth: containerWidth * 0.1,),
-              // KTableCellHeader(header: "State Code", context: context, cellWidth: containerWidth * 0.05,),
-              KTableCellHeader(header: customer.stateCode,
-                context: context,
-                cellWidth: containerWidth * 0.1,),
-              KTableCellHeader(header: customer.gst,
-                context: context,
-                cellWidth: containerWidth * .1,),
-              KTableCellHeader(header: customer.creditPeriod.toString(),
-                context: context,
-                cellWidth: containerWidth * .05,
-                isLastPos: true,),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.center,
+          //   children:[
+              for(var i=0; i< customer.length; i++)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    KTableCellHeader(header: customer[i].id.toString(),
+                      context: context,
+                      cellWidth: widget.containerWidth * .03,),
+                    KTableCellHeader(header: customer[i].company_name,
+                      context: context,
+                      cellWidth: widget.containerWidth * 0.18,),
+                    KTableCellHeader(header: customer[i].contact_person,
+                      context: context,
+                      cellWidth: widget.containerWidth * 0.14,),
+                    KTableCellHeader(header: customer[i].contact_phone,
+                      context: context,
+                      cellWidth: widget.containerWidth * 0.1,),
+                    KTableCellHeader(header: customer[i].address,
+                      context: context,
+                      cellWidth: widget.containerWidth * 0.14,),
+                    // KTableCellHeader(header: "Pin", context: context, cellWidth: containerWidth * 0.05,),
+                    KTableCellHeader(header: customer[i].pin.toString(),
+                      context: context,
+                      cellWidth: widget.containerWidth * .1,),
+                    KTableCellHeader(header: customer[i].state,
+                      context: context,
+                      cellWidth: widget.containerWidth * 0.1,),
+                    // KTableCellHeader(header: "State Code", context: context, cellWidth: containerWidth * 0.05,),
+                    KTableCellHeader(header: customer[i].gst,
+                      context: context,
+                      cellWidth: widget.containerWidth * 0.1,),
+                    KTableCellHeader(header: customer[i].creditPeriod.toString(),
+                      context: context,
+                      cellWidth: widget.containerWidth * .08,),
+                    KTableCellHeader(header: customer[i].isActive == 1? "Active" : "Inactive",
+                      context: context,
+                      cellWidth: widget.containerWidth * .07,
+                      isLastPos: true,),
+                //   ],
+                // ),
             ],
           ),
         ],
       );
     }
-  }
+}

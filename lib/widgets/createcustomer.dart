@@ -6,9 +6,12 @@ import '../kwidgets/ktextfield.dart';
 import '../kwidgets/kvariables.dart';
 import '../domain/customer.dart';
 import '../providers/customer_provider.dart';
+import '../screens/viewchallan.dart';
 
 class CreateCustomer extends StatefulWidget {
-  const CreateCustomer({Key? key}) : super(key: key);
+  final Function refreshViewCustomer;
+  const CreateCustomer({Key? key,
+    required this.refreshViewCustomer}) : super(key: key);
 
   @override
   State<CreateCustomer> createState() => _CreateCustomerState();
@@ -62,8 +65,9 @@ class _CreateCustomerState extends State<CreateCustomer> {
     void submitForm(){
       if(_formKey.currentState!.validate()){
         Customer customer = Customer(
-          name: companyController.text,
-          contact: contactPersonController.text,
+          company_name: companyController.text,
+          contact_person: contactPersonController.text,
+          contact_phone: contactPersonController.text,
           address: addressController.text,
           pin: int.parse(pinController.text),
           city: cityController.text,
@@ -73,6 +77,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
           creditPeriod: int.parse(creditPeriodController.text),
         );
         Provider.of<CustomerProvider>(context, listen: false).createCustomer(customer);
+        // widget.refreshViewCustomer();
         Navigator.of(context).pop();
       }
       else{

@@ -1,7 +1,8 @@
 class Customer{
   int? id;
-  String name;
-  String contact;
+  String company_name;
+  String contact_person;
+  String contact_phone;
   String address;
   int pin;
   String city;
@@ -11,9 +12,10 @@ class Customer{
   int creditPeriod;  // NUMBER OF DAYS
   int isActive;
   Customer({
-    this.id,
-    required this.name,
-    this.contact = "",
+    this.id = 0,
+    required this.company_name,
+    this.contact_person = "",
+    this.contact_phone = "",
     this.address = "",
     this.pin = 0,
     this.city = "",
@@ -23,4 +25,37 @@ class Customer{
     this.creditPeriod = 0,
     this.isActive = 1,
   });
+
+  Customer.fromMap(Map<String, dynamic> res)
+      : id = res["id"],
+        company_name = res["company_name"],
+        contact_person = res["contact_person"],
+        contact_phone = res["contact_phone"],
+        address = res["address"],
+        pin = res["PIN"],
+        city = res["city"],
+        state = res["state"],
+        stateCode = res["state_cd"],
+        gst = res["GST"],
+        creditPeriod = res["credit_period"],
+        isActive = res["active"];
+
+
+    Map<String, Object?> toMap() {
+      return {
+        // 'id':id,
+        'company_name': company_name,
+        'contact_person': contact_person,
+        'contact_phone': contact_phone,
+        'address': address,
+        'PIN': pin,
+        'city': city,
+        'state': state,
+        'state_cd': stateCode,
+        'GST': gst,
+        'credit_period': creditPeriod,
+        'active': isActive,
+      };
+    }
+
 }

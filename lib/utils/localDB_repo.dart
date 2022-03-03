@@ -53,7 +53,7 @@ class LocalDBRepo {
 			},
 
 		);
-		// deleteDb(path);
+
 
 		return newDB;
 	}
@@ -210,7 +210,7 @@ class LocalDBRepo {
 	}
 
 	Future<void> createTables(Database db) async {
-		print("startwd creating db tables");
+		print("started creating db tables");
 		await db.execute("CREATE TABLE PRODUCT ("
 			"key TEXT PRIMARY KEY,"
 			"name TEXT,"
@@ -236,8 +236,9 @@ class LocalDBRepo {
 
 		await db.execute("CREATE TABLE CUSTOMER ("
 			"id INTEGER PRIMARY KEY AUTOINCREMENT,"
-			"name TEXT,"
-			"contact TEXT,"
+			"company_name TEXT,"
+			"contact_person TEXT,"
+			"contact_phone TEXT  ,"
 			"address TEXT,"
 			"PIN INTEGER,"
 			"city TEXT,"

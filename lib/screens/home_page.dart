@@ -11,7 +11,7 @@ class HomePage extends StatelessWidget {
 
   late OrgProvider _OrgProvider;
   Future<void> initApp() async{
-    bool newDb = await LocalDBRepo().init(forceRebuild: true);
+    bool newDb = await LocalDBRepo().init(forceRebuild: false);
     if(newDb) await _OrgProvider.insertOrganization();
 
   }

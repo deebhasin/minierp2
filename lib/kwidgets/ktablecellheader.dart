@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'kvariables.dart';
 
 class KTableCellHeader extends StatelessWidget {
-  var header;
+  String header = "";
   final BuildContext context;
   final CrossAxisAlignment crossAxisAlignment;
   final double cellWidth;
