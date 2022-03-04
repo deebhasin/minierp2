@@ -7,11 +7,11 @@ import '../widgets/company_logo_name.dart';
 import '../widgets/top_nav.dart';
 import '../kwidgets/ktabbar.dart';
 import '../widgets/footer.dart';
-import '../screens/viewchallan.dart';
-import '../screens/viewcustomers.dart';
+import '../screens/challanview.dart';
+import '../screens/customersview.dart';
 import '../domain/organization.dart';
 import '../providers/org_provider.dart';
-import '../screens/viewproducts.dart';
+import '../screens/productsview.dart';
 
 import '../widgets/sidebar.dart';
 
@@ -90,13 +90,13 @@ Widget body() {
           break;
         case "Customers" :
           {
-            displayWidget = ViewCustomers(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
+            displayWidget = CustomersView(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
           }
           break;
 
         case "Products" :
           {
-            displayWidget = ViewProducts(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
+            displayWidget = ProductsView(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
           }
           break;
         default: displayWidget = Center(

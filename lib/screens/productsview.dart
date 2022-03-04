@@ -1,0 +1,226 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../domain/product.dart';
+import '../providers/product_provider.dart';
+import '../kwidgets/kcreatebutton.dart';
+import '../kwidgets/ktablecellheader.dart';
+import '../screens/productcreate.dart';
+
+
+
+
+class ProductsView extends StatefulWidget {
+  final double width;
+
+  const ProductsView({Key? key,
+    this.width = 50}) : super(key: key);
+
+  @override
+  State<ProductsView> createState() => _ProductsViewState();
+}
+
+class _ProductsViewState extends State<ProductsView> {
+  late List<Product> product;
+  late double containerWidth;
+
+  @override
+  void initState() {
+    containerWidth = widget.width * 0.95;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ProductProvider>(builder: (ctx, provider, child) {
+      return FutureBuilder(
+        future: provider.getProductList(),
+        builder: (context, AsyncSnapshot<List<Product>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else {
+            if (snapshot.hasError) {
+//                  if (snapshot.error is ConnectivityError) {
+//                    return NoConnectionScreen();
+//                  }
+              return Center(child: Text("An error occured.\n$snapshot"));
+              // return noData(context);
+            } else if (snapshot.hasData) {
+              product = snapshot.data!;
+
+              if(product.isEmpty){
+                return noData(context);
+              }
+              else {
+                return _displayProduct(context);
+              }
+
+            } else
+              return noData(context);
+          }
+        },
+      );
+    });
+  }
+
+  Widget noData(context) {
+    return Column(
+      children: [
+        KCreateButton(callFunction: productCreate,),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text(
+              "Product",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                letterSpacing: 2,
+                textBaseline: TextBaseline.alphabetic,
+              ),
+            ),
+          ],
+        ),
+        const Divider(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Product does Not Exist",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _displayProduct(BuildContext context) {
+      return Column(
+        children: [
+          KCreateButton(callFunction: productCreate,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Text(
+                "Product",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  letterSpacing: 2,
+                  textBaseline: TextBaseline.alphabetic,
+                ),
+              ),
+            ],
+          ),
+          const Divider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              KTableCellHeader(header: "#",
+                context: context,
+                cellWidth: containerWidth * .03,),
+              KTableCellHeader(header: "Product Name",
+                context: context,
+                cellWidth: containerWidth * 0.18,),
+              KTableCellHeader(header: "Unit",
+                context: context,
+                cellWidth: containerWidth * 0.14,),
+              KTableCellHeader(header: "HSN Code",
+                context: context,
+                cellWidth: containerWidth * 0.1,),
+              KTableCellHeader(header: "GST Number",
+                context: context,
+                cellWidth: containerWidth * 0.14,),
+              KTableCellHeader(header: "",
+                context: context,
+                cellWidth: containerWidth * .07,
+                isLastPos: true,),
+            ],
+          ),
+
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.center,
+          //   children:[
+          for(var i = 0; i < product.length; i++)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                KTableCellHeader(header: product[i].id.toString(),
+                  context: context,
+                  cellWidth: containerWidth * .03,),
+                KTableCellHeader(header: product[i].name,
+                  context: context,
+                  cellWidth: containerWidth * 0.18,),
+                KTableCellHeader(header: product[i].unit,
+                  context: context,
+                  cellWidth: containerWidth * 0.14,),
+                KTableCellHeader(header: product[i].HSN,
+                  context: context,
+                  cellWidth: containerWidth * 0.1,),
+                KTableCellHeader(header: product[i].GST,
+                  context: context,
+                  cellWidth: containerWidth * 0.14,),
+                KTableCellHeader(header: "",
+                  context: context,
+                  cellWidth: containerWidth * .07,
+                  isLastPos: true,
+                  id: product[i].id,
+                  deleteAction: deleteAction,
+                  editAction: editAction,
+                ),
+                //   ],
+                // ),
+              ],
+            ),
+        ],
+      );
+    }
+
+  void productCreate(BuildContext context){
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context){
+          return ProductCreate(product: Product(name: ""));
+        }
+    );
+  }
+
+  void deleteAction(int id){
+    Provider.of<ProductProvider>(context, listen: false).deleteProduct(id);
+  }
+
+  Widget editAction(int id){
+    Product product;
+    return Consumer<ProductProvider>(builder: (ctx, provider, child) {
+      return FutureBuilder(
+        future: provider.getProductById(id),
+        builder: (context, AsyncSnapshot<Product> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else {
+            if (snapshot.hasError) {
+              //                  if (snapshot.error is ConnectivityError) {
+              //                    return NoConnectionScreen();
+              //                  }
+              return Center(child: Text("An error occured.\n$snapshot"));
+              // return noData(context);
+            } else if (snapshot.hasData) {
+              product = snapshot.data!;
+              // customer.forEach((row) => print(row));
+              // return displayCustomer(context);
+              return ProductCreate(product: product);
+            } else
+              return Container();
+          }
+        },
+      );
+    });
+  }
+
+}
+

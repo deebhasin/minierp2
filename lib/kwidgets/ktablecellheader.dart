@@ -1,5 +1,5 @@
 import 'package:erpapp/domain/customer.dart';
-import 'package:erpapp/widgets/createcustomer.dart';
+import 'package:erpapp/screens/customercreate.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,6 +15,8 @@ class KTableCellHeader extends StatelessWidget {
   double width = 100;
   double height;
   final int? id;
+  final Function? deleteAction;
+  final Function? editAction;
 
   KTableCellHeader({Key? key,
     required this.header,
@@ -23,11 +25,14 @@ class KTableCellHeader extends StatelessWidget {
     this.cellWidth = 100,
     this.isLastPos = false,
     this.height = 25,
-    this.id = 0
+    this.id = 0,
+    this.deleteAction,
+    this.editAction,
   }) : super(key: key) {
     width = (MediaQuery.of(context).size.width - KVariables.sidebarWidth) * 0.95;
   }
 
+  _test(){}
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -53,79 +58,53 @@ class KTableCellHeader extends StatelessWidget {
       ),
     );
   }
-}
 
 
-Widget showText(String header){
-  return Text(
-    header,
-    style: const TextStyle(
-      fontSize: 12,
-      fontWeight: FontWeight.bold,
-    ),
-  );
-}
-
-Widget showIcons(int id, BuildContext context){
-
-
-  return Row(
-    children: [
-      InkWell(
-        onTap: (){
-          showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (BuildContext context){
-                Customer customer;
-                return Consumer<CustomerProvider>(builder: (ctx, provider, child) {
-                  return FutureBuilder(
-                    future: provider.getCustomerWithId(id),
-                    builder: (context, AsyncSnapshot<Customer> snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else {
-                        if (snapshot.hasError) {
-//                  if (snapshot.error is ConnectivityError) {
-//                    return NoConnectionScreen();
-//                  }
-                          return Center(child: Text("An error occured.\n$snapshot"));
-                          // return noData(context);
-                        } else if (snapshot.hasData) {
-                          customer = snapshot.data!;
-                          // customer.forEach((row) => print(row));
-                          // return displayCustomer(context);
-                          return CreateCustomer(customer);
-                        } else
-                          return Container();
-                      }
-                    },
-                  );
-                });
-              }
-          );
-        },
-        child: Icon(
-          Icons.edit,
-          size: 16,
-          color: Colors.grey,
-        ),
+  Widget showText(String header){
+    return Text(
+      header,
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
       ),
-      const SizedBox(width: 8,),
-      InkWell(
-        onTap: (){Provider.of<CustomerProvider>(context, listen: false).deleteCustomer(id);},
-        child: Icon(
-          Icons.delete,
-          size: 16,
-          color: Colors.red,
-        ),
-      ),
-    ],
-  );
-
-  _getCustomer() {
-
+    );
   }
 
+  Widget showIcons(int id, BuildContext context,){
+    return Row(
+      children: [
+        InkWell(
+          onTap: (){
+            showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext context){
+                  if(editAction!(id) != null){
+                    return editAction!(id);
+                  }
+                  else{
+                    return Container();
+                  }
 
+                }
+            );
+          },
+          child: Icon(
+            Icons.edit,
+            size: 16,
+            color: Colors.grey,
+          ),
+        ),
+        const SizedBox(width: 8,),
+        InkWell(
+          onTap: () => deleteAction!(id),
+          child: Icon(
+            Icons.delete,
+            size: 16,
+            color: Colors.red,
+          ),
+        ),
+      ],
+    );
+  }
 }

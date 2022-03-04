@@ -1,3 +1,4 @@
+import 'package:erpapp/widgets/alertdialognav.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
@@ -7,16 +8,18 @@ import '../kwidgets/kvariables.dart';
 import '../domain/customer.dart';
 import '../providers/customer_provider.dart';
 
-class CreateCustomer extends StatefulWidget {
+class CustomerCreate extends StatefulWidget {
     late final Customer customer;
 
-    CreateCustomer(this.customer);
+    CustomerCreate({Key? key,
+      required this.customer
+    }) : super(key: key);
 
   @override
-  State<CreateCustomer> createState() => _CreateCustomerState();
+  State<CustomerCreate> createState() => _CustomerCreateState();
 }
 
-class _CreateCustomerState extends State<CreateCustomer> {
+class _CustomerCreateState extends State<CustomerCreate> {
   // late Customer customer;
   late double containerWidth;
   double containerHeight = 700;
@@ -118,28 +121,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
               ),
               width:  containerWidth,
               // height: containerHeight,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 100,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Icon(Icons.help_outline),
-                        const Text("Help"),
-                        InkResponse(
-                          onTap: (){
-                            Navigator.of(context).pop();
-                          },
-                          child: const Icon(Icons.close),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+              child: AlertDialogNav(),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -225,9 +207,6 @@ class _CreateCustomerState extends State<CreateCustomer> {
     );
   }
 
-  Widget _updateCustomer(Customer customer){
-    return Container();
-  }
 
   void resetForm(){
     setState(() {
@@ -252,12 +231,12 @@ class _CreateCustomerState extends State<CreateCustomer> {
         widget.customer.contact_person = contactPersonController.text;
         widget.customer.contact_phone= contactPersonController.text;  //Have to add Phone and Active Status fields on the page
         widget.customer.address= addressController.text;
-    widget.customer.pin= int.parse(pinController.text);
+        widget.customer.pin= int.parse(pinController.text);
         widget.customer.city= cityController.text;
         widget.customer.state=  stateController.text;
         widget.customer.stateCode= stateCodeController.text;
-    widget.customer.gst= gstController.text;
-    widget.customer.creditPeriod= int.parse(creditPeriodController.text);
+        widget.customer.gst= gstController.text;
+        widget.customer.creditPeriod= int.parse(creditPeriodController.text);
 
       // print(customer);
       print("ID: ${widget.customer.id}");
