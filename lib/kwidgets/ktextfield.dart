@@ -46,13 +46,13 @@ class _KTextFieldState extends State<KTextField> {
 
   String? checkValidation(String? value){
     setState(() {
-      // print("${widget.label}");
+       print("${widget.label}");
       _validatorError = widget.validator?.call(value);
       if(_validatorError != null){
         _errormsg = _validatorError!;
         _isError = true;
       }
-      // print(_validatorError);
+      print(_validatorError);
     });
     return null;
   }
@@ -66,6 +66,7 @@ class _KTextFieldState extends State<KTextField> {
 
   @override
   Widget build(BuildContext context) {
+    // widget.controller.text = widget.initialValue;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [ widget.isEmail? Container(

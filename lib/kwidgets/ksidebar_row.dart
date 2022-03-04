@@ -11,6 +11,7 @@ class KSidebarRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // print("Selection: $text. Status: $isSelected");
     return Container(
       decoration: BoxDecoration(
         color: isSelected? Colors.brown: Colors.transparent,

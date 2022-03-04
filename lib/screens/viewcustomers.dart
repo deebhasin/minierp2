@@ -29,22 +29,16 @@ class _ViewCustomersState extends State<ViewCustomers> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context){
-          return CreateCustomer(refreshViewCustomer: refreshViewCustomer,);
+          return CreateCustomer(Customer(company_name: ""));
         }
     );
-  }
-
-  void refreshViewCustomer(){
-    setState(() {
-
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<CustomerProvider>(builder: (ctx, provider, child) {
       return FutureBuilder(
-        future: provider.getCustomer(),
+        future: provider.getCustomerList(),
         builder: (context, AsyncSnapshot<List<Customer>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator();
@@ -154,7 +148,7 @@ class _ViewCustomersState extends State<ViewCustomers> {
               KTableCellHeader(header: "Credit Period",
                 context: context,
                 cellWidth: widget.containerWidth * .08,),
-              KTableCellHeader(header: "Status",
+              KTableCellHeader(header: "",
                 context: context,
                 cellWidth: widget.containerWidth * .07,
                 isLastPos: true,),
@@ -197,10 +191,12 @@ class _ViewCustomersState extends State<ViewCustomers> {
                     KTableCellHeader(header: customer[i].creditPeriod.toString(),
                       context: context,
                       cellWidth: widget.containerWidth * .08,),
-                    KTableCellHeader(header: customer[i].isActive == 1? "Active" : "Inactive",
+                    KTableCellHeader(header: "",
                       context: context,
                       cellWidth: widget.containerWidth * .07,
-                      isLastPos: true,),
+                      isLastPos: true,
+                      id: customer[i].id,
+                    ),
                 //   ],
                 // ),
             ],

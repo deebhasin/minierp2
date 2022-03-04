@@ -212,13 +212,12 @@ class LocalDBRepo {
 	Future<void> createTables(Database db) async {
 		print("started creating db tables");
 		await db.execute("CREATE TABLE PRODUCT ("
-			"key TEXT PRIMARY KEY,"
+			"id INTEGER PRIMARY KEY,"
 			"name TEXT,"
 			"unit TEXT,"
-		"HSN TEXT,"
-		"GST DECIMAL(3,2),"
-		"ACTIVE TINYINT(1)"
-
+			"HSN TEXT,"
+			"GST TEXT,"
+			"ACTIVE TINYINT(1)"
 			")");
 
 		await db.execute("CREATE TABLE ORGANIZATION ("
@@ -248,6 +247,16 @@ class LocalDBRepo {
 			"credit_period INTEGER,"
 			"active TINYINT(1)"
 			")");
+
+		// await db.execute("CREATE TABLE PRODUCT ("
+		// 		"id INTEGER PRIMARY KEY,"
+		// 		"name TEXT,"
+		// 		"unit TEXT," //(Liters, KG etc)
+		// 		"HSN TEXT,"
+		// 		"GST TEXT,"
+		// 		"active TINYINT(1)"
+		// 		")");
+
 		print("completed creating db tables");
 		// await db.execute("CREATE TABLE CHALLAN ("
 		// 	"id INTEGER PRIMARY KEY AUTOINCREMENT,"

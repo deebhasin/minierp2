@@ -16,13 +16,16 @@ class Sidebar extends StatefulWidget {
 }
 
 class _SidebarState extends State<Sidebar> {
-  bool dashboardSelected = true;
-  bool challanSelected = false;
-  bool invoiceSelected = false;
-  bool paymentsSelected = false;
-  bool customersSelected = false;
-  bool organizationSelected = false;
-  bool reportsSelected = false;
+  late bool dashboardSelected;
+  late bool challanSelected;
+  late bool invoiceSelected;
+  late bool paymentsSelected;
+  late bool customersSelected;
+  late bool productsSelected;
+  late bool organizationSelected;
+  late bool reportsSelected;
+
+
   menuSelected(String selectionText){
     widget.setDisplayPage(selectionText);
     setState(() {
@@ -34,6 +37,7 @@ class _SidebarState extends State<Sidebar> {
             invoiceSelected = false;
             paymentsSelected = false;
             customersSelected = false;
+            productsSelected = false;
             organizationSelected = false;
             reportsSelected = false;
           }
@@ -45,6 +49,7 @@ class _SidebarState extends State<Sidebar> {
             invoiceSelected = false;
             paymentsSelected = false;
             customersSelected = false;
+            productsSelected = false;
             organizationSelected = false;
             reportsSelected = false;
           }
@@ -56,6 +61,7 @@ class _SidebarState extends State<Sidebar> {
             invoiceSelected = true;
             paymentsSelected = false;
             customersSelected = false;
+            productsSelected = false;
             organizationSelected = false;
             reportsSelected = false;
           }
@@ -67,6 +73,7 @@ class _SidebarState extends State<Sidebar> {
             invoiceSelected = false;
             paymentsSelected = true;
             customersSelected = false;
+            productsSelected = false;
             organizationSelected = false;
             reportsSelected = false;
           }
@@ -78,6 +85,19 @@ class _SidebarState extends State<Sidebar> {
             invoiceSelected = false;
             paymentsSelected = false;
             customersSelected = true;
+            productsSelected = false;
+            organizationSelected = false;
+            reportsSelected = false;
+          }
+          break;
+        case "Products":
+          {
+            dashboardSelected = false;
+            challanSelected = false;
+            invoiceSelected = false;
+            paymentsSelected = false;
+            customersSelected = false;
+            productsSelected = true;
             organizationSelected = false;
             reportsSelected = false;
           }
@@ -89,6 +109,7 @@ class _SidebarState extends State<Sidebar> {
             invoiceSelected = false;
             paymentsSelected = false;
             customersSelected = false;
+            productsSelected = false;
             organizationSelected = true;
             reportsSelected = false;
           }
@@ -100,6 +121,7 @@ class _SidebarState extends State<Sidebar> {
             invoiceSelected = false;
             paymentsSelected = false;
             customersSelected = false;
+            productsSelected = false;
             organizationSelected = false;
             reportsSelected = true;
           }
@@ -107,6 +129,16 @@ class _SidebarState extends State<Sidebar> {
       // default: ;
       }
     });
+
+    print("Dashboard: $dashboardSelected");
+    print("Challan: $challanSelected");
+    print("Invoice: $invoiceSelected");
+    print("Payments: $paymentsSelected");
+    print("Customer: $customersSelected");
+    print("Products: $productsSelected");
+    print("Organization: $organizationSelected");
+    print("Reports: $reportsSelected");
+
   }
 
   void popup(){
@@ -119,6 +151,18 @@ class _SidebarState extends State<Sidebar> {
     );
   }
 
+  @override
+  void initState() {
+    dashboardSelected = true;
+    challanSelected = false;
+    invoiceSelected = false;
+    paymentsSelected = false;
+    customersSelected = false;
+    productsSelected = false;
+    organizationSelected = false;
+    reportsSelected = false;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -191,6 +235,10 @@ class _SidebarState extends State<Sidebar> {
             InkWell(
               onTap: () => menuSelected("Customers"),
               child: KSidebarRow(text: "Customers", isSelected: customersSelected,),
+            ),
+            InkWell(
+              onTap: () => menuSelected("Products"),
+              child: KSidebarRow(text: "Products", isSelected: productsSelected,),
             ),
             InkWell(
               onTap: () => menuSelected("Organization"),

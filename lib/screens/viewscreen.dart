@@ -1,6 +1,4 @@
 import 'package:desktop_window/desktop_window.dart';
-import 'package:erpapp/domain/organization.dart';
-import 'package:erpapp/providers/org_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +9,9 @@ import '../kwidgets/ktabbar.dart';
 import '../widgets/footer.dart';
 import '../screens/viewchallan.dart';
 import '../screens/viewcustomers.dart';
+import '../domain/organization.dart';
+import '../providers/org_provider.dart';
+import '../screens/viewproducts.dart';
 
 import '../widgets/sidebar.dart';
 
@@ -92,15 +93,11 @@ Widget body() {
             displayWidget = ViewCustomers(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
           }
           break;
-        // case "Organization" :
-        //   {
-        //     displayWidget = const ViewChallan();
-        //   }
-          break;
-        // case "Reports" :
-        //   {
-        //     displayWidget = const ViewChallan();
-        //   }
+
+        case "Products" :
+          {
+            displayWidget = ViewProducts(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
+          }
           break;
         default: displayWidget = Center(
           child: Text(

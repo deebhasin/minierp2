@@ -6,88 +6,100 @@ import '../kwidgets/ktextfield.dart';
 import '../kwidgets/kvariables.dart';
 import '../domain/customer.dart';
 import '../providers/customer_provider.dart';
-import '../screens/viewchallan.dart';
 
 class CreateCustomer extends StatefulWidget {
-  final Function refreshViewCustomer;
-  const CreateCustomer({Key? key,
-    required this.refreshViewCustomer}) : super(key: key);
+    late final Customer customer;
+
+    CreateCustomer(this.customer);
 
   @override
   State<CreateCustomer> createState() => _CreateCustomerState();
 }
 
 class _CreateCustomerState extends State<CreateCustomer> {
+  // late Customer customer;
+  late double containerWidth;
+  double containerHeight = 700;
+  final _formKey = GlobalKey<FormState>();
+  late TextEditingController customerIdController ;
+  late final companyController;
+  late final contactPersonController;
+  late final addressController ;
+  late final pinController;
+  late final cityController ;
+  late final stateController;
+  late final stateCodeController ;
+  late final gstController ;
+  late final creditPeriodController ;
+  final companyNameValidator = MultiValidator([
+    RequiredValidator(errorText: 'Company Name is required'),
+    MinLengthValidator(8, errorText: 'Company Name must be at least 8 digits long'),
+    // PatternValidator(r'(?=.*?[#?!@$%^&*-])', errorText: 'passwords must have at least one special character')
+  ]);
+  final pinValidator = PatternValidator(r'\d+?$', errorText: "PIN should be number");
+  final gstValidator = RequiredValidator(errorText: 'GST is required');
+  final creditPeriodValidator = MultiValidator([
+    RequiredValidator(errorText: 'Credit Period is required'),
+    PatternValidator(r'\d+?$', errorText: "Credit Period should be number"),
+  ]);
+
+
+  @override
+  void initState() {
+    super.initState();
+    customerIdController = TextEditingController(text: widget.customer.id.toString());
+     companyController = TextEditingController(text: widget.customer.company_name);
+     contactPersonController = TextEditingController(text: widget.customer.contact_person);
+     addressController = TextEditingController(text: widget.customer.address);
+     pinController = TextEditingController(text: widget.customer.pin.toString());
+     cityController = TextEditingController(text: widget.customer.city);
+     stateController = TextEditingController(text: widget.customer.state);
+     stateCodeController = TextEditingController(text: widget.customer.stateCode);
+     gstController = TextEditingController(text: widget.customer.gst);
+     creditPeriodController = TextEditingController(text: widget.customer.creditPeriod.toString());
+
+
+  }
   @override
   Widget build(BuildContext context) {
-    double containerWidth = (MediaQuery.of(context).size.width - KVariables.sidebarWidth);
-    double containerHeight = 700;
-    final _formKey = GlobalKey<FormState>();
-    final customerIdController = TextEditingController();
-    final companyController = TextEditingController();
-    final contactPersonController = TextEditingController();
-    final addressController = TextEditingController();
-    final pinController = TextEditingController();
-    final cityController = TextEditingController();
-    final stateController = TextEditingController();
-    final stateCodeController = TextEditingController();
-    final gstController = TextEditingController();
-    final creditPeriodController = TextEditingController(text: "60");
-    final companyNameValidator = MultiValidator([
-      RequiredValidator(errorText: 'Company Name is required'),
-      MinLengthValidator(8, errorText: 'Company Name must be at least 8 digits long'),
-      // PatternValidator(r'(?=.*?[#?!@$%^&*-])', errorText: 'passwords must have at least one special character')
-    ]);
-    final pinValidator = MultiValidator([
-      PatternValidator(RegExp(r'[0-9]'), errorText: "PIN should be number"),
-    ]);
-    final gstValidator = RequiredValidator(errorText: 'GST is required');
-    final creditPeriodValidator = MultiValidator([
-      RequiredValidator(errorText: 'Credit Period is required'),
-      PatternValidator(RegExp(r'\d+'), errorText: "Credit Period should be number"),
-    ]);
+    containerWidth = (MediaQuery
+        .of(context)
+        .size
+        .width - KVariables.sidebarWidth);
+    // if(widget.id == 0){
+    //   customer = Customer(company_name: "");
+      return _createCustomer();
+    // }
+//     else{
+//       return Consumer<CustomerProvider>(builder: (ctx, provider, child) {
+//         return FutureBuilder(
+//           future: provider.getCustomerWithId(widget.id),
+//           builder: (context, AsyncSnapshot<Customer> snapshot) {
+//             if (snapshot.connectionState == ConnectionState.waiting) {
+//               return CircularProgressIndicator();
+//             } else {
+//               if (snapshot.hasError) {
+// //                  if (snapshot.error is ConnectivityError) {
+// //                    return NoConnectionScreen();
+// //                  }
+//                 return Center(child: Text("An error occured.\n$snapshot"));
+//                 // return noData(context);
+//               } else if (snapshot.hasData) {
+//                 customer = snapshot.data!;
+//
+//               } else
+//                 customer = Customer(company_name: "");
+//
+//             }
+//             return _createCustomer();
+//           },
+//         );
+//       });
+//     }
 
-    void resetForm(){
-      setState(() {
-        customerIdController.text = "";
-        companyController.text = "";
-        contactPersonController.text = "";
-        addressController.text = "";
-        pinController.text = "";
-        cityController.text = "";
-        stateController.text = "";
-        stateCodeController.text = "";
-        gstController.text = "";
-        creditPeriodController.text = "";
-      });
-    }
+  }
 
-    void submitForm(){
-      if(_formKey.currentState!.validate()){
-        Customer customer = Customer(
-          company_name: companyController.text,
-          contact_person: contactPersonController.text,
-          contact_phone: contactPersonController.text,
-          address: addressController.text,
-          pin: int.parse(pinController.text),
-          city: cityController.text,
-          state: stateController.text,
-          stateCode: stateCodeController.text,
-          gst: gstController.text,
-          creditPeriod: int.parse(creditPeriodController.text),
-        );
-        Provider.of<CustomerProvider>(context, listen: false).createCustomer(customer);
-        // widget.refreshViewCustomer();
-        Navigator.of(context).pop();
-      }
-      else{
-        print("Validation Failed");
-      }
-    }
-
-
-
-
+  Widget _createCustomer(){
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       // backgroundColor: Color.fromRGBO(242,243,247,1),
@@ -145,7 +157,7 @@ class _CreateCustomerState extends State<CreateCustomer> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
-                  child: KTextField(label: "Company name *", width: 250,controller: companyController, isValidate: true, validator: companyNameValidator,),
+                  child: KTextField(label: "Company name *", width: 250,controller: companyController, validator: companyNameValidator, ),
                 ),
                 Container(
                   child: KTextField(label: "Contact Person", width: 250, controller: contactPersonController,),
@@ -212,4 +224,65 @@ class _CreateCustomerState extends State<CreateCustomer> {
       ),
     );
   }
+
+  Widget _updateCustomer(Customer customer){
+    return Container();
+  }
+
+  void resetForm(){
+    setState(() {
+      customerIdController.text = "";
+      companyController.text = "";
+      contactPersonController.text = "";
+      addressController.text = "";
+      pinController.text = "";
+      cityController.text = "";
+      stateController.text = "";
+      stateCodeController.text = "";
+      gstController.text = "";
+      creditPeriodController.text = "";
+    });
+  }
+
+  void submitForm(){
+    if(_formKey.currentState!.validate()){
+      // Customer customer = Customer(
+
+        widget.customer.company_name = companyController.text;
+        widget.customer.contact_person = contactPersonController.text;
+        widget.customer.contact_phone= contactPersonController.text;  //Have to add Phone and Active Status fields on the page
+        widget.customer.address= addressController.text;
+    widget.customer.pin= int.parse(pinController.text);
+        widget.customer.city= cityController.text;
+        widget.customer.state=  stateController.text;
+        widget.customer.stateCode= stateCodeController.text;
+    widget.customer.gst= gstController.text;
+    widget.customer.creditPeriod= int.parse(creditPeriodController.text);
+
+      // print(customer);
+      print("ID: ${widget.customer.id}");
+      if(widget.customer.id != 0){
+        Provider.of<CustomerProvider>(context, listen: false).updateCustomer(widget.customer);
+        print("Customer Updated");
+      }
+      else{
+        Provider.of<CustomerProvider>(context, listen: false).createCustomer(widget.customer);
+      }
+      Navigator.of(context).pop();
+    }
+    else{
+      print("Validation Failed");
+    }
+  }
+
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+
+    customerIdController.dispose();
+    super.dispose();
+  }
 }
+
+
