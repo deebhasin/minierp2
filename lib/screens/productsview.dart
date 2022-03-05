@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../domain/product.dart';
+import '../model/product.dart';
 import '../providers/product_provider.dart';
 import '../kwidgets/kcreatebutton.dart';
 import '../kwidgets/ktablecellheader.dart';

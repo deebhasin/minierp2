@@ -1,10 +1,11 @@
-import 'package:erpapp/domain/organization.dart';
-import 'package:erpapp/providers/org_provider.dart';
-import 'package:erpapp/utils/localDB_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '/screens/loadscreen.dart';
 import '/screens/viewscreen.dart';
+
+import '../providers/org_provider.dart';
+import '../utils/localDB_repo.dart';
 
 
 class HomePage extends StatelessWidget {

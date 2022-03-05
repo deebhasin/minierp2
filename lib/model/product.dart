@@ -1,5 +1,5 @@
 class Product{
-  int? id;
+  int id;
   String name;
   String unit;
   String HSN;

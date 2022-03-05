@@ -1,5 +1,4 @@
 import 'package:desktop_window/desktop_window.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,7 +8,7 @@ import '../kwidgets/ktabbar.dart';
 import '../widgets/footer.dart';
 import '../screens/challanview.dart';
 import '../screens/customersview.dart';
-import '../domain/organization.dart';
+import '../model/organization.dart';
 import '../providers/org_provider.dart';
 import '../screens/productsview.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../domain/product.dart';
+import '../model/product.dart';
 import '../utils/localDB_repo.dart';
 
 class ProductProvider with ChangeNotifier{

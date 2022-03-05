@@ -1,11 +1,12 @@
-import 'package:erpapp/domain/product.dart';
-import 'package:erpapp/kwidgets/ktextfield.dart';
-import 'package:erpapp/kwidgets/kvariables.dart';
-import 'package:erpapp/providers/product_provider.dart';
-import 'package:erpapp/widgets/alertdialognav.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
+
+import '../model/product.dart';
+import '../kwidgets/ktextfield.dart';
+import '../kwidgets/kvariables.dart';
+import '../providers/product_provider.dart';
+import '../widgets/alertdialognav.dart';
 
 class ProductCreate extends StatefulWidget {
   late Product product;

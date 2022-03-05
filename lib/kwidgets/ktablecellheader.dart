@@ -1,7 +1,4 @@
-import 'package:erpapp/domain/customer.dart';
-import 'package:erpapp/screens/customercreate.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'kvariables.dart';
 import '../providers/customer_provider.dart';
@@ -14,7 +11,7 @@ class KTableCellHeader extends StatelessWidget {
   final bool isLastPos;
   double width = 100;
   double height;
-  final int? id;
+  final int id;
   final Function? deleteAction;
   final Function? editAction;
 
@@ -52,7 +49,7 @@ class KTableCellHeader extends StatelessWidget {
         children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: (isLastPos && id !=0)? showIcons(id!, context) : showText(header),
+              child: (isLastPos && id !=0)? showIcons(id, context) : showText(header),
             ),
         ],
       ),

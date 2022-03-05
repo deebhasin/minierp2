@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../kwidgets/ktextfield.dart';
 import '../kwidgets/kvariables.dart';
-import '../domain/customer.dart';
+import '../model/customer.dart';
 import '../providers/customer_provider.dart';
 
 class CustomerCreate extends StatefulWidget {

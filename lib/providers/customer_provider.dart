@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../domain/customer.dart';
+import '../model/customer.dart';
 import '../utils/localDB_repo.dart';
 
 class CustomerProvider with ChangeNotifier {

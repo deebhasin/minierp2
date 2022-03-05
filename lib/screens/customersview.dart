@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../kwidgets/kcreatebutton.dart';
 import '../kwidgets/ktablecellheader.dart';
 import 'customercreate.dart';
-import '../domain/customer.dart';
+import '../model/customer.dart';
 import '../providers/customer_provider.dart';
 
 

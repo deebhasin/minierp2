@@ -1,9 +1,10 @@
-import 'package:erpapp/domain/customer.dart';
-import 'package:erpapp/domain/organization.dart';
-import 'package:erpapp/utils/localDB_repo.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
+
+import '../model/organization.dart';
+import '../utils/localDB_repo.dart';
+
 
 class OrgProvider with ChangeNotifier {
     Organization? _organization;
