@@ -21,7 +21,7 @@ class ProductsView extends StatefulWidget {
 }
 
 class _ProductsViewState extends State<ProductsView> {
-  late List<Product> product;
+  late List<Product> productList;
   late double containerWidth;
 
   @override
@@ -46,9 +46,9 @@ class _ProductsViewState extends State<ProductsView> {
               return Center(child: Text("An error occured.\n$snapshot"));
               // return noData(context);
             } else if (snapshot.hasData) {
-              product = snapshot.data!;
+              productList = snapshot.data!;
 
-              if(product.isEmpty){
+              if(productList.isEmpty){
                 return noData(context);
               }
               else {
@@ -129,6 +129,9 @@ class _ProductsViewState extends State<ProductsView> {
               KTableCellHeader(header: "Unit",
                 context: context,
                 cellWidth: containerWidth * 0.14,),
+              KTableCellHeader(header: "Price Per Unit",
+                context: context,
+                cellWidth: containerWidth * 0.14,),
               KTableCellHeader(header: "HSN Code",
                 context: context,
                 cellWidth: containerWidth * 0.1,),
@@ -145,30 +148,33 @@ class _ProductsViewState extends State<ProductsView> {
           // Row(
           //   mainAxisAlignment: MainAxisAlignment.center,
           //   children:[
-          for(var i = 0; i < product.length; i++)
+          for(var i = 0; i < productList.length; i++)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                KTableCellHeader(header: product[i].id.toString(),
+                KTableCellHeader(header: productList[i].id.toString(),
                   context: context,
                   cellWidth: containerWidth * .03,),
-                KTableCellHeader(header: product[i].name,
+                KTableCellHeader(header: productList[i].name,
                   context: context,
                   cellWidth: containerWidth * 0.18,),
-                KTableCellHeader(header: product[i].unit,
+                KTableCellHeader(header: productList[i].unit,
                   context: context,
                   cellWidth: containerWidth * 0.14,),
-                KTableCellHeader(header: product[i].HSN,
+                KTableCellHeader(header: productList[i].price_per_unit == null? "" : productList[i].price_per_unit.toString() ,
+                  context: context,
+                  cellWidth: containerWidth * 0.14,),
+                KTableCellHeader(header: productList[i].HSN,
                   context: context,
                   cellWidth: containerWidth * 0.1,),
-                KTableCellHeader(header: product[i].GST,
+                KTableCellHeader(header: productList[i].GST,
                   context: context,
                   cellWidth: containerWidth * 0.14,),
                 KTableCellHeader(header: "",
                   context: context,
                   cellWidth: containerWidth * .07,
                   isLastPos: true,
-                  id: product[i].id,
+                  id: productList[i].id,
                   deleteAction: deleteAction,
                   editAction: editAction,
                 ),

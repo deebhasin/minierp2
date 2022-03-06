@@ -1,3 +1,4 @@
+import 'package:erpapp/providers/challan_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -15,6 +16,7 @@ class AppProvider {
 			ChangeNotifierProvider<OrgProvider>(create: (_) => OrgProvider()),
 			ChangeNotifierProvider<CustomerProvider>(create: (_) => CustomerProvider()),
 			ChangeNotifierProvider<ProductProvider>(create: (_) => ProductProvider()),
+			ChangeNotifierProvider<ChallanProvider>(create: (_) => ChallanProvider()),
 	];
 	}
 }

@@ -8,12 +8,20 @@ class KDropdown extends StatefulWidget {
   final double width;
   final double height;
   final String initialValue;
-  const KDropdown({Key? key,
+  final Function? onChangeDropDown;
+  String selectedValue = "";
+  KDropdown({Key? key,
     required this.dropDownList,
     required this.label,
     this.width = 100,
     this.height = 25,
-    this.initialValue = "-----"}) : super(key: key);
+    this.initialValue = "-----",
+    this.onChangeDropDown,
+  }) : super(key: key);
+
+  String getSelectedValue(){
+    return selectedValue;
+  }
 
   @override
   _KDropdownState createState() => _KDropdownState();
@@ -24,11 +32,13 @@ class _KDropdownState extends State<KDropdown> {
 
   void updateDropdownText(String selectedValue){
     if(selectedValue != "NoValue"){
-      dropdownValue = selectedValue;
+      widget.selectedValue = selectedValue;
     }
-    print(selectedValue);
+    print("Selection: $dropdownValue");
     // showDropdownList();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +48,7 @@ class _KDropdownState extends State<KDropdown> {
         Text(
           widget.label,
           style: const TextStyle(
-            fontSize: 11,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -56,6 +66,7 @@ class _KDropdownState extends State<KDropdown> {
               selectedItem: widget.initialValue,
               popupBackgroundColor: const Color.fromRGBO(242,243,247,1),
               popupElevation: 0,
+              onChanged: (value) => updateDropdownText(value.toString()),
               popupShape: const Border(
                 left:  BorderSide(color: Colors.grey),
                 top:  BorderSide(color: Colors.grey),

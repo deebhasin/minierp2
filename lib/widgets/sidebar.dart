@@ -1,3 +1,4 @@
+import 'package:erpapp/model/challan.dart';
 import 'package:flutter/material.dart';
 
 import '../kwidgets/ksidebar_row.dart';
@@ -146,7 +147,7 @@ class _SidebarState extends State<Sidebar> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context){
-          return const CreateChallan();
+          return ChallanCreate(challan: Challan(),);
         }
     );
   }

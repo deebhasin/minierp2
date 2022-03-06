@@ -9,7 +9,7 @@ import '../providers/product_provider.dart';
 import '../widgets/alertdialognav.dart';
 
 class ProductCreate extends StatefulWidget {
-  late Product product;
+  Product product;
   ProductCreate({Key? key,
     required this.product,
   }) : super(key: key);
@@ -24,6 +24,7 @@ class _ProductCreateState extends State<ProductCreate> {
   late TextEditingController idController ;
   late final nameController;
   late final unitController;
+  late final pricePerUnitController;
   late final hsnController ;
   late final gstController;
   late final activeController;
@@ -39,9 +40,14 @@ class _ProductCreateState extends State<ProductCreate> {
 
   @override
   void initState() {
+    String pricePerUnit = "";
+    if(widget.product.price_per_unit != null){
+      pricePerUnit = widget.product.price_per_unit.toString();
+    }
     idController = TextEditingController(text: widget.product.id.toString());
     nameController = TextEditingController(text: widget.product.name);
     unitController = TextEditingController(text: widget.product.unit);
+    pricePerUnitController = TextEditingController(text: pricePerUnit);
     hsnController = TextEditingController(text: widget.product.HSN);
     gstController = TextEditingController(text: widget.product.GST);
     activeController = TextEditingController(text: widget.product.isActive.toString());
@@ -100,6 +106,9 @@ class _ProductCreateState extends State<ProductCreate> {
                 Container(
                   child: KTextField(label: "Unit", width: 250, controller: unitController,),
                 ),
+                Container(
+                  child: KTextField(label: "Price", width: 250, controller: pricePerUnitController,),
+                ),
               ],
             ),
             const SizedBox(height: 10,),
@@ -153,6 +162,7 @@ class _ProductCreateState extends State<ProductCreate> {
       // idController.text = "";
       nameController.text = "";
       unitController.text = "";
+      pricePerUnitController.text = "";
       hsnController.text = "";
       gstController.text = "";
       activeController.text = "";
@@ -165,6 +175,7 @@ class _ProductCreateState extends State<ProductCreate> {
 
       widget.product.name = nameController.text;
       widget.product.unit = unitController.text;
+      widget.product.price_per_unit = pricePerUnitController.text ==""? null : double.parse(pricePerUnitController.text);
       widget.product.HSN = hsnController.text;
       widget.product.GST = gstController.text;
       widget.product.isActive = int.parse(activeController.text);
