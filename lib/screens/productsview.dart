@@ -135,7 +135,7 @@ class _ProductsViewState extends State<ProductsView> {
               KTableCellHeader(header: "HSN Code",
                 context: context,
                 cellWidth: containerWidth * 0.1,),
-              KTableCellHeader(header: "GST Number",
+              KTableCellHeader(header: "GST Code",
                 context: context,
                 cellWidth: containerWidth * 0.14,),
               KTableCellHeader(header: "",

@@ -34,6 +34,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
   late final challanNumberController;
   late final challanDateController;
   late final challanPricePerUnitController;
+  late final challanUnitController;
   late final challanQuantityController;
   late final challanAmountController;
 
@@ -42,6 +43,8 @@ class _ChallanCreateState extends State<ChallanCreate> {
   String customerName = "-----";
   String productName = "-----";
   late double containerWidth;
+  late List<Customer> customerListFetched;
+  late List<Product> productListFetched;
   List<String> customerList = [];
   List<String> productList = [];
 
@@ -51,6 +54,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
     RequiredValidator(errorText: 'Price Per Unit is required'),
     PatternValidator(r'\d+?$', errorText: "Price Per Unit should be number"),
   ]);
+  final challanUnitValidator = RequiredValidator(errorText: 'Item Unit is required');
   final challanQuantityValidator = MultiValidator([
     RequiredValidator(errorText: 'Quantity is required'),
     PatternValidator(r'\d+?$', errorText: "Quantity should be number"),
@@ -134,6 +138,9 @@ class _ChallanCreateState extends State<ChallanCreate> {
                   child: KTextField(label: "Price Per Unit *", width: 250,controller: challanPricePerUnitController, validator: challanPricePerUnitValidator, valueUpdated: valueUpdated,),
                 ),
                 Container(
+                  child: KTextField(label: "Unit *", width: 250,controller: challanUnitController, validator: challanUnitValidator),
+                ),
+                Container(
                   child: KTextField(label: "Quantity *", width: 250,controller: challanQuantityController, validator: challanQuantityValidator, valueUpdated: valueUpdated,),
                 ),
                 Container(
@@ -168,12 +175,12 @@ class _ChallanCreateState extends State<ChallanCreate> {
   _getdropdownList() async{
     CustomerProvider customerProvider = CustomerProvider();
     ProductProvider productProvider = ProductProvider();
-    List<Customer> customerListFetched = await customerProvider.getCustomerList();
+    customerListFetched = await customerProvider.getCustomerList();
 
     for(int i=0; i < customerListFetched.length;i++){
       customerList.add(customerListFetched[i].company_name);
     };
-    List<Product> productListFetched = await productProvider.getProductList();
+    productListFetched = await productProvider.getProductList();
     for(int i=0; i < productListFetched.length;i++){
       productList.add(productListFetched[i].name);
     };
@@ -181,7 +188,9 @@ class _ChallanCreateState extends State<ChallanCreate> {
 
   void valueUpdated(){
     print("Value Updated");
-    challanAmountController.text = (double.parse(challanPricePerUnitController.text) * double.parse(challanQuantityController.text)).toString();
+    challanAmountController.text =
+        (double.parse(challanPricePerUnitController.text) *
+        double.parse(challanQuantityController.text)).toString();
   }
   onChangeDropdown(String value){
     List<String> val = value.split(":");
@@ -190,8 +199,15 @@ class _ChallanCreateState extends State<ChallanCreate> {
     }
     else if(val[0] == "Product"){
       productName = val[1];
+      print("New List Begins");
+      // List newlist = productListFetched.where((item) => item.name == val[1]).toList();
+      final product = productListFetched.singleWhere((element) => element.name == val[1]);
+      // print("Price: ${price.price_per_unit}");
+      challanPricePerUnitController.text = product.price_per_unit.toString();
+      challanUnitController.text = product.unit;
     }
-    print("${val[0]}: $customerName");
+
+    print("${val[0]}: ${val[1]}");
   }
 
   void _buildForm(){
@@ -205,6 +221,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
     challanNumberController = TextEditingController(text:widget.challan.challanNo);
     challanDateController = TextEditingController(text:DateFormat("d-M-y").format(widget.challan.challanDate!));
     challanPricePerUnitController = TextEditingController(text: widget.challan.pricePerUnit.toString());
+    challanUnitController = TextEditingController(text: widget.challan.productUnit);
     challanQuantityController = TextEditingController(text: widget.challan.quantity.toString());
     challanAmountController = TextEditingController(text: widget.challan.totalAmount.toString());
   }
@@ -217,6 +234,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
       challanNumberController.text = widget.challan.challanNo;
       challanDateController.text = DateFormat("d-M-y").format(widget.challan.challanDate!);
       challanPricePerUnitController.text = widget.challan.pricePerUnit.toString();
+      challanUnitController.text = widget.challan.productUnit;
       challanQuantityController.text = widget.challan.quantity.toString();
       challanAmountController.text = widget.challan.totalAmount.toString();
       print("Reset End");
@@ -233,6 +251,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
       widget.challan.challanNo = challanNumberController.text;
       widget.challan.challanDate = DateFormat("d-M-y").parse(challanDateController.text);
       widget.challan.pricePerUnit = double.parse(challanPricePerUnitController.text);
+      widget.challan.productUnit = challanUnitController.text;
       widget.challan.quantity = double.parse(challanQuantityController.text);
       widget.challan.totalAmount = double.parse(challanAmountController.text);
 
