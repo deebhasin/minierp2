@@ -14,6 +14,7 @@ class KTextField extends StatefulWidget {
   final TextEditingController controller;
   final bool isValidate;
   final FieldValidator? validator;
+  final Function? valueUpdated;
 
   KTextField({Key? key,
     required this.label,
@@ -25,6 +26,7 @@ class KTextField extends StatefulWidget {
     required this.controller,
     this.isValidate = false,
     this.validator = null,
+    this.valueUpdated,
   }) : super(key: key){
     height *= multiLine;
     if (label == "Email"){
@@ -59,8 +61,11 @@ class _KTextFieldState extends State<KTextField> {
 
   void valueChanged(String? value){
     setState(() {
+      print("Value Changed");
       _isError = false;
       _errormsg = "";
+      widget.valueUpdated!();
+      print("Changed to $value");
     });
   }
 

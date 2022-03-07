@@ -212,7 +212,7 @@ class LocalDBRepo {
 	Future<void> createTables(Database db) async {
 		print("started creating db tables");
 		await db.execute("CREATE TABLE PRODUCT ("
-			"id INTEGER PRIMARY KEY,"
+			"id INTEGER PRIMARY KEY AUTOINCREMENT,"
 			"name TEXT,"
 			"unit TEXT,"
 			"price_per_unit REAL,"
@@ -222,7 +222,7 @@ class LocalDBRepo {
 			")");
 
 		await db.execute("CREATE TABLE CHALLAN ("
-				"id INTEGER PRIMARY KEY,"
+				"id INTEGER PRIMARY KEY AUTOINCREMENT,"
 				"challan_no TEXT,"
 				"challan_date TEXT,"
 				"customer_name TEXT,"
@@ -236,7 +236,7 @@ class LocalDBRepo {
 				")");
 
 		await db.execute("CREATE TABLE ORGANIZATION ("
-			"id INTEGER PRIMARY KEY,"
+			"id INTEGER PRIMARY KEY AUTOINCREMENT,"
 			"name TEXT,"
 			"Contact_person TEXT,"
 			"address TEXT,"
@@ -249,19 +249,36 @@ class LocalDBRepo {
 			")");
 
 		await db.execute("CREATE TABLE CUSTOMER ("
-			"id INTEGER PRIMARY KEY AUTOINCREMENT,"
-			"company_name TEXT,"
-			"contact_person TEXT,"
-			"contact_phone TEXT  ,"
-			"address TEXT,"
-			"PIN INTEGER,"
-			"city TEXT,"
-			"state TEXT,"
-			"state_cd TEXT,"
-			"GST TEXT,"
-			"credit_period INTEGER,"
-			"active TINYINT(1)"
-			")");
+				"id INTEGER PRIMARY KEY AUTOINCREMENT,"
+				"company_name TEXT,"
+				"contact_person TEXT,"
+				"contact_phone TEXT  ,"
+				"address TEXT,"
+				"PIN INTEGER,"
+				"city TEXT,"
+				"state TEXT,"
+				"state_cd TEXT,"
+				"GST TEXT,"
+				"credit_period INTEGER,"
+				"active TINYINT(1)"
+				")");
+
+		await db.execute("CREATE TABLE INVOICE ("
+				"id INTEGER PRIMARY KEY AUTOINCREMENT,"
+				"company_name TEXT,"
+				"contact_person TEXT,"
+				"contact_phone TEXT  ,"
+				"address TEXT,"
+				"PIN INTEGER,"
+				"city TEXT,"
+				"state TEXT,"
+				"state_cd TEXT,"
+				"GST TEXT,"
+				"credit_period INTEGER,"
+				"active TINYINT(1)"
+				")");
+
+
 
 		// await db.execute("CREATE TABLE PRODUCT ("
 		// 		"id INTEGER PRIMARY KEY,"

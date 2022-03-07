@@ -45,15 +45,15 @@ class _ChallanCreateState extends State<ChallanCreate> {
   List<String> customerList = [];
   List<String> productList = [];
 
-  final challanNumberValidator = RequiredValidator(errorText: 'Company Name is required');
-  final challanDateValidator = RequiredValidator(errorText: 'Company Name is required');
+  final challanNumberValidator = RequiredValidator(errorText: 'Challan Number is required');
+  final challanDateValidator = RequiredValidator(errorText: 'Challan Date is required');
   final challanPricePerUnitValidator = MultiValidator([
-    RequiredValidator(errorText: 'Credit Period is required'),
-    PatternValidator(r'\d+?$', errorText: "Credit Period should be number"),
+    RequiredValidator(errorText: 'Price Per Unit is required'),
+    PatternValidator(r'\d+?$', errorText: "Price Per Unit should be number"),
   ]);
   final challanQuantityValidator = MultiValidator([
-    RequiredValidator(errorText: 'Credit Period is required'),
-    PatternValidator(r'\d+?$', errorText: "Credit Period should be number"),
+    RequiredValidator(errorText: 'Quantity is required'),
+    PatternValidator(r'\d+?$', errorText: "Quantity should be number"),
   ]);
 
 
@@ -68,7 +68,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
   Widget build(BuildContext context) {
     containerWidth = (MediaQuery.of(context).size.width - KVariables.sidebarWidth);
 
-
+    print("CHallan create bui;d ca;;ed");
     return _challanCreate();
   }
 
@@ -107,7 +107,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
-                  child: customerDropdown,
+                  child: KDropdown(dropDownList: customerList, label: "Customer", initialValue: customerName, width: 250, onChangeDropDown: onChangeDropdown,),
                 ),
                 Container(
                   child: KTextField(label: "Challan # *", width: 250,controller: challanNumberController, validator: challanNumberValidator, ),
@@ -119,10 +119,10 @@ class _ChallanCreateState extends State<ChallanCreate> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
-                  child: productDropdown,
+                  child: KDropdown(dropDownList: productList, label: "Product", initialValue: productName, width: 250, onChangeDropDown: onChangeDropdown,),
                 ),
                 Container(
-                  child: KTextField(label: "Challan Date *", width: 250,controller: challanDateController, validator: challanDateValidator, ),
+                  child: KTextField(label: "Challan Date *", width: 250,controller: challanDateController, validator: challanDateValidator,),
                 ),
               ],
             ),
@@ -131,10 +131,10 @@ class _ChallanCreateState extends State<ChallanCreate> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
-                  child: KTextField(label: "Price Per Unit *", width: 250,controller: challanPricePerUnitController, validator: challanPricePerUnitValidator, ),
+                  child: KTextField(label: "Price Per Unit *", width: 250,controller: challanPricePerUnitController, validator: challanPricePerUnitValidator, valueUpdated: valueUpdated,),
                 ),
                 Container(
-                  child: KTextField(label: "Quantity *", width: 250,controller: challanQuantityController, validator: challanQuantityValidator, ),
+                  child: KTextField(label: "Quantity *", width: 250,controller: challanQuantityController, validator: challanQuantityValidator, valueUpdated: valueUpdated,),
                 ),
                 Container(
                   child: KTextField(label: "Total Amount", width: 250,controller: challanAmountController, isDisabled: true, ),
@@ -179,26 +179,41 @@ class _ChallanCreateState extends State<ChallanCreate> {
     };
   }
 
+  void valueUpdated(){
+    print("Value Updated");
+    challanAmountController.text = (double.parse(challanPricePerUnitController.text) * double.parse(challanQuantityController.text)).toString();
+  }
+  onChangeDropdown(String value){
+    List<String> val = value.split(":");
+    if(val[0] == "Customer"){
+      customerName = val[1];
+    }
+    else if(val[0] == "Product"){
+      productName = val[1];
+    }
+    print("${val[0]}: $customerName");
+  }
+
   void _buildForm(){
     if(widget.challan.id != 0) {
       challanNewOrEdit = "Edit Challan";
       customerName = widget.challan.customerName;
       productName =widget.challan.productName;
     }
-    customerDropdown = KDropdown(dropDownList: customerList, label: "Customer", initialValue: customerName, width: 250,);
-    productDropdown = KDropdown(dropDownList: productList, label: "Product", initialValue: productName, width: 250,);
+    // customerDropdown = KDropdown(dropDownList: customerList, label: "Customer", initialValue: customerName, width: 250,);
+    // productDropdown = KDropdown(dropDownList: productList, label: "Product", initialValue: productName, width: 250,);
     challanNumberController = TextEditingController(text:widget.challan.challanNo);
     challanDateController = TextEditingController(text:DateFormat("d-M-y").format(widget.challan.challanDate!));
     challanPricePerUnitController = TextEditingController(text: widget.challan.pricePerUnit.toString());
     challanQuantityController = TextEditingController(text: widget.challan.quantity.toString());
     challanAmountController = TextEditingController(text: widget.challan.totalAmount.toString());
-
   }
   void _resetForm(){
     setState(() {
       print("Reset Start");
       customerName = "-----";
       productName = "-----";
+      // customerDropdown.initialValueChanged(widget.challan.customerName);
       challanNumberController.text = widget.challan.challanNo;
       challanDateController.text = DateFormat("d-M-y").format(widget.challan.challanDate!);
       challanPricePerUnitController.text = widget.challan.pricePerUnit.toString();
@@ -211,13 +226,15 @@ class _ChallanCreateState extends State<ChallanCreate> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
 
-      widget.challan.customerName = customerDropdown.getSelectedValue() == ""? widget.challan.customerName : customerDropdown.getSelectedValue();
-      widget.challan.productName = productDropdown.getSelectedValue() == ""? widget.challan.productName : productDropdown.getSelectedValue();
+      // widget.challan.customerName = customerDropdown.getSelectedValue() == ""? widget.challan.customerName : customerDropdown.getSelectedValue();
+      // widget.challan.productName = productDropdown.getSelectedValue() == ""? widget.challan.productName : productDropdown.getSelectedValue();
+      widget.challan.customerName = customerName;
+      widget.challan.productName = productName;
       widget.challan.challanNo = challanNumberController.text;
-      widget.challan.challanDate = DateTime.parse(challanDateController.text);
+      widget.challan.challanDate = DateFormat("d-M-y").parse(challanDateController.text);
       widget.challan.pricePerUnit = double.parse(challanPricePerUnitController.text);
       widget.challan.quantity = double.parse(challanQuantityController.text);
-      widget.challan.totalAmount = widget.challan.pricePerUnit * widget.challan.quantity;
+      widget.challan.totalAmount = double.parse(challanAmountController.text);
 
       print("Customer Name: ${widget.challan.customerName}");
 
@@ -234,6 +251,15 @@ class _ChallanCreateState extends State<ChallanCreate> {
     }
     else {
       print("Validation Failed");
+    }
+
+    @override
+    void dispose(){
+      challanNumberController.dispose();
+      challanDateController.dispose();
+      challanPricePerUnitController.dispose();
+      challanQuantityController.dispose();
+      challanAmountController.dispose();
     }
   }
 

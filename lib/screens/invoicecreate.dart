@@ -156,7 +156,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const KDropdown(dropDownList: customerList, label: "Customer", initialValue: customerName, width: 250,),
+                            // const KDropdown(dropDownList: customerList, label: "Customer", initialValue: customerName, width: 250,),
                             SizedBox(
                               width: 300,
                               // height: 10,
@@ -286,7 +286,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
                                   "Amounts Are ",
                                   style: TextStyle(fontSize: 11),
                                 ),
-                                KDropdown(dropDownList: amountTypeList,width: 110, initialValue: amountType, label: ""),
+                                // KDropdown(dropDownList: amountTypeList,width: 110, initialValue: amountType, label: ""),
                               ],
                             ),
                           ),

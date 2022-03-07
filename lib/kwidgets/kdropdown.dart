@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 
-class KDropdown extends StatefulWidget {
+class KDropdown extends StatelessWidget {
   final List<String> dropDownList;
   final String label;
   final double width;
   final double height;
-  final String initialValue;
+  String initialValue;
   final Function? onChangeDropDown;
   String selectedValue = "";
   KDropdown({Key? key,
@@ -23,47 +23,50 @@ class KDropdown extends StatefulWidget {
     return selectedValue;
   }
 
-  @override
-  _KDropdownState createState() => _KDropdownState();
-}
+  void initialValueChanged(String newValue){
+    this.initialValue = newValue;
+  }
 
-class _KDropdownState extends State<KDropdown> {
   String dropdownValue = "-----";
+
 
   void updateDropdownText(String selectedValue){
     if(selectedValue != "NoValue"){
-      widget.selectedValue = selectedValue;
+      selectedValue = selectedValue;
+      onChangeDropDown!("$label:$selectedValue");
+
     }
-    print("Selection: $dropdownValue");
+    // print("Selection: $dropdownValue");
     // showDropdownList();
   }
 
 
-
   @override
   Widget build(BuildContext context) {
+
+    print("kdropdown widget build called");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          widget.label,
+          label,
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
         Container(
-          width: widget.width + widget.height,
-          height: widget.height * 2,
+          width: width + height,
+          height: height * 2,
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey),
           ),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(10,0,0,0),
             child: DropdownSearch(
-              dialogMaxWidth: widget.width + widget.height,
+              dialogMaxWidth: width + height,
               showSearchBox: true,
-              selectedItem: widget.initialValue,
+              selectedItem: initialValue,
               popupBackgroundColor: const Color.fromRGBO(242,243,247,1),
               popupElevation: 0,
               onChanged: (value) => updateDropdownText(value.toString()),
@@ -75,7 +78,7 @@ class _KDropdownState extends State<KDropdown> {
               ),
               dropdownSearchBaseStyle: const TextStyle(fontSize: 2),
               mode: Mode.MENU,
-              items: widget.dropDownList,
+              items: dropDownList,
               dropdownSearchDecoration: const InputDecoration(
                 border: InputBorder.none,
                 // icon: Icon(
