@@ -229,6 +229,7 @@ class LocalDBRepo {
 				"product_id INT,"
 				"product_name TEXT,"
 				"price_per_unit REAL,"
+				"product_unit,"
 				"quantity REAL,"
 				"total_amount REAL,"
 				"invoice_number TEXT,"

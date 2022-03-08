@@ -8,6 +8,7 @@ class Challan {
   int productId;
   String productName;
   double pricePerUnit;
+  String productUnit;
   double quantity;
   double totalAmount;
   String invoiceNo;
@@ -21,6 +22,7 @@ class Challan {
     this.productId = 0,
     this.productName = "",
     this.pricePerUnit = 0,
+    this.productUnit = "",
     this.quantity = 0,
     this.totalAmount = 0,
     this.invoiceNo = "",
@@ -38,6 +40,7 @@ class Challan {
         productId = res["product_id"],
         productName = res["product_name"],
         pricePerUnit = res["price_per_unit"],
+        productUnit = res["product_unit"],
         quantity = res["quantity"],
         totalAmount = res["total_amount"],
         invoiceNo = res["invoice_number"],
@@ -52,13 +55,11 @@ class Challan {
       'product_id': productId,
       'product_name': productName,
       'price_per_unit': pricePerUnit,
+      "product_unit": productUnit,
       'quantity': quantity,
       'total_amount': totalAmount,
       'invoice_number': invoiceNo,
       'active': active,
     };
   }
-
-
-
 }
