@@ -36,6 +36,10 @@ class CustomerProvider with ChangeNotifier {
     return customer;
   }
 
+  Future<int> saveCustomer(Customer customer) async {
+    return customer.id == 0? createCustomer(customer) : updateCustomer(customer);
+  }
+
   Future<int> createCustomer(Customer customer) async {
     int id = 0;
     try {
@@ -78,7 +82,7 @@ class CustomerProvider with ChangeNotifier {
     }
   }
 
-    Future<void> updateCustomer(Customer customer) async {
+    Future<int> updateCustomer(Customer customer) async {
       print("Updating Customer with id ${customer.id} in Customer Provider");
       try {
         await LocalDBRepo().db.update(
@@ -91,7 +95,7 @@ class CustomerProvider with ChangeNotifier {
       } on Exception catch (e,s) {
         handleException("Error while updating customer $e", e, s);
       }
-
+    return -1;
   }
 
 

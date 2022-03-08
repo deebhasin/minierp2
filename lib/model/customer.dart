@@ -22,9 +22,14 @@ class Customer{
     this.state = "",
     this.stateCode = "",
     this.gst = "",
-    this.creditPeriod = 0,
+    this.creditPeriod = 30,
     this.isActive = 1,
+
   });
+
+
+
+
 
   Customer.fromMap(Map<String, dynamic> res)
       : id = res["id"],
