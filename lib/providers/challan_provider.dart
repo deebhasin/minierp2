@@ -1,10 +1,8 @@
-import 'package:erpapp/model/challan.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../utils/localDB_repo.dart';
-
+import '../model/challan.dart';
 
 class ChallanProvider with ChangeNotifier{
 
@@ -23,6 +21,28 @@ class ChallanProvider with ChangeNotifier{
     return challanList;
   }
 
+  Future<List<String>> getChallanListwithGSTbyCompanyName(String customerName) async{
+    late List<String> gstList;
+    print("In Challan Provider getChallanListwithGSTbyCompanyName Start");
+
+    try {
+      final List<Map<String, Object?>> queryResult = await LocalDBRepo().db.rawQuery(
+          'select a.*,  b.GST from CHALLAN a, PRODUCT b WHERE a.customer_name = "$customerName" AND a.product_name = b.name;'
+      );
+    //   final List<String> queryResult = await LocalDBRepo().db.rawQuery(
+    // 'select a.*,  b.GST from CHALLAN a, PRODUCT b WHERE a.customer_name = "$customerName" AND a.product_name = b.name;'
+    // );
+      gstList = queryResult.map((e)  => e["GST"].toString()).toList();
+      // gstList = queryResult;
+
+      print("Challan List Length: ${gstList.length}");
+    } on Exception catch (e, s) {
+      handleException("Error while fetching Challan List $e", e, s);
+      gstList = [];
+    }
+    return gstList;
+  }
+
   Future<Challan> getChallanById(int id) async{
     late Challan challan;
     print("In Challan Provider GetChallanById Start");
@@ -35,6 +55,20 @@ class ChallanProvider with ChangeNotifier{
       handleException("Error while fetching Challan with Id $id $e", e, s);
     }
     return challan;
+  }
+
+  Future<List<Challan>> getChallanByCompanyName(String companyName) async{
+    late List<Challan> challanList;
+    print("In Challan Provider getChallanByCompanyName Start");
+
+    try {
+      final List<Map<String, Object?>> queryResult = await LocalDBRepo().db.query('CHALLAN',where: "customer_name = ?",whereArgs: [companyName]);
+      challanList = queryResult.map((e) => Challan.fromMap(e)).toList();
+      print("getting Challan with COmpany Name: $companyName in Challan Provider}");
+    } on Exception catch (e, s) {
+      handleException("Error while fetching Challan with Company Name $companyName $e", e, s);
+    }
+    return challanList;
   }
 
   Future<int> createChallan(Challan challan) async{

@@ -1,430 +1,598 @@
+import 'package:erpapp/kwidgets/KDateTextForm.dart';
 import 'package:erpapp/kwidgets/kchallanbutton.dart';
+import 'package:erpapp/kwidgets/ktextfield.dart';
 import 'package:erpapp/model/challan.dart';
+import 'package:erpapp/model/customer.dart';
+import 'package:erpapp/model/invoice.dart';
+import 'package:erpapp/model/product.dart';
+import 'package:erpapp/providers/challan_provider.dart';
+import 'package:erpapp/providers/customer_provider.dart';
+import 'package:erpapp/providers/product_provider.dart';
+import 'package:erpapp/widgets/alertdialognav.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../kwidgets/kvariables.dart';
 import '../kwidgets/kdropdown.dart';
 import '../kwidgets/ktablecellheader.dart';
-import '../kwidgets/ktablecell.dart';
+import 'challancreate.dart';
 
-class ChallanCreate extends StatefulWidget {
-  int id;
-  Challan? challan;
-  ChallanCreate({
+class InvoiceCreate extends StatefulWidget {
+  Invoice? invoice;
+  InvoiceCreate({
     Key? key,
-    this.id = 0,
-    this.challan,
+    this.invoice,
   }) : super(key: key);
 
   @override
-  State<ChallanCreate> createState() => _ChallanCreateState();
+  State<InvoiceCreate> createState() => _InvoiceCreateState();
 }
 
-class _ChallanCreateState extends State<ChallanCreate> {
+class _InvoiceCreateState extends State<InvoiceCreate> {
+  late double containerWidth;
+  late final invoiceNumberController;
   final _formKey = GlobalKey<FormState>();
+
+  List<Customer> _customerList = [];
+  List<Challan> _challanList = [];
+  List<Product> _productList = [];
+
+  String _companyName = "";
+  DateTime _fromDate = DateTime.now();
+  DateTime _toDate = DateTime.now();
+
   String dropdownValue = "-----";
   final currencyFormat = NumberFormat("#,##0.00", "en_US");
   double challanAmount = 0;
   bool isChecked = false;
 
+  final double subtotal = 0;
+  final double total = 0;
+  final double challantotal = 0;
+
   @override
   void initState() {
-    if(widget.challan != null){
-      widget.id = widget.challan!.id;
-    }
+    _getAllLists();
+    invoiceNumberController =
+        TextEditingController(text: widget.invoice!.invoiceNo);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    const int challanNumber = 001;
-    const String financialYear = "2021-2022";
-    double containerWidth = (MediaQuery.of(context).size.width - KVariables.sidebarWidth);
-    const double inputComponentWidth = 200;
-    const String email = "billing@ituple.com";
-    const String billingAddress = "Mr. Avtar\nI Provide Solution India\nIprovide House, Opp. Indian Oil Petrol Pump, Near Omaxe City,\nNH-2";
-    const String customerName = "I Provide Solution India";
-    const String placeOfSupply = "Haryana";
-    const String status = "Pending";
-    const String estimateDate = "03/02/2022";
-    const String estimateNo = "1001";
-    const String amountType = "Exclusive of Tax";
-    const double subtotal = 0;
-    const double total = 0;
-    const double challantotal = 0;
-
-    const List<String> customerList = [
-      "I Provide Solution India",
-      "Alfa Bottle",
-      "Beta Pharma",
-      "Cat Stevens",
-      "Rock the Boat",
-      "Mitch Mitchell",
-    ];
-
-    const List<String> statusList = [
-      // "-----",
-      "Pending",
-      "Complete",
-      "Active",
-      "Suspended",
-    ];
-
-    const List<String> stateList = [
-      // "-----",
-      "Punjab",
-      "Haryana",
-      "Maharashtra",
-      "Kerela",
-    ];
-
-    const List<String> amountTypeList = [
-      // "-----",
-      "Inclusive of Tax",
-      "Exclusive of Tax",
-      "Exempted from Tax",
-    ];
+    containerWidth =
+        (MediaQuery.of(context).size.width - KVariables.sidebarWidth);
 
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(20),
       ),
-      content: Container(
-        decoration: const BoxDecoration(color: Color.fromRGBO(242,243,247,1)),
-        width: containerWidth,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Container(
-                width:  containerWidth,
-                // padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Image.asset(
-                              "asset/images/back_arrow.png",
-                              width: 20,
-                            ),
-                          ),
-                          const Text(
-                            "Challan No. $challanNumber/$financialYear",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: 100,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Icon(Icons.help_outline),
-                          const Text("Help"),
-                          InkResponse(
-                            onTap: (){
-                              Navigator.of(context).pop();
-                            },
-                            child: const Icon(Icons.close),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(242, 243, 247, 1),
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                    bottomLeft: Radius.zero,
+                    bottomRight: Radius.zero),
               ),
-              Container(
-                width: containerWidth * 0.95,
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
+              width: containerWidth,
+              child: AlertDialogNav(),
+            ),
+            Container(
+              width: containerWidth * 0.95,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        widget.invoice!.id != 0
+                            ? "Edit Invoice"
+                            : "New Invoice",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // const SizedBox(width: 50,),
+                      KDropdown(
+                        dropDownList: _customerList
+                            .map((item) => item.company_name.toString())
+                            .toList(),
+                        label: "Customer Name",
+                        width: 300,
+                        onChangeDropDown: _onCompanyChange,
+                      ),
+                      Column(
+                        children: [
+                          KTextField(
+                            label: "Invoice #",
+                            controller: invoiceNumberController,
+                            width: 200,
+                          ),
+                          KTextField(
+                            label: "Invoice Date",
+                            controller: invoiceNumberController,
+                            width: 200,
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      KTextField(
+                        label: "Billing Address",
+                        controller: invoiceNumberController,
+                        width: 310,
+                        multiLine: 5,
+                      ),
+                      Column(
+                        children: [
+                          KTextField(
+                            label: "GST #",
+                            controller: invoiceNumberController,
+                            width: 200,
+                          ),
+                          KTextField(
+                            label: "Due Date",
+                            controller: invoiceNumberController,
+                            width: 200,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Container(
+                    // color: Colors.green,
+                    padding: EdgeInsets.only(right: 10),
+                    width: containerWidth * 0.95,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Container(
+                          // color: Colors.cyan,
+                          width: containerWidth * 0.95/2.2,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              KDateTextForm(label: "From:",selectedDate: fromDateSelected,),
+                              // Container(
+                              //     width: 150,
+                              //     child: InputDatePickerFormField(
+                              //         firstDate:
+                              //             DateFormat("d-M-y").parse("1-1-2022"),
+                              //         lastDate: DateTime.now()),
+                              // ),
+                              SizedBox(
+                                width: 50,
+                              ),
+                              KDateTextForm(label: "To:", selectedDate: toDateSelected,),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: containerWidth * 0.95/2.2,
+                          // color: Colors.red,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              const Text(
+                                "Amount",
+                                style: TextStyle(fontSize: 11),
+                              ),
+                              Text(
+                                "\u{20B9}${currencyFormat.format(challanAmount)}",
+                                style: const TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Challan",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      KTableCellHeader(
+                        header: "Select",
+                        context: context,
+                        cellWidth: containerWidth * .05,
+                      ),
+                      KTableCellHeader(
+                        header: "#",
+                        context: context,
+                        cellWidth: containerWidth * .03,
+                      ),
+                      KTableCellHeader(
+                        header: "Challan #",
+                        context: context,
+                        cellWidth: containerWidth * 0.08,
+                      ),
+                      KTableCellHeader(
+                        header: "Challan Date",
+                        context: context,
+                        cellWidth: containerWidth * 0.08,
+                      ),
+                      // KTableCellHeader(header: "Customer Name", context: context, cellWidth: containerWidth * 0.14,),
+                      KTableCellHeader(
+                        header: "Product Name",
+                        context: context,
+                        cellWidth: containerWidth * 0.14,
+                      ),
+                      KTableCellHeader(
+                        header: "Price Per Unit",
+                        context: context,
+                        cellWidth: containerWidth * 0.1,
+                      ),
+                      KTableCellHeader(
+                        header: "Unit",
+                        context: context,
+                        cellWidth: containerWidth * 0.08,
+                      ),
+                      KTableCellHeader(
+                        header: "Quantity",
+                        context: context,
+                        cellWidth: containerWidth * 0.06,
+                      ),
+                      KTableCellHeader(
+                        header: "Amount",
+                        context: context,
+                        cellWidth: containerWidth * .1,
+                      ),
+                      KTableCellHeader(
+                        header: "Tax",
+                        context: context,
+                        cellWidth: containerWidth * 0.07,
+                      ),
+                      KTableCellHeader(
+                        header: "",
+                        context: context,
+                        cellWidth: containerWidth * .05,
+                        isLastPos: true,
+                      ),
+                    ],
+                  ),
+                  _getChallanList(_companyName),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    width: containerWidth * 0.95,
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // const KDropdown(dropDownList: customerList, label: "Customer", initialValue: customerName, width: 250,),
-                            SizedBox(
-                              width: 300,
-                              // height: 10,
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: CircleAvatar(
-                                      radius: 10,
-                                      backgroundColor: Colors.amber,
-                                      child: Image.asset("asset/images/clock_32.png", width: 15,color: Colors.white,),
-                                    ),
+                        Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: const [
+                                  KChallanButton(
+                                    label: "Add lines",
                                   ),
-                                  // SizedBox(width: 10,),
-                                  KDropdown(dropDownList: statusList, label: "", initialValue: status, height: 20, width: 100,),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            // KTextField(label: "Email", initialValue: email, width: 150,),
-                            Container(
-                              padding: EdgeInsets.zero,
-                              width: 150,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
-                                    child: Checkbox(
-                                      value: isChecked,
-                                      onChanged: (bool? value){
-                                        setState(() {
-                                          isChecked = value!;
-                                        });
-                                      },
-                                    ),
+                                  SizedBox(
+                                    width: 10,
                                   ),
-                                  const Text(
-                                    "Send later",
-                                    style: TextStyle(fontSize: 11),
+                                  KChallanButton(
+                                    label: "Clear all lines",
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  KChallanButton(
+                                    label: "Add subtotal",
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const Text(
-                          "Amount",
-                          style: TextStyle(fontSize: 11),
-                        ),
-                        Text(
-                          "\u{20B9}${currencyFormat.format(challanAmount)}",
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              // KTextField(label: "Message displayed on estimate", width: 200, multiLine: 4, ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20,),
-              Container(
-                width: containerWidth *0.95,
-                padding: const EdgeInsets.all(10),
-                // height: 20,
-                // color: Colors.red,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // KTextField(label: "Billing address", initialValue: billingAddress, width: 150, multiLine: 6,),
-                        const SizedBox(height: 10,),
-                        KDropdown(dropDownList: stateList, label: "Place of Supply", initialValue: placeOfSupply, height: 20, width: 100,),
-                      ],
-                    ),
-                    const SizedBox(width: 20,),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        // KTextField(label: "Estimate Date", initialValue: estimateDate, width: 150,),
-                        const SizedBox(height: 30,),
-                        // KTextField(label: "LUT No.", width: 150,),
-                      ],
-                    ),
-                    const SizedBox(width: 90,),
-                    // KTextField(label: "Expiration Date", width: 150,),
-
-                    const SizedBox(width: 430,),
-                    // KTextField(label: "Challan no.", initialValue: estimateNo, width: 150,),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20,),
-              Container(
-                width: containerWidth,
-                height: 365,
-                color: Colors.white,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 15,),
-                    SizedBox(
-                      width: containerWidth *0.95,
-                      height: 25,
-                      // color: Colors.red,
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: containerWidth * 0.95,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                        Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: const [
                                 Text(
-                                  "Amounts Are ",
-                                  style: TextStyle(fontSize: 11),
+                                  "Subtotal",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
                                 ),
-                                // KDropdown(dropDownList: amountTypeList,width: 110, initialValue: amountType, label: ""),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Text(
+                                  "Total",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Text(
+                                  "Challan Total",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 15,),
-                    Container(
-                      width: containerWidth * 0.95,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              KTableCellHeader(header: "", context: context, crossAxisAlignment: CrossAxisAlignment.end,cellWidth: containerWidth * 0.03,),
-                              KTableCellHeader(header: "#", context: context, crossAxisAlignment: CrossAxisAlignment.end,cellWidth: containerWidth * 0.04,),
-                              KTableCellHeader(header: "PRODUCT/SERVICE", context: context, crossAxisAlignment: CrossAxisAlignment.end,cellWidth: containerWidth * 0.18,),
-                              KTableCellHeader(header: "HSN/SAC", context: context, crossAxisAlignment: CrossAxisAlignment.end,cellWidth: containerWidth * 0.13,),
-                              KTableCellHeader(header: "DESCRIPTION", context: context, crossAxisAlignment: CrossAxisAlignment.end,cellWidth: containerWidth * 0.18,),
-                              KTableCellHeader(header: "QTY", context: context, crossAxisAlignment: CrossAxisAlignment.start,cellWidth: containerWidth * 0.08,),
-                              KTableCellHeader(header: "RATE", context: context, crossAxisAlignment: CrossAxisAlignment.start,cellWidth: containerWidth * 0.08,),
-                              KTableCellHeader(header: "AMOUNT (\u{20B9})", context: context, crossAxisAlignment: CrossAxisAlignment.start,cellWidth: containerWidth * 0.12,),
-                              KTableCellHeader(header: "TAX", context: context, crossAxisAlignment: CrossAxisAlignment.start,cellWidth: containerWidth * 0.12,),
-                              KTableCellHeader(header: "", context: context, crossAxisAlignment: CrossAxisAlignment.end,cellWidth: containerWidth * 0.03, isLastPos: true,),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              KTableCell(pos: 1, context: context),
-                              KTableCell(pos: 2, parameterValue: "1", context: context),
-                              KTableCell(pos: 3, dropdownList: customerList, context: context),
-                              KTableCell(pos: 4, context: context),
-                              KTableCell(pos: 5, context: context),
-                              KTableCell(pos: 6, context: context),
-                              KTableCell(pos: 7, context: context),
-                              KTableCell(pos: 8, context: context),
-                              KTableCell(pos: 9, dropdownList: statusList, context: context),
-                              KTableCell(pos: 10, context: context),
-                            ],
-                          ),
-
-                          Row(
-                            children: [
-                              KTableCell(pos: 1, context: context),
-                              KTableCell(pos: 2, parameterValue: "2", context: context),
-                              KTableCell(pos: 3, dropdownList: customerList, context: context),
-                              KTableCell(pos: 4, parameterValue: "123456", context: context),
-                              KTableCell(pos: 5, context: context),
-                              KTableCell(pos: 6, context: context),
-                              KTableCell(pos: 7, context: context),
-                              KTableCell(pos: 8, context: context),
-                              KTableCell(pos: 9, dropdownList: statusList, context: context),
-                              KTableCell(pos: 10, context: context),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20,),
-                    SizedBox(
-                      width: containerWidth * 0.95,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            const SizedBox(
+                              width: 50,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Row(
-                                  children: const [
-                                    KChallanButton(label: "Add lines",),
-                                    SizedBox(width: 10,),
-                                    KChallanButton(label: "Clear all lines",),
-                                    SizedBox(width: 10,),
-                                    KChallanButton(label: "Add subtotal",),
-                                  ],
+                                Text(
+                                  subtotal.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
                                 ),
-                                const SizedBox(height: 10,),
-                                // KTextField(label: "Message displayed on estimate", width: 200, multiLine: 4, ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                Text(
+                                  total.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                Text(
+                                  challantotal.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ],
                             ),
-                          ),
-                          Row(
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: const [
-                                  Text("Subtotal", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
-                                  SizedBox(height: 20,),
-                                  Text("Total", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
-                                  SizedBox(height: 20,),
-                                  Text("Challan Total", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
-                                ],
-                              ),
-                              const SizedBox(width: 50,),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(subtotal.toString(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
-                                  const SizedBox(height: 20,),
-                                  Text(total.toString(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
-                                  const SizedBox(height: 20,),
-                                  Text(challantotal.toString(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),),
-                                ],
-                              ),
-                              const SizedBox(width: 10,),
-                            ],
-                          ),
-                        ],
-                      ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              // Container(
-              //   width: containerWidth,
-              //   padding: const EdgeInsets.all(10),
-              //   child: Row(
-              //     children: [
-              //       Container(
-              //         width: 350,
-              //         // decoration: BoxDecoration(color: Colors.red),
-              //         child: Row(
-              //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //           children: [
-              //             const KDropdown(dropDownList: customerList, label: "Customer", width: 150,),
-              //             KTextField(label: "Email", width: 150,),
-              //           ],
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-            ],
-          ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _getAllLists() async {
+    _customerList = await Provider.of<CustomerProvider>(context, listen: false)
+        .getCustomerList();
+    _challanList = await Provider.of<ChallanProvider>(context, listen: false)
+        .getChallanList();
+    _productList = await Provider.of<ProductProvider>(context, listen: false)
+        .getProductList();
+    setState(() {});
+  }
+
+  void _onCompanyChange(String companyName) {
+    setState(() {
+      this._companyName = companyName;
+      print("Company NMae on CHange: $_companyName");
+    });
+  }
+
+  Widget editAction(int id) {
+    Challan challan;
+    return Consumer<ChallanProvider>(builder: (ctx, provider, child) {
+      return FutureBuilder(
+        future: provider.getChallanById(id),
+        builder: (context, AsyncSnapshot<Challan> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else {
+            if (snapshot.hasError) {
+              //                  if (snapshot.error is ConnectivityError) {
+              //                    return NoConnectionScreen();
+              //                  }
+              return Center(child: Text("An error occured.\n$snapshot"));
+              // return noData(context);
+            } else if (snapshot.hasData) {
+              challan = snapshot.data!;
+              // customer.forEach((row) => print(row));
+              // return displayCustomer(context);
+              return ChallanCreate(
+                challan: challan,
+              );
+            } else
+              return Container();
+          }
+        },
+      );
+    });
+  }
+
+  void deleteAction(int id) {
+    Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
+  }
+
+  void fromDateSelected(DateTime _pickedDate){
+    _fromDate = _pickedDate;
+    print("From Date: $_fromDate");
+  }
+  void toDateSelected(DateTime _pickedDate){
+    _toDate = _pickedDate;
+    print("To Date: $_toDate");
+  }
+
+  Widget _getChallanList(String _companyName) {
+    List<Challan> challanList;
+    return _companyName == ""
+        ? Text("Company Name is Blank")
+        : Consumer<ChallanProvider>(builder: (ctx, provider, child) {
+            return FutureBuilder(
+              future: provider.getChallanByCompanyName(_companyName),
+              builder: (context, AsyncSnapshot<List<Challan>> snapshot) {
+                print("Inside fetchGST Function");
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else {
+                  if (snapshot.hasError) {
+                    return Center(child: Text("An error occured.\n$snapshot"));
+                    // return noData(context);
+                  } else if (snapshot.hasData) {
+                    challanList = snapshot.data!;
+                    challanList.forEach((row) => print(row));
+                    return _gSTList(challanList, _companyName, context);
+                    // return _displayChallans(challanList, context);
+                  } else
+                    return Container();
+                }
+              },
+            );
+          });
+  }
+
+  Widget _gSTList(
+      List<Challan> _challanList, String CompanyName, BuildContext context) {
+    List<String> _gstList = [];
+    return Consumer<ChallanProvider>(builder: (ctx, provider, child) {
+      return FutureBuilder(
+        future: provider.getChallanListwithGSTbyCompanyName(CompanyName),
+        builder: (context, AsyncSnapshot<List<String>> snapshot) {
+          print("Inside fetchGST Function");
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else {
+            if (snapshot.hasError) {
+              //                  if (snapshot.error is ConnectivityError) {
+              //                    return NoConnectionScreen();
+              //                  }
+              return Center(child: Text("An error occured.\n$snapshot"));
+              // return noData(context);
+            } else if (snapshot.hasData) {
+              _gstList = snapshot.data!;
+              // _gstList.forEach((row) => print(row));
+              return _displayChallans(_challanList, _gstList, context);
+            } else
+              return Container();
+          }
+        },
+      );
+    });
+  }
+
+  Widget _displayChallans(
+      List<Challan> _challanList, List<String> _gstList, BuildContext context) {
+    return Container(
+      width: containerWidth,
+      height: 100,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            for (var i = 0; i < _challanList.length; i++)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  KTableCellHeader(
+                    header: (i + 1).toString(),
+                    context: context,
+                    cellWidth: containerWidth * .03,
+                  ),
+                  KTableCellHeader(
+                    header: _challanList[i].challanNo,
+                    context: context,
+                    cellWidth: containerWidth * 0.08,
+                  ),
+                  KTableCellHeader(
+                    header: DateFormat("d-M-y")
+                        .format(_challanList[i].challanDate!),
+                    context: context,
+                    cellWidth: containerWidth * 0.08,
+                  ),
+                  // KTableCellHeader(header: challanList[i].customerName, context: context, cellWidth: containerWidth * 0.14,),
+                  KTableCellHeader(
+                    header: _challanList[i].productName,
+                    context: context,
+                    cellWidth: containerWidth * 0.14,
+                  ),
+                  KTableCellHeader(
+                    header: _challanList[i].pricePerUnit.toString(),
+                    context: context,
+                    cellWidth: containerWidth * 0.1,
+                  ),
+                  KTableCellHeader(
+                    header: _challanList[i].productUnit,
+                    context: context,
+                    cellWidth: containerWidth * 0.08,
+                  ),
+                  KTableCellHeader(
+                    header: _challanList[i].quantity.toString(),
+                    context: context,
+                    cellWidth: containerWidth * 0.06,
+                  ),
+                  KTableCellHeader(
+                    header: _challanList[i].totalAmount.toString(),
+                    context: context,
+                    cellWidth: containerWidth * .1,
+                  ),
+                  KTableCellHeader(
+                    header: _gstList[i],
+                    context: context,
+                    cellWidth: containerWidth * 0.07,
+                  ),
+                  KTableCellHeader(
+                    header: "",
+                    context: context,
+                    cellWidth: containerWidth * .05,
+                    id: _challanList[i].id,
+                    deleteAction: deleteAction,
+                    editAction: editAction,
+                    isLastPos: true,
+                  ),
+                ],
+              ),
+          ],
         ),
       ),
     );

@@ -70,7 +70,7 @@ class _ProductCreateState extends State<ProductCreate> {
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30)
+          borderRadius: BorderRadius.circular(20)
       ),
       content: Form(
         key: _formKey,
@@ -119,7 +119,7 @@ class _ProductCreateState extends State<ProductCreate> {
                   child: KTextField(label: "HSN Code *", width: 250,controller: hsnController, validator: hsnValidator, ),
                 ),
                 Container(
-                  child: KTextField(label: "GST Code", width: 250, controller: gstController, validator: gstValidator,),
+                  child: KTextField(label: "GST (%)", width: 250, controller: gstController, validator: gstValidator,),
                 ),
               ],
             ),

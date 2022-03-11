@@ -38,6 +38,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
   late final challanQuantityController;
   late final challanAmountController;
 
+
   String challanNewOrEdit = "New Challan";
 
   String customerName = "-----";
@@ -80,7 +81,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(20),
       ),
       content: Form(
         key: _formKey,
@@ -111,7 +112,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
-                  child: KDropdown(dropDownList: customerList, label: "Customer", initialValue: customerName, width: 250, onChangeDropDown: onChangeDropdown,),
+                  child: KDropdown(dropDownList: customerList, label: "Customer", initialValue: customerName, width: 250, onChangeDropDown: _onCompanyChange,),
                 ),
                 Container(
                   child: KTextField(label: "Challan # *", width: 250,controller: challanNumberController, validator: challanNumberValidator, ),
@@ -123,7 +124,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
-                  child: KDropdown(dropDownList: productList, label: "Product", initialValue: productName, width: 250, onChangeDropDown: onChangeDropdown,),
+                  child: KDropdown(dropDownList: productList, label: "Product", initialValue: productName, width: 250, onChangeDropDown: _onProductyChange,),
                 ),
                 Container(
                   child: KTextField(label: "Challan Date *", width: 250,controller: challanDateController, validator: challanDateValidator,),
@@ -208,6 +209,22 @@ class _ChallanCreateState extends State<ChallanCreate> {
     }
 
     print("${val[0]}: ${val[1]}");
+  }
+
+  void _onCompanyChange(String companyName){
+    setState(() {
+      this.customerName = companyName;
+    });
+  }
+
+  void _onProductyChange(String productName){
+    setState(() {
+      this.productName = productName;
+      final product = productListFetched.singleWhere((element) => element.name == productName);
+      // print("Price: ${price.price_per_unit}");
+      challanPricePerUnitController.text = product.price_per_unit.toString();
+      challanUnitController.text = product.unit;
+    });
   }
 
   void _buildForm(){

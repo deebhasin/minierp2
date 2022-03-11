@@ -11,6 +11,7 @@ import '../screens/customersview.dart';
 import '../model/organization.dart';
 import '../providers/org_provider.dart';
 import '../screens/productsview.dart';
+import '../screens/invoiceview.dart';
 
 import '../widgets/sidebar.dart';
 
@@ -77,10 +78,10 @@ Widget body() {
             displayWidget = ViewChallan(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
           }
           break;
-        // case "Invoice" :
-        //   {
-        //     displayWidget = const ViewChallan();
-        //   }
+        case "Invoice" :
+          {
+            displayWidget = InvoiceView(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
+          }
           break;
         // case "Payments" :
         //   {

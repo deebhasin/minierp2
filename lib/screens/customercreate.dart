@@ -33,12 +33,16 @@ class _CustomerCreateState extends State<CustomerCreate> {
   late final creditPeriodController;
   final companyNameValidator = MultiValidator([
     RequiredValidator(errorText: 'Company Name is required'),
-    MinLengthValidator(4, errorText: 'Company Name must be at least 4 digits long'),
+    MinLengthValidator(4,
+        errorText: 'Company Name must be at least 4 digits long'),
   ]);
-  final pinValidator = PatternValidator(r'\d+?$', errorText: "PIN should be number");
-  final gstValidator = RequiredValidator(errorText: 'Customers GST number is required');
+  final pinValidator =
+      PatternValidator(r'\d+?$', errorText: "PIN should be number");
+  final gstValidator =
+      RequiredValidator(errorText: 'Customers GST number is required');
   final addressValidator = RequiredValidator(errorText: 'Address is required');
-  final stateCdValidator = RequiredValidator(errorText: 'State code is required');
+  final stateCdValidator =
+      RequiredValidator(errorText: 'State code is required');
   final creditPeriodValidator = MultiValidator([
     RequiredValidator(errorText: 'Credit Period is required'),
     PatternValidator(r'\d+?$', errorText: "Credit Period should be number"),
@@ -51,26 +55,24 @@ class _CustomerCreateState extends State<CustomerCreate> {
     companyController = TextEditingController();
     contactPersonController = TextEditingController();
     addressController = TextEditingController();
-    pinController =
-        TextEditingController();
+    pinController = TextEditingController();
     cityController = TextEditingController();
     stateController = TextEditingController();
     stateCodeController = TextEditingController();
     gstController = TextEditingController();
     creditPeriodController = TextEditingController();
     _initializeForm();
-
   }
 
   _initializeForm() {
-    customerIdController.text =  widget.customer.id.toString();
+    customerIdController.text = widget.customer.id.toString();
     companyController.text = widget.customer.company_name;
     contactPersonController.text = widget.customer.contact_person;
     addressController.text = widget.customer.address;
     pinController.text =
         widget.customer.pin == 0 ? "" : widget.customer.pin.toString();
     cityController.text = widget.customer.city;
-    stateController.text =  widget.customer.state;
+    stateController.text = widget.customer.state;
     stateCodeController.text = widget.customer.stateCode;
     gstController.text = widget.customer.gst;
     creditPeriodController.text = widget.customer.creditPeriod.toString();
@@ -78,13 +80,13 @@ class _CustomerCreateState extends State<CustomerCreate> {
 
   @override
   Widget build(BuildContext context) {
-    containerWidth = (MediaQuery.of(context).size.width - KVariables.sidebarWidth);
+    containerWidth =
+        (MediaQuery.of(context).size.width - KVariables.sidebarWidth);
     return _createCustomer();
   }
 
   Widget _createCustomer() {
     return AlertDialog(
-
       contentPadding: EdgeInsets.zero,
       // backgroundColor: Color.fromRGBO(242,243,247,1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
@@ -92,7 +94,7 @@ class _CustomerCreateState extends State<CustomerCreate> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.all(15),
+            padding: EdgeInsets.all(5),
             decoration: BoxDecoration(
               color: Color.fromRGBO(242, 243, 247, 1),
               borderRadius: BorderRadius.only(
@@ -108,7 +110,7 @@ class _CustomerCreateState extends State<CustomerCreate> {
           Form(
             key: _formKey,
             child: Container(
-              padding: EdgeInsets.fromLTRB(40, 30, 0, 20),
+              padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
               // color: Colors.yellow,
               child: Column(
                 children: [
@@ -136,16 +138,13 @@ class _CustomerCreateState extends State<CustomerCreate> {
                                 validator: companyNameValidator,
                               ),
                               DTextField(
-                                label: "Address Line 1",
+                                label: "Address",
                                 controller: addressController,
                                 validator: addressValidator,
                                 isMandatory: true,
                                 multiLine: 5,
                               ),
-                              // DTextField(
-                              //   label: "Address Line 2",
-                              //   controller: address2Controller,
-                              // ),
+
                               DTextField(
                                 label: "City",
                                 controller: cityController,
@@ -196,9 +195,9 @@ class _CustomerCreateState extends State<CustomerCreate> {
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  // SizedBox(
+                  //   height: 20,
+                  // ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -210,7 +209,7 @@ class _CustomerCreateState extends State<CustomerCreate> {
                             primary: Colors.red, // background
                             onPrimary: Colors.white, // foreground
                           ),
-                          onPressed: resetForm,
+                          onPressed: _resetForm,
                           child: Text(
                             "Reset",
                             style: const TextStyle(
@@ -231,7 +230,7 @@ class _CustomerCreateState extends State<CustomerCreate> {
                             primary: Colors.green, // background
                             onPrimary: Colors.white, // foreground
                           ),
-                          onPressed: submitForm,
+                          onPressed: _submitForm,
                           child: Text(
                             "Submit",
                             style: const TextStyle(
@@ -252,28 +251,31 @@ class _CustomerCreateState extends State<CustomerCreate> {
     );
   }
 
-  void resetForm() {
+  void _resetForm() {
     // setState(() {
-     _initializeForm();
+    _initializeForm();
     // });
   }
 
-  void submitForm() {
+  void _submitForm() {
     if (_formKey.currentState!.validate()) {
       widget.customer.company_name = companyController.text;
       widget.customer.contact_person = contactPersonController.text;
-      widget.customer.contact_phone =
-          contactPersonController.text; //Have to add Phone and Active Status fields on the page
+      widget.customer.contact_phone = contactPersonController
+          .text; //Have to add Phone and Active Status fields on the page
       widget.customer.address = addressController.text;
-      widget.customer.pin = int.parse(pinController.text =="" ? "0" : pinController.text);
+      widget.customer.pin =
+          int.parse(pinController.text == "" ? "0" : pinController.text);
       widget.customer.city = cityController.text;
       widget.customer.state = stateController.text;
       widget.customer.stateCode = stateCodeController.text;
       widget.customer.gst = gstController.text;
-      widget.customer.creditPeriod = int.parse(creditPeriodController.text ?? "0");
+      widget.customer.creditPeriod =
+          int.parse(creditPeriodController.text ?? "0");
 
       print("ID: ${widget.customer.id}");
-      Provider.of<CustomerProvider>(context, listen: false).saveCustomer(widget.customer);
+      Provider.of<CustomerProvider>(context, listen: false)
+          .saveCustomer(widget.customer);
       Navigator.of(context).pop();
     } else {
       print("Validation Failed");

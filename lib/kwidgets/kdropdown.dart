@@ -33,7 +33,7 @@ class KDropdown extends StatelessWidget {
   void updateDropdownText(String selectedValue){
     if(selectedValue != "NoValue"){
       selectedValue = selectedValue;
-      onChangeDropDown!("$label:$selectedValue");
+      onChangeDropDown!("$selectedValue");
 
     }
     // print("Selection: $dropdownValue");
