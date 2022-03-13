@@ -30,7 +30,7 @@ class Invoice{
   Invoice.fromMap(Map<String, dynamic> res)
       : id = res["id"],
         invoiceNo = res["invoice_no"],
-        invoiceDate = DateFormat("d-M-y").parse(res["invoice_date"]),
+        invoiceDate = DateFormat("yyyy-MM-dd").parse(res["invoice_date"]),
         customerName = res["customer_name"],
         customerAddress = res["customer_address"],
         invoiceAmount = res["invoice_amount"],
@@ -43,7 +43,7 @@ class Invoice{
     return {
       // "id": id,
       "invoice_no": invoiceNo,
-      "invoice_date": DateFormat("d-M-y").format(invoiceDate!),
+      "invoice_date": DateFormat("yyyy-MM-dd").format(invoiceDate!),
       "customer_name": customerName,
       "customer_address": customerAddress,
       "invoice_amount": invoiceAmount,

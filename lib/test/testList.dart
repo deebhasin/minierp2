@@ -87,7 +87,7 @@ class _TestListState extends State<TestList> {
     return companyName == ""? Text("Company Name is Blank") :
     Consumer<ChallanProvider>(builder: (ctx, provider, child) {
       return FutureBuilder(
-        future: provider.getChallanByCompanyName(companyName),
+        future: provider.getChallanListByParameters(customerName: companyName),
         builder: (context, AsyncSnapshot<List<Challan>> snapshot) {
           print("Inside fetchGST Function");
           if (snapshot.connectionState == ConnectionState.waiting) {

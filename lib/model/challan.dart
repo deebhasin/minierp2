@@ -35,7 +35,7 @@ class Challan {
   Challan.fromMap(Map<String, dynamic> res)
       : id = res["id"],
         challanNo = res["challan_no"],
-        challanDate = DateFormat("d-M-y").parse(res["challan_date"]),
+        challanDate = DateFormat("yyyy-MM-dd").parse(res["challan_date"]),
         customerName = res["customer_name"],
         productId = res["product_id"],
         productName = res["product_name"],
@@ -50,7 +50,7 @@ class Challan {
     return {
       // 'id':id,
       'challan_no': challanNo,
-      'challan_date': DateFormat("d-M-y").format(challanDate!),
+      'challan_date': DateFormat("yyyy-MM-dd").format(challanDate!),
       'customer_name': customerName,
       'product_id': productId,
       'product_name': productName,

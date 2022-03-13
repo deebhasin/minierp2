@@ -40,7 +40,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   List<Product> _productList = [];
 
   String _companyName = "";
-  DateTime _fromDate = DateTime.now();
+  DateTime _fromDate = DateFormat("yyyy-MM-dd").parse("2000-01-01");
   DateTime _toDate = DateTime.now();
 
   String dropdownValue = "-----";
@@ -167,27 +167,26 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                       children: [
                         Container(
                           // color: Colors.cyan,
-                          width: containerWidth * 0.95/2.2,
+                          width: containerWidth * 0.95 / 2.2,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              KDateTextForm(label: "From:",selectedDate: fromDateSelected,),
-                              // Container(
-                              //     width: 150,
-                              //     child: InputDatePickerFormField(
-                              //         firstDate:
-                              //             DateFormat("d-M-y").parse("1-1-2022"),
-                              //         lastDate: DateTime.now()),
-                              // ),
+                              KDateTextForm(
+                                label: "From:",
+                                selectedDate: fromDateSelected,
+                              ),
                               SizedBox(
                                 width: 50,
                               ),
-                              KDateTextForm(label: "To:", selectedDate: toDateSelected,),
+                              KDateTextForm(
+                                label: "To:",
+                                selectedDate: toDateSelected,
+                              ),
                             ],
                           ),
                         ),
                         Container(
-                          width: containerWidth * 0.95/2.2,
+                          width: containerWidth * 0.95 / 2.2,
                           // color: Colors.red,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -456,35 +455,49 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
   }
 
-  void fromDateSelected(DateTime _pickedDate){
+  void fromDateSelected(DateTime _pickedDate) {
     _fromDate = _pickedDate;
     print("From Date: $_fromDate");
   }
-  void toDateSelected(DateTime _pickedDate){
+
+  void toDateSelected(DateTime _pickedDate) {
     _toDate = _pickedDate;
     print("To Date: $_toDate");
   }
 
   Widget _getChallanList(String _companyName) {
     List<Challan> challanList;
+
+    print("Date From in _getChallanList: $_fromDate");
+    print("Date To in _getChallanList: $_toDate");
+
     return _companyName == ""
         ? Text("Company Name is Blank")
         : Consumer<ChallanProvider>(builder: (ctx, provider, child) {
             return FutureBuilder(
-              future: provider.getChallanByCompanyName(_companyName),
+              future: provider.getChallanListByParameters(
+                customerName: _companyName,
+                active: 1,
+                invoiceNo: "Not Assigned",
+                fromDate: _fromDate,
+                toDate: _toDate,
+              ),
               builder: (context, AsyncSnapshot<List<Challan>> snapshot) {
                 print("Inside fetchGST Function");
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
                 } else {
                   if (snapshot.hasError) {
-                    return Center(child: Text("An error occured.\n$snapshot"));
+                    return Center(
+                        child: Text(
+                            "An error occured in _getChallanList.\n$snapshot"));
                     // return noData(context);
                   } else if (snapshot.hasData) {
                     challanList = snapshot.data!;
-                    challanList.forEach((row) => print(row));
+                    challanList.forEach((row) => print(row.customerName));
                     return _gSTList(challanList, _companyName, context);
                     // return _displayChallans(challanList, context);
+                    // return Container();
                   } else
                     return Container();
                 }
