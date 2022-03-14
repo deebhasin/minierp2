@@ -112,6 +112,7 @@ class _TestListState extends State<TestList> {
   }
 
   Widget _displayChallans(List<Challan> _challanList, BuildContext context){
+    bool isChecked = false;
     return Container(
       width: containerWidth,
       height: 100,
@@ -122,6 +123,7 @@ class _TestListState extends State<TestList> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Checkbox(value: isChecked, onChanged:(value) => (){print("Value: $value`");}),
                   KTableCellHeader(header: (i+1).toString(), context: context, cellWidth: containerWidth *.03,),
                   KTableCellHeader(header: _challanList[i].challanNo, context: context, cellWidth: containerWidth * 0.08,),
                   KTableCellHeader(header: DateFormat("d-M-y").format(_challanList[i].challanDate!), context: context, cellWidth: containerWidth * 0.08,),

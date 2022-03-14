@@ -456,12 +456,16 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   }
 
   void fromDateSelected(DateTime _pickedDate) {
-    _fromDate = _pickedDate;
+    setState(() {
+      _fromDate = _pickedDate;
+    });
     print("From Date: $_fromDate");
   }
 
   void toDateSelected(DateTime _pickedDate) {
-    _toDate = _pickedDate;
+    setState(() {
+      _toDate = _pickedDate;
+    });
     print("To Date: $_toDate");
   }
 
@@ -547,6 +551,11 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Checkbox(
+                    // key: _challanList[i].id.toString(),
+                    value: isChecked,
+                    onChanged: (bool? value) => checkboxChanged(value!, _challanList[i].id),
+                  ),
                   KTableCellHeader(
                     header: (i + 1).toString(),
                     context: context,
@@ -609,5 +618,12 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
         ),
       ),
     );
+  }
+
+  void checkboxChanged(bool _isChecked, int _id) {
+    setState(() {
+      isChecked = _isChecked; 
+      print("Checkbox Status: $_isChecked");
+    });
   }
 }

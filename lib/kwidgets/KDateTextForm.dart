@@ -37,7 +37,7 @@ class _KDateTextFormState extends State<KDateTextForm> {
       width: 150,
       child: TextFormField(
         controller: dateinput,
-        readOnly: false,
+        readOnly: true,
         decoration: InputDecoration(
           icon: Icon(Icons.calendar_today), //icon of text field
           labelText: widget.label, //label text of field

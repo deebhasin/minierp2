@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'kvariables.dart';
-import '../providers/customer_provider.dart';
 
 class KTableCellHeader extends StatelessWidget {
   String header = "";
