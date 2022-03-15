@@ -146,13 +146,7 @@ Widget _displayChallan(BuildContext context){
               KTableCellHeader(header: challanList[i].quantity.toString(), context: context, cellWidth: containerWidth * 0.06,),
               KTableCellHeader(header: challanList[i].totalAmount.toString(), context: context, cellWidth: containerWidth * .1,),
               KTableCellHeader(header: challanList[i].invoiceNo, context: context, cellWidth: containerWidth * 0.07,),
-              KTableCellHeader(header: "",
-                context: context,
-                cellWidth: containerWidth *.05,
-                id: challanList[i].id,
-                deleteAction: deleteAction,
-                editAction: editAction,
-                isLastPos: true,),
+              _displayIcons(i),
             ],
           ),
       ],
@@ -201,4 +195,24 @@ Widget _displayChallan(BuildContext context){
       );
     });
   }
+
+  Widget _displayIcons(int i){
+    return challanList[i].invoiceNo == ""?
+    KTableCellHeader(header: "",
+      context: context,
+      cellWidth: containerWidth *.05,
+      id: challanList[i].id,
+      deleteAction: deleteAction,
+      editAction: editAction,
+      isLastPos: true,) :
+    KTableCellHeader(header: "",
+      isInvoice: true,
+      context: context,
+      cellWidth: containerWidth *.05,
+      id: challanList[i].id,
+      deleteAction: deleteAction,
+      editAction: editAction,
+      isLastPos: true,);
+  }
+
 }

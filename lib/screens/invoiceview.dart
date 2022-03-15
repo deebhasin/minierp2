@@ -148,6 +148,7 @@ class _InvoiceViewState extends State<InvoiceView> {
               KTableCellHeader(header: invoiceList[i].invoiceTotal.toString(), context: context, cellWidth: containerWidth * 0.08,),
               KTableCellHeader(header: invoiceList[i].pdfFileLocation.toString(), context: context, cellWidth: containerWidth * .1,),
               KTableCellHeader(header: "",
+                isInvoice: true,
                 context: context,
                 cellWidth: containerWidth *.05,
                 id: invoiceList[i].id,

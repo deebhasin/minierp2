@@ -13,8 +13,10 @@ class KTableCellHeader extends StatelessWidget {
   final int id;
   final Function? deleteAction;
   final Function? editAction;
+  final bool isInvoice;
 
-  KTableCellHeader({Key? key,
+  KTableCellHeader({
+    Key? key,
     required this.header,
     required this.context,
     this.crossAxisAlignment = CrossAxisAlignment.center,
@@ -24,11 +26,13 @@ class KTableCellHeader extends StatelessWidget {
     this.id = 0,
     this.deleteAction,
     this.editAction,
+    this.isInvoice = false,
   }) : super(key: key) {
-    width = (MediaQuery.of(context).size.width - KVariables.sidebarWidth) * 0.95;
+    width =
+        (MediaQuery.of(context).size.width - KVariables.sidebarWidth) * 0.95;
   }
 
-  _test(){}
+  _test() {}
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -38,7 +42,8 @@ class KTableCellHeader extends StatelessWidget {
         border: Border(
           left: const BorderSide(color: Colors.transparent),
           top: const BorderSide(color: Colors.transparent),
-          right: BorderSide(color: isLastPos? Colors.transparent : Colors.grey),
+          right:
+              BorderSide(color: isLastPos ? Colors.transparent : Colors.grey),
           bottom: const BorderSide(color: Colors.grey),
         ),
       ),
@@ -46,17 +51,18 @@ class KTableCellHeader extends StatelessWidget {
         crossAxisAlignment: crossAxisAlignment,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: (isLastPos && id !=0)? showIcons(id, context) : showText(header),
-            ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: (isLastPos && id != 0)
+                ? showIcons(id, context)
+                : showText(header),
+          ),
         ],
       ),
     );
   }
 
-
-  Widget showText(String header){
+  Widget showText(String header) {
     return Text(
       header,
       style: const TextStyle(
@@ -66,32 +72,40 @@ class KTableCellHeader extends StatelessWidget {
     );
   }
 
-  Widget showIcons(int id, BuildContext context,){
+  Widget showIcons(
+    int id,
+    BuildContext context,
+  ) {
     return Row(
       children: [
-        InkWell(
-          onTap: (){
-            showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (BuildContext context){
-                  if(editAction!(id) != null){
-                    return editAction!(id);
-                  }
-                  else{
-                    return Container();
-                  }
-
-                }
-            );
-          },
-          child: Icon(
-            Icons.edit,
-            size: 16,
-            color: Colors.grey,
-          ),
+        isInvoice
+            ? Icon(
+                Icons.edit_off,
+                size: 16,
+                color: Colors.grey,
+              )
+            : InkWell(
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        if (editAction!(id) != null) {
+                          return editAction!(id);
+                        } else {
+                          return Container();
+                        }
+                      });
+                },
+                child: Icon(
+                  Icons.edit,
+                  size: 16,
+                  color: Colors.grey,
+                ),
+              ),
+        const SizedBox(
+          width: 8,
         ),
-        const SizedBox(width: 8,),
         InkWell(
           onTap: () => deleteAction!(id),
           child: Icon(
