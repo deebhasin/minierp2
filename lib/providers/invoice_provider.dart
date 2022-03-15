@@ -35,6 +35,10 @@ class InvoiceProvider with ChangeNotifier{
     return invoice;
   }
 
+  Future<void> saveInvoice(Invoice invoice) async {
+    invoice.id == 0? createInvoice(invoice) : updateInvoice(invoice);
+  }
+
   Future<int> createInvoice(Invoice invoice) async{
     int id = 0;
     print("In Invoice Provider Create Invoice Start");

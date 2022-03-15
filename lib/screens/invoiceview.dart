@@ -177,7 +177,7 @@ class _InvoiceViewState extends State<InvoiceView> {
   }
 
   Widget editAction(int id){
-    Invoice invoice;
+    Invoice invoice = Invoice();
     return Consumer<InvoiceProvider>(builder: (ctx, provider, child) {
       return FutureBuilder(
         future: provider.getInvoiceById(id),

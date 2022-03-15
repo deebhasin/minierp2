@@ -155,7 +155,7 @@ class ChallanProvider with ChangeNotifier {
       gstList = queryResult.map((e) => e["GST"].toString()).toList();
       // gstList = queryResult;
 
-      print("Challan List Length: ${gstList.length}");
+      print("Challan List GST Length: ${gstList.length}");
     } on Exception catch (e, s) {
       handleException("Error while fetching Challan List $e", e, s);
       gstList = [];
@@ -294,6 +294,28 @@ class ChallanProvider with ChangeNotifier {
       await LocalDBRepo().db.update("CHALLAN", challan.toMap(),
           where: "id = ?", whereArgs: [challan.id]);
       print("Updating Challan with Id: ${challan.id} in Challan Provider}");
+      notifyListeners();
+    } on Exception catch (e, s) {
+      handleException("Error while Updating Challan $e", e, s);
+    }
+  }
+
+  Future<void> updateInvoiceNumberInChallan(List<int> idList, String invoiceNumber) async{
+    var invoiceMap = Map();
+    String whereArgs = "";
+    for(int i = 0; i < idList.length; i++){
+      whereArgs += idList[i].toString();
+      if(i != idList.length -1){
+        whereArgs += ",";
+      }
+    }
+    invoiceMap = {"invoice_number": invoiceNumber};
+    print("In Update of invoice in Challan in Challan Provider Update Challan Start");
+    try {
+      await LocalDBRepo().db.rawQuery("UPDATE CHALLAN SET invoice_number = '$invoiceNumber' where id in ($whereArgs);");
+      // await LocalDBRepo().db.update("CHALLAN",invoiceMap,
+      //     where: "id in (?)", whereArgs: idList);
+      print("Updating Invoice Number in Challan with Id: $whereArgs Challan Provider}");
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Updating Challan $e", e, s);

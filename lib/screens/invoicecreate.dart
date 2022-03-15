@@ -1,29 +1,29 @@
-import 'package:erpapp/kwidgets/KDateTextForm.dart';
-import 'package:erpapp/kwidgets/kchallanbutton.dart';
-import 'package:erpapp/kwidgets/ktextfield.dart';
-import 'package:erpapp/model/challan.dart';
-import 'package:erpapp/model/customer.dart';
-import 'package:erpapp/model/invoice.dart';
-import 'package:erpapp/model/product.dart';
-import 'package:erpapp/providers/challan_provider.dart';
-import 'package:erpapp/providers/customer_provider.dart';
-import 'package:erpapp/providers/product_provider.dart';
-import 'package:erpapp/widgets/alertdialognav.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:erpapp/providers/invoice_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../kwidgets/kvariables.dart';
 import '../kwidgets/kdropdown.dart';
 import '../kwidgets/ktablecellheader.dart';
+import '../kwidgets/KDateTextForm.dart';
+import '../kwidgets/ktextfield.dart';
+import '../model/challan.dart';
+import '../model/customer.dart';
+import '../model/invoice.dart';
+import '../model/product.dart';
+import '../providers/challan_provider.dart';
+import '../providers/customer_provider.dart';
+import '../providers/product_provider.dart';
+import '../widgets/alertdialognav.dart';
 import 'challancreate.dart';
 
 class InvoiceCreate extends StatefulWidget {
-  Invoice? invoice;
+  Invoice invoice;
   InvoiceCreate({
     Key? key,
-    this.invoice,
+    required this.invoice,
   }) : super(key: key);
 
   @override
@@ -32,12 +32,28 @@ class InvoiceCreate extends StatefulWidget {
 
 class _InvoiceCreateState extends State<InvoiceCreate> {
   late double containerWidth;
-  late final invoiceNumberController;
   final _formKey = GlobalKey<FormState>();
+  late final invoiceNumberController;
+  late final invoiceDateController;
+  late final gstNumberController;
+  late final dueDateController;
+  late final billingAddressController;
+
+  late final RequiredValidator invoiceNumberValidator;
+  late final RequiredValidator invoiceDateValidator;
+  late final RequiredValidator gstValidator;
+  late final RequiredValidator billingAddressValidator;
+
+
+  String _gstNumber = "";
+  String _billingAddress = "";
+  DateTime? _dueDate;
 
   List<Customer> _customerList = [];
   List<Challan> _challanList = [];
   List<Product> _productList = [];
+  List<bool> checkboxList = [];
+  List<int> challanSelected = [];
 
   String _companyName = "";
   DateTime _fromDate = DateFormat("yyyy-MM-dd").parse("2000-01-01");
@@ -48,15 +64,29 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   double challanAmount = 0;
   bool isChecked = false;
 
-  final double subtotal = 0;
-  final double total = 0;
-  final double challantotal = 0;
+  double subtotal = 0;
+  double taxTotal = 0;
+  double invoiceTotal = 0;
 
   @override
   void initState() {
     _getAllLists();
     invoiceNumberController =
-        TextEditingController(text: widget.invoice!.invoiceNo);
+        TextEditingController(text: widget.invoice.invoiceNo);
+    invoiceDateController =
+        TextEditingController(text:DateFormat("d-M-y").format(widget.invoice.invoiceDate!));
+    gstNumberController =
+        TextEditingController(text: _gstNumber);
+    dueDateController =
+        TextEditingController(text: _dueDate == null? "" : DateFormat("d-M-y").format(_dueDate!));
+    billingAddressController =
+        TextEditingController(text: _billingAddress);
+
+    invoiceNumberValidator = RequiredValidator(errorText: 'Invoice number is required');
+    invoiceDateValidator = RequiredValidator(errorText: 'Invoice Date   is required');
+    gstValidator = RequiredValidator(errorText: 'GST number is required');
+    billingAddressValidator = RequiredValidator(errorText: 'Billing number is required');
+
     super.initState();
   }
 
@@ -95,7 +125,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        widget.invoice!.id != 0
+                        widget.invoice.id != 0
                             ? "Edit Invoice"
                             : "New Invoice",
                         style: TextStyle(
@@ -114,6 +144,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                             .toList(),
                         label: "Customer Name",
                         width: 300,
+                        initialValue: "-----",
                         onChangeDropDown: _onCompanyChange,
                       ),
                       Column(
@@ -122,11 +153,13 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                             label: "Invoice #",
                             controller: invoiceNumberController,
                             width: 200,
+                            validator: invoiceNumberValidator,
                           ),
                           KTextField(
                             label: "Invoice Date",
-                            controller: invoiceNumberController,
+                            controller: invoiceDateController,
                             width: 200,
+                            validator: invoiceDateValidator,
                           )
                         ],
                       ),
@@ -138,20 +171,22 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                     children: [
                       KTextField(
                         label: "Billing Address",
-                        controller: invoiceNumberController,
+                        controller: billingAddressController,
                         width: 310,
                         multiLine: 5,
+                        validator: billingAddressValidator,
                       ),
                       Column(
                         children: [
                           KTextField(
                             label: "GST #",
-                            controller: invoiceNumberController,
+                            controller: gstNumberController,
                             width: 200,
+                            validator: gstValidator,
                           ),
                           KTextField(
                             label: "Due Date",
-                            controller: invoiceNumberController,
+                            controller: dueDateController,
                             width: 200,
                           ),
                         ],
@@ -197,7 +232,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                 style: TextStyle(fontSize: 11),
                               ),
                               Text(
-                                "\u{20B9}${currencyFormat.format(challanAmount)}",
+                                "\u{20B9}${currencyFormat.format(invoiceTotal)}",
                                 style: const TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
@@ -295,32 +330,24 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          width: containerWidth * 0.95/1.3,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Row(
-                                children: const [
-                                  KChallanButton(
-                                    label: "Add lines",
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  KChallanButton(
-                                    label: "Clear all lines",
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  KChallanButton(
-                                    label: "Add subtotal",
-                                  ),
-                                ],
+                              Container(
+                                width: 80,
+                                child: ElevatedButton(
+                                  onPressed: _resetForm,
+                                  child: Text("Reset"),
+                                ),
                               ),
-                              const SizedBox(
-                                height: 10,
+                              Container(
+                                width: 80,
+                                child: ElevatedButton(
+                                  onPressed: _submitForm,
+                                  child: Text("Submit"),
+                                ),
                               ),
-                              // KTextField(label: "Message displayed on estimate", width: 200, multiLine: 4, ),
                             ],
                           ),
                         ),
@@ -339,7 +366,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                   height: 20,
                                 ),
                                 Text(
-                                  "Total",
+                                  "Tax Total",
                                   style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold),
@@ -348,7 +375,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                   height: 20,
                                 ),
                                 Text(
-                                  "Challan Total",
+                                  "Invoice Total",
                                   style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold),
@@ -362,7 +389,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  subtotal.toString(),
+                                  "\u{20B9}${currencyFormat.format(subtotal)}",
                                   style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold),
@@ -371,7 +398,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                   height: 20,
                                 ),
                                 Text(
-                                  total.toString(),
+                                  "\u{20B9}${currencyFormat.format(taxTotal)}",
                                   style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold),
@@ -380,7 +407,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                   height: 20,
                                 ),
                                 Text(
-                                  challantotal.toString(),
+                                  "\u{20B9}${currencyFormat.format(invoiceTotal)}",
                                   style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold),
@@ -417,6 +444,21 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   void _onCompanyChange(String companyName) {
     setState(() {
       this._companyName = companyName;
+      if(companyName != ""){
+        Customer _customerData = _customerList.where((element) => element.company_name == companyName).toList()[0];
+        _billingAddress = _customerData.address;
+        _gstNumber = _customerData.gst;
+        _dueDate = (widget.invoice.invoiceDate!.add(Duration(days: _customerData.creditPeriod))) ;
+
+        billingAddressController.text = _billingAddress;
+        gstNumberController.text = _gstNumber;
+        dueDateController.text = DateFormat("d-M-y").format(_dueDate!);
+      }
+      checkboxList.clear();
+      challanSelected.clear();
+      subtotal = 0;
+      taxTotal = 0;
+      invoiceTotal = 0;
       print("Company NMae on CHange: $_companyName");
     });
   }
@@ -476,7 +518,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     print("Date To in _getChallanList: $_toDate");
 
     return _companyName == ""
-        ? Text("Company Name is Blank")
+        ? Text("Please Select Company")
         : Consumer<ChallanProvider>(builder: (ctx, provider, child) {
             return FutureBuilder(
               future: provider.getChallanListByParameters(
@@ -541,6 +583,15 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
 
   Widget _displayChallans(
       List<Challan> _challanList, List<String> _gstList, BuildContext context) {
+    print("CheckboxKist LEngth: ${checkboxList.length}");
+
+    if (checkboxList.isEmpty) {
+      for (int i = 0; i < _challanList.length; i++) {
+        checkboxList.add(false);
+        challanSelected.add(-1);
+      }
+    }
+
     return Container(
       width: containerWidth,
       height: 100,
@@ -553,8 +604,9 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                 children: [
                   Checkbox(
                     // key: _challanList[i].id.toString(),
-                    value: isChecked,
-                    onChanged: (bool? value) => checkboxChanged(value!, _challanList[i].id),
+                    value: checkboxList[i],
+                    onChanged: (bool? value) => checkboxChanged(
+                        value!, _challanList[i], i, _gstList[i]),
                   ),
                   KTableCellHeader(
                     header: (i + 1).toString(),
@@ -620,10 +672,47 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     );
   }
 
-  void checkboxChanged(bool _isChecked, int _id) {
+  void checkboxChanged(bool _isChecked, Challan _challan, int i, String _gst) {
     setState(() {
-      isChecked = _isChecked; 
-      print("Checkbox Status: $_isChecked");
+      checkboxList[i] = _isChecked;
+      if (_isChecked) {
+        challanSelected[i] = _challan.id;
+        subtotal += _challan.totalAmount;
+        taxTotal += _challan.totalAmount * double.parse(_gst) / 100;
+        invoiceTotal += _challan.totalAmount +
+            (_challan.totalAmount * double.parse(_gst) / 100);
+      } else {
+        challanSelected[i] = -1;
+        subtotal -= _challan.totalAmount;
+        taxTotal -= _challan.totalAmount * double.parse(_gst) / 100;
+        invoiceTotal -= (_challan.totalAmount +
+            (_challan.totalAmount * double.parse(_gst) / 100));
+      }
+      print("Checkbox Status: $_isChecked od id: $_challan.id");
+      print("Selected Challans: ${challanSelected}");
     });
+  }
+
+  void _resetForm() {
+    invoiceNumberController.text = "";
+    invoiceDateController.text = DateFormat("d-M-y").format(widget.invoice.invoiceDate!);
+    billingAddressController.text = "";
+    gstNumberController.text = "";
+    dueDateController.text = "";
+    _onCompanyChange("");
+  }
+
+  void _submitForm() {
+    print("Submit Form");
+    widget.invoice.invoiceNo = invoiceNumberController.text;
+    widget.invoice.invoiceDate = DateFormat("yyyy-MM-dd").parse(invoiceDateController.text);
+    widget.invoice.customerName = _companyName;
+    widget.invoice.customerAddress = billingAddressController.text;
+    widget.invoice.invoiceAmount = subtotal;
+    widget.invoice.invoiceTax = taxTotal;
+    widget.invoice.invoiceTotal = invoiceTotal;
+    Provider.of<InvoiceProvider>(context, listen: false).saveInvoice(widget.invoice);
+    Provider.of<ChallanProvider>(context, listen: false).updateInvoiceNumberInChallan(challanSelected, widget.invoice.invoiceNo);
+    Navigator.of(context).pop();
   }
 }
