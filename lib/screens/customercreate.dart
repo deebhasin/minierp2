@@ -11,7 +11,10 @@ import '../providers/customer_provider.dart';
 class CustomerCreate extends StatefulWidget {
   late final Customer customer;
 
-  CustomerCreate({Key? key, required this.customer}) : super(key: key);
+  CustomerCreate({
+    Key? key,
+    required this.customer,
+  }) : super(key: key);
 
   @override
   State<CustomerCreate> createState() => _CustomerCreateState();
@@ -89,7 +92,7 @@ class _CustomerCreateState extends State<CustomerCreate> {
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       // backgroundColor: Color.fromRGBO(242,243,247,1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       content: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -98,8 +101,8 @@ class _CustomerCreateState extends State<CustomerCreate> {
             decoration: BoxDecoration(
               color: Color.fromRGBO(242, 243, 247, 1),
               borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                   bottomLeft: Radius.zero,
                   bottomRight: Radius.zero),
             ),
@@ -115,7 +118,8 @@ class _CustomerCreateState extends State<CustomerCreate> {
               child: Column(
                 children: [
                   Text(
-                    "New Customer",
+                    widget.customer.id == 0 ?
+                    "New Customer" : "Edit Customer",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
@@ -144,7 +148,6 @@ class _CustomerCreateState extends State<CustomerCreate> {
                                 isMandatory: true,
                                 multiLine: 5,
                               ),
-
                               DTextField(
                                 label: "City",
                                 controller: cityController,

@@ -136,13 +136,13 @@ class _ChallanCreateState extends State<ChallanCreate> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
-                  child: KTextField(label: "Price Per Unit *", width: 250,controller: challanPricePerUnitController, validator: challanPricePerUnitValidator, valueUpdated: valueUpdated,),
+                  child: KTextField(label: "Price Per Unit *", width: 250,controller: challanPricePerUnitController, validator: challanPricePerUnitValidator, ),
                 ),
                 Container(
                   child: KTextField(label: "Unit *", width: 250,controller: challanUnitController, validator: challanUnitValidator),
                 ),
                 Container(
-                  child: KTextField(label: "Quantity *", width: 250,controller: challanQuantityController, validator: challanQuantityValidator, valueUpdated: valueUpdated,),
+                  child: KTextField(label: "Quantity *", width: 250,controller: challanQuantityController, validator: challanQuantityValidator,),
                 ),
                 Container(
                   child: KTextField(label: "Total Amount", width: 250,controller: challanAmountController, isDisabled: true, ),
@@ -288,15 +288,15 @@ class _ChallanCreateState extends State<ChallanCreate> {
     else {
       print("Validation Failed");
     }
+  }
 
-    @override
-    void dispose(){
-      challanNumberController.dispose();
-      challanDateController.dispose();
-      challanPricePerUnitController.dispose();
-      challanQuantityController.dispose();
-      challanAmountController.dispose();
-    }
+  @override
+  void dispose(){
+    challanNumberController.dispose();
+    challanDateController.dispose();
+    challanPricePerUnitController.dispose();
+    challanQuantityController.dispose();
+    challanAmountController.dispose();
   }
 
 }

@@ -14,7 +14,7 @@ class DTextField extends StatelessWidget {
   final FieldValidator? validator;
   final bool isMandatory;
 
-  DTextField({
+   DTextField({
     Key? key,
     required this.label,
     this.width = 400,

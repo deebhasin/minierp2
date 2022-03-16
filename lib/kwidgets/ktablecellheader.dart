@@ -100,7 +100,7 @@ class KTableCellHeader extends StatelessWidget {
                 child: Icon(
                   Icons.edit,
                   size: 16,
-                  color: Colors.grey,
+                  color: Colors.green,
                 ),
               ),
         const SizedBox(

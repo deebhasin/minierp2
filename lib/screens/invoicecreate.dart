@@ -715,4 +715,14 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     Provider.of<ChallanProvider>(context, listen: false).updateInvoiceNumberInChallan(challanSelected, widget.invoice.invoiceNo);
     Navigator.of(context).pop();
   }
+
+  @override
+  void dispose(){
+    invoiceNumberController.dispose();
+    invoiceDateController.dispose();
+    billingAddressController.dispose();
+    gstNumberController.dispose();
+    dueDateController.dispose();
+    _formKey.currentState!.dispose();
+  }
 }

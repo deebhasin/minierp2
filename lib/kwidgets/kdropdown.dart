@@ -53,31 +53,28 @@ class KDropdown extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey),
           ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(10,0,0,0),
-            child: DropdownSearch(
-              dialogMaxWidth: width + height,
-              showSearchBox: true,
-              selectedItem: initialValue,
-              popupBackgroundColor: const Color.fromRGBO(242,243,247,1),
-              popupElevation: 0,
-              onChanged: (value) => updateDropdownText(value.toString()),
-              popupShape: const Border(
-                left:  BorderSide(color: Colors.grey),
-                top:  BorderSide(color: Colors.grey),
-                right:  BorderSide(color: Colors.grey),
-                bottom:  BorderSide(color: Colors.grey),
-              ),
-              dropdownSearchBaseStyle: const TextStyle(fontSize: 2),
-              mode: Mode.MENU,
-              items: dropDownList,
-              dropdownSearchDecoration: const InputDecoration(
-                border: InputBorder.none,
-                // icon: Icon(
-                //     Icons.keyboard_arrow_down,
-                //   size: 23,
-                // ),
-              ),
+          child: DropdownSearch(
+            dialogMaxWidth: width + height,
+            showSearchBox: true,
+            selectedItem: initialValue,
+            popupBackgroundColor: const Color.fromRGBO(242,243,247,1),
+            popupElevation: 0,
+            onChanged: (value) => updateDropdownText(value.toString()),
+            popupShape: const Border(
+              left:  BorderSide(color: Colors.grey),
+              top:  BorderSide(color: Colors.grey),
+              right:  BorderSide(color: Colors.grey),
+              bottom:  BorderSide(color: Colors.grey),
+            ),
+            dropdownSearchBaseStyle: const TextStyle(fontSize: 2),
+            mode: Mode.MENU,
+            items: dropDownList,
+            dropdownSearchDecoration: const InputDecoration(
+              border: InputBorder.none,
+              // icon: Icon(
+              //     Icons.keyboard_arrow_down,
+              //   size: 23,
+              // ),
             ),
           ),
         ),
