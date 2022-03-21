@@ -348,15 +348,15 @@ class ChallanProvider with ChangeNotifier {
       challanNo: "12as",
       challanDate: DateTime.now(),
       customerName: "Disco",
-      productId: 12,
-      productName: "Mineral Water",
-      pricePerUnit: 10,
-      quantity: 10,
-      totalAmount: 100,
+      total: 5000,
+      taxAmount: 900,
+      challanAmount: 5900,
     );
 
-    int id = await challanProvider.createChallan(challan);
+    // int id = await challanProvider.createChallan(challan);
     // List<Challan> challanList = await challanProvider.getChallanList();
+    List<Challan> challanList = await challanProvider.getChallanListByParameters(active: 1);
+
     // challan = await challanProvider.getChallanById(id);
     // challan.customerName = "Khisco";
     // await challanProvider.updateChallan(challan);

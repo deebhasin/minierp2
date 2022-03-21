@@ -1,3 +1,4 @@
+import 'package:erpapp/kwidgets/ksubmitresetbuttons.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
@@ -100,7 +101,9 @@ class _ProductCreateState extends State<ProductCreate> {
                 ],
               ),
             ),
-            const SizedBox(height: 10,),
+            const SizedBox(
+              height: 10,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -146,59 +149,22 @@ class _ProductCreateState extends State<ProductCreate> {
                       controller: pricePerUnitController,
                     ),
                     KTextField(
-                      label: "GST (%)",
+                      label: "Active",
                       isMandatory: true,
                       width: 250,
-                      controller: gstController,
-                      validator: gstValidator,
+                      controller: activeController,
+                      validator: activeValidator,
                     ),
                   ],
                 ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  height: 40,
-                  width: 200,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red, // background
-                      onPrimary: Colors.white, // foreground
-                    ),
-                    onPressed: _resetForm,
-                    child: Text(
-                      "Reset",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 30,
-                ),
-                Container(
-                  height: 40,
-                  width: 200,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.green, // background
-                      onPrimary: Colors.white, // foreground
-                    ),
-                    onPressed: _submitForm,
-                    child: Text(
-                      "Submit",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            const SizedBox(
+              height: 50,
+            ),
+            KSubmitResetButtons(
+              resetForm: _resetForm,
+              submitForm: _submitForm,
             ),
           ],
         ),
@@ -209,12 +175,12 @@ class _ProductCreateState extends State<ProductCreate> {
   void _resetForm() {
     setState(() {
       // idController.text = "";
-      nameController.text = "";
-      unitController.text = "";
-      pricePerUnitController.text = "";
-      hsnController.text = "";
-      gstController.text = "";
-      activeController.text = "";
+      nameController.text = widget.product.name;
+      unitController.text = widget.product.unit;
+      pricePerUnitController.text = widget.product.price_per_unit.toString();
+      hsnController.text = widget.product.HSN;
+      gstController.text = widget.product.GST;
+      activeController.text = widget.product.isActive;
     });
   }
 

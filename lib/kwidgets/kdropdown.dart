@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
-
 class KDropdown extends StatelessWidget {
   final List<String> dropDownList;
   final String label;
@@ -10,7 +9,8 @@ class KDropdown extends StatelessWidget {
   String initialValue;
   final Function? onChangeDropDown;
   String selectedValue = "";
-  KDropdown({Key? key,
+  KDropdown({
+    Key? key,
     required this.dropDownList,
     required this.label,
     this.width = 100,
@@ -19,23 +19,22 @@ class KDropdown extends StatelessWidget {
     this.onChangeDropDown,
   }) : super(key: key);
 
-  String getSelectedValue(){
+  String getSelectedValue() {
     return selectedValue;
   }
 
-  void updateDropdownText(String selectedValue){
-    if(selectedValue != "NoValue"){
+  void updateDropdownText(String selectedValue) {
+    if (selectedValue != "NoValue") {
       selectedValue = selectedValue;
-      onChangeDropDown!("$selectedValue");
+      print("DropDown Selected Value: $selectedValue");
+      onChangeDropDown!(selectedValue);
     }
     // print("Selection: $dropdownValue");
     // showDropdownList();
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     print("kdropdown widget build called");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,32 +48,33 @@ class KDropdown extends StatelessWidget {
         ),
         Container(
           width: width + height,
-          height: height * 2,
+          // height: height * 2,
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
+            border: Border(
+              left: BorderSide(color: Colors.transparent),
+              top: BorderSide(color: Colors.transparent),
+              right: BorderSide(color: Colors.transparent),
+              bottom: BorderSide(color: Colors.grey),
+            ),
           ),
           child: DropdownSearch(
             dialogMaxWidth: width + height,
             showSearchBox: true,
             selectedItem: initialValue,
-            popupBackgroundColor: const Color.fromRGBO(242,243,247,1),
+            popupBackgroundColor: const Color.fromRGBO(242, 243, 247, 1),
             popupElevation: 0,
             onChanged: (value) => updateDropdownText(value.toString()),
             popupShape: const Border(
-              left:  BorderSide(color: Colors.grey),
-              top:  BorderSide(color: Colors.grey),
-              right:  BorderSide(color: Colors.grey),
-              bottom:  BorderSide(color: Colors.grey),
+              left: BorderSide(color: Colors.grey),
+              top: BorderSide(color: Colors.grey),
+              right: BorderSide(color: Colors.grey),
+              bottom: BorderSide(color: Colors.grey),
             ),
             dropdownSearchBaseStyle: const TextStyle(fontSize: 2),
             mode: Mode.MENU,
             items: dropDownList,
             dropdownSearchDecoration: const InputDecoration(
               border: InputBorder.none,
-              // icon: Icon(
-              //     Icons.keyboard_arrow_down,
-              //   size: 23,
-              // ),
             ),
           ),
         ),

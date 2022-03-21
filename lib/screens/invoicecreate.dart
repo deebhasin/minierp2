@@ -625,31 +625,31 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                     cellWidth: containerWidth * 0.08,
                   ),
                   // KTableCellHeader(header: challanList[i].customerName, context: context, cellWidth: containerWidth * 0.14,),
-                  KTableCellHeader(
-                    header: _challanList[i].productName,
-                    context: context,
-                    cellWidth: containerWidth * 0.14,
-                  ),
-                  KTableCellHeader(
-                    header: _challanList[i].pricePerUnit.toString(),
-                    context: context,
-                    cellWidth: containerWidth * 0.1,
-                  ),
-                  KTableCellHeader(
-                    header: _challanList[i].productUnit,
-                    context: context,
-                    cellWidth: containerWidth * 0.08,
-                  ),
-                  KTableCellHeader(
-                    header: _challanList[i].quantity.toString(),
-                    context: context,
-                    cellWidth: containerWidth * 0.06,
-                  ),
-                  KTableCellHeader(
-                    header: _challanList[i].totalAmount.toString(),
-                    context: context,
-                    cellWidth: containerWidth * .1,
-                  ),
+                  // KTableCellHeader(
+                  //   header: _challanList[i].productName,
+                  //   context: context,
+                  //   cellWidth: containerWidth * 0.14,
+                  // ),
+                  // KTableCellHeader(
+                  //   header: _challanList[i].pricePerUnit.toString(),
+                  //   context: context,
+                  //   cellWidth: containerWidth * 0.1,
+                  // ),
+                  // KTableCellHeader(
+                  //   header: _challanList[i].productUnit,
+                  //   context: context,
+                  //   cellWidth: containerWidth * 0.08,
+                  // ),
+                  // KTableCellHeader(
+                  //   header: _challanList[i].quantity.toString(),
+                  //   context: context,
+                  //   cellWidth: containerWidth * 0.06,
+                  // ),
+                  // KTableCellHeader(
+                  //   header: _challanList[i].totalAmount.toString(),
+                  //   context: context,
+                  //   cellWidth: containerWidth * .1,
+                  // ),
                   KTableCellHeader(
                     header: _gstList[i],
                     context: context,
@@ -675,19 +675,19 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   void checkboxChanged(bool _isChecked, Challan _challan, int i, String _gst) {
     setState(() {
       checkboxList[i] = _isChecked;
-      if (_isChecked) {
-        challanSelected[i] = _challan.id;
-        subtotal += _challan.totalAmount;
-        taxTotal += _challan.totalAmount * double.parse(_gst) / 100;
-        invoiceTotal += _challan.totalAmount +
-            (_challan.totalAmount * double.parse(_gst) / 100);
-      } else {
-        challanSelected[i] = -1;
-        subtotal -= _challan.totalAmount;
-        taxTotal -= _challan.totalAmount * double.parse(_gst) / 100;
-        invoiceTotal -= (_challan.totalAmount +
-            (_challan.totalAmount * double.parse(_gst) / 100));
-      }
+      // if (_isChecked) {
+      //   challanSelected[i] = _challan.id;
+      //   subtotal += _challan.totalAmount;
+      //   taxTotal += _challan.totalAmount * double.parse(_gst) / 100;
+      //   invoiceTotal += _challan.totalAmount +
+      //       (_challan.totalAmount * double.parse(_gst) / 100);
+      // } else {
+      //   challanSelected[i] = -1;
+      //   subtotal -= _challan.totalAmount;
+      //   taxTotal -= _challan.totalAmount * double.parse(_gst) / 100;
+      //   invoiceTotal -= (_challan.totalAmount +
+      //       (_challan.totalAmount * double.parse(_gst) / 100));
+      // }
       print("Checkbox Status: $_isChecked od id: $_challan.id");
       print("Selected Challans: ${challanSelected}");
     });

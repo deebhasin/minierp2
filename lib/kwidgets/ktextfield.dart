@@ -13,18 +13,20 @@ class KTextField extends StatelessWidget {
   final TextEditingController controller;
   final FieldValidator? validator;
   final bool isMandatory;
+  final Function? valueUpdated;
 
   KTextField({
     Key? key,
     required this.label,
     this.width = 400,
-    this.height = 100,
+    this.height = 80,
     this.multiLine = 1,
     this.isDisabled = false,
     required this.controller,
     this.validator,
     this.isMandatory = false,
-    this.maxLength = 200
+    this.maxLength = 200,
+    this.valueUpdated,
   }) : super(key: key);
 
   @override
@@ -64,10 +66,13 @@ class KTextField extends StatelessWidget {
               width: 1,
             ),
             TextFormField(
+              cursorColor: Colors.greenAccent,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               inputFormatters: [
                 LengthLimitingTextInputFormatter(maxLength),
               ],
+              // onEditingComplete: () => valueUpdatedTest,
+              onChanged: (value) => valueUpdated!(value),
               maxLines: multiLine,
               readOnly: isDisabled,
               controller: controller,
@@ -82,5 +87,8 @@ class KTextField extends StatelessWidget {
             ),
           ]),
     );
+  }
+  void valueUpdatedTest(String val){
+    print("Testing On Changed of TextFormField");
   }
 }

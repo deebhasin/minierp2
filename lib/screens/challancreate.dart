@@ -1,12 +1,14 @@
-import 'package:erpapp/kwidgets/kchallanbutton.dart';
+import 'package:erpapp/kwidgets/ksubmitresetbuttons.dart';
 import 'package:erpapp/kwidgets/ktextfield.dart';
 import 'package:erpapp/model/challan.dart';
 import 'package:erpapp/model/customer.dart';
 import 'package:erpapp/model/product.dart';
+import 'package:erpapp/providers/challan_product_provider.dart';
 import 'package:erpapp/providers/challan_provider.dart';
 import 'package:erpapp/providers/customer_provider.dart';
 import 'package:erpapp/providers/product_provider.dart';
 import 'package:erpapp/widgets/alertdialognav.dart';
+import 'package:erpapp/widgets/challan_product_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +16,7 @@ import 'package:provider/provider.dart';
 
 import '../kwidgets/kvariables.dart';
 import '../kwidgets/kdropdown.dart';
+import '../model/challan_product.dart';
 
 class ChallanCreate extends StatefulWidget {
   Challan challan;
@@ -29,55 +32,59 @@ class ChallanCreate extends StatefulWidget {
 class _ChallanCreateState extends State<ChallanCreate> {
   final _formKey = GlobalKey<FormState>();
 
-  late KDropdown customerDropdown;
-  late KDropdown productDropdown;
+  // late KDropdown customerDropdown;
+  // late KDropdown productDropdown;
   late final challanNumberController;
   late final challanDateController;
-  late final challanPricePerUnitController;
-  late final challanUnitController;
-  late final challanQuantityController;
-  late final challanAmountController;
+  late final challanTotalController;
+  late final challanTaxAmountController;
+  late final challanChallanAmountController;
+  late final challanInvoiceNoController;
 
+  late final productNameController;
 
-  String challanNewOrEdit = "New Challan";
+  int lineItem = 0;
+  late List<ChallanProduct> _challanProductList;
 
   String customerName = "-----";
-  String productName = "-----";
   late double containerWidth;
-  late List<Customer> customerListFetched;
-  late List<Product> productListFetched;
-  List<String> customerList = [];
-  List<String> productList = [];
+  List<Customer> customerList = [];
+  List<Product> productList = [];
 
-  final challanNumberValidator = RequiredValidator(errorText: 'Challan Number is required');
-  final challanDateValidator = RequiredValidator(errorText: 'Challan Date is required');
+  final challanNumberValidator =
+      RequiredValidator(errorText: 'Challan Number is required');
+  final challanDateValidator =
+      RequiredValidator(errorText: 'Challan Date is required');
   final challanPricePerUnitValidator = MultiValidator([
     RequiredValidator(errorText: 'Price Per Unit is required'),
     PatternValidator(r'\d+?$', errorText: "Price Per Unit should be number"),
   ]);
-  final challanUnitValidator = RequiredValidator(errorText: 'Item Unit is required');
+  final challanUnitValidator =
+      RequiredValidator(errorText: 'Item Unit is required');
   final challanQuantityValidator = MultiValidator([
     RequiredValidator(errorText: 'Quantity is required'),
     PatternValidator(r'\d+?$', errorText: "Quantity should be number"),
   ]);
 
-
   @override
   void initState() {
     _buildForm();
     _getdropdownList();
+    _challanProductList = widget.challan.challanProductList??[];
+    _challanProductList.length == 0? _challanProductList.add(ChallanProduct()) : _challanProductList;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    containerWidth = (MediaQuery.of(context).size.width - KVariables.sidebarWidth);
+    containerWidth =
+        (MediaQuery.of(context).size.width - KVariables.sidebarWidth);
 
     print("CHallan create bui;d ca;;ed");
     return _challanCreate();
   }
 
-  Widget _challanCreate(){
+  Widget _challanCreate() {
     return AlertDialog(
       contentPadding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
@@ -90,10 +97,14 @@ class _ChallanCreateState extends State<ChallanCreate> {
             Container(
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Color.fromRGBO(242,243,247,1),
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30), bottomLeft: Radius.zero, bottomRight: Radius.zero),
+                color: Color.fromRGBO(242, 243, 247, 1),
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                    bottomLeft: Radius.zero,
+                    bottomRight: Radius.zero),
               ),
-              width:  containerWidth,
+              width: containerWidth,
               child: AlertDialogNav(),
             ),
             Padding(
@@ -102,7 +113,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    challanNewOrEdit,
+                    widget.challan.id == 0 ? "New Challan" : "Edit Challan",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -110,62 +121,105 @@ class _ChallanCreateState extends State<ChallanCreate> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  child: KDropdown(dropDownList: customerList, label: "Customer", initialValue: customerName, width: 250, onChangeDropDown: _onCompanyChange,),
+                KDropdown(
+                  dropDownList:
+                      customerList.map((e) => e.company_name).toList(),
+                  label: "Customer",
+                  initialValue: customerName,
+                  width: 250,
+                  onChangeDropDown: _onCompanyChange,
                 ),
-                Container(
-                  child: KTextField(label: "Challan # *", width: 250,controller: challanNumberController, validator: challanNumberValidator, ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    KTextField(
+                      label: "Challan #",
+                      width: 150,
+                      isMandatory: true,
+                      controller: challanNumberController,
+                      validator: challanNumberValidator,
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    KTextField(
+                      label: "Challan Date",
+                      isMandatory: true,
+                      width: 150,
+                      controller: challanDateController,
+                      validator: challanDateValidator,
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: 10,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Container(
-                  child: KDropdown(dropDownList: productList, label: "Product", initialValue: productName, width: 250, onChangeDropDown: _onProductyChange,),
-                ),
-                Container(
-                  child: KTextField(label: "Challan Date *", width: 250,controller: challanDateController, validator: challanDateValidator,),
-                ),
-              ],
+            const SizedBox(
+              height: 30,
             ),
-            const SizedBox(height: 30,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Container(
-                  child: KTextField(label: "Price Per Unit *", width: 250,controller: challanPricePerUnitController, validator: challanPricePerUnitValidator, ),
-                ),
-                Container(
-                  child: KTextField(label: "Unit *", width: 250,controller: challanUnitController, validator: challanUnitValidator),
-                ),
-                Container(
-                  child: KTextField(label: "Quantity *", width: 250,controller: challanQuantityController, validator: challanQuantityValidator,),
-                ),
-                Container(
-                  child: KTextField(label: "Total Amount", width: 250,controller: challanAmountController, isDisabled: true, ),
-                ),
-              ],
+            Expanded(
+              child: SingleChildScrollView(
+                child: _getChallanProductWidgets(),
+              ),
             ),
-            const SizedBox(height: 10,),
+            const SizedBox(
+              height: 30,
+            ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(
+                const SizedBox(
+                  width: 20,
+                ),
+                SizedBox(
+                  width: 80,
+                  height: 25,
                   child: ElevatedButton(
-                    onPressed: _resetForm,
-                    child: Text("Reset"),
+                    onPressed: _addLineItem,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(
+                          Icons.add,
+                          color: Colors.blue,
+                          size: 20,
+                        ),
+                        // const SizedBox(width: 5,),
+                        Text(
+                          "Add",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ],
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      primary: Color.fromRGBO(0, 0, 0, .05),
+                      shadowColor: Colors.transparent,
+                      side: const BorderSide(
+                        width: 2,
+                        color: Colors.blue,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
                   ),
                 ),
-                Container(
-                  child: ElevatedButton(
-                    onPressed: _submitForm,
-                    child: Text("Submit"),
-                  ),
-                ),
               ],
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+            KSubmitResetButtons(
+              resetForm: _resetForm,
+              submitForm: _submitForm,
+            ),
+            const SizedBox(
+              height: 30,
             ),
           ],
         ),
@@ -173,130 +227,142 @@ class _ChallanCreateState extends State<ChallanCreate> {
     );
   }
 
-  _getdropdownList() async{
-    CustomerProvider customerProvider = CustomerProvider();
-    ProductProvider productProvider = ProductProvider();
-    customerListFetched = await customerProvider.getCustomerList();
-
-    for(int i=0; i < customerListFetched.length;i++){
-      customerList.add(customerListFetched[i].company_name);
-    };
-    productListFetched = await productProvider.getProductList();
-    for(int i=0; i < productListFetched.length;i++){
-      productList.add(productListFetched[i].name);
-    };
-  }
-
-  void valueUpdated(){
-    print("Value Updated");
-    challanAmountController.text =
-        (double.parse(challanPricePerUnitController.text) *
-        double.parse(challanQuantityController.text)).toString();
-  }
-  onChangeDropdown(String value){
-    List<String> val = value.split(":");
-    if(val[0] == "Customer"){
-      customerName = val[1];
-    }
-    else if(val[0] == "Product"){
-      productName = val[1];
-      print("New List Begins");
-      // List newlist = productListFetched.where((item) => item.name == val[1]).toList();
-      final product = productListFetched.singleWhere((element) => element.name == val[1]);
-      // print("Price: ${price.price_per_unit}");
-      challanPricePerUnitController.text = product.price_per_unit.toString();
-      challanUnitController.text = product.unit;
-    }
-
-    print("${val[0]}: ${val[1]}");
-  }
-
-  void _onCompanyChange(String companyName){
+  _getdropdownList() async {
+    customerList = await Provider.of<CustomerProvider>(context, listen: false).getCustomerList();
+    productList = await Provider.of<ProductProvider>(context, listen: false).getProductList();
+    _challanProductList = await Provider.of<ChallanProductProvider>(context, listen: false).getChallanProductList();
     setState(() {
-      this.customerName = companyName;
+
     });
+    print(
+        "Customer List: ${customerList.length} and Product List: ${productList.length}");
   }
 
-  void _onProductyChange(String productName){
-    setState(() {
-      this.productName = productName;
-      final product = productListFetched.singleWhere((element) => element.name == productName);
-      // print("Price: ${price.price_per_unit}");
-      challanPricePerUnitController.text = product.price_per_unit.toString();
-      challanUnitController.text = product.unit;
-    });
+
+  void _onCompanyChange(String customerName) {
+    this.customerName = customerName;
   }
 
-  void _buildForm(){
-    if(widget.challan.id != 0) {
-      challanNewOrEdit = "Edit Challan";
+  // void _onProductChange(String productName) {
+  //   this.productNameInitialValueList[lineItem] = productName;
+  //   final product =
+  //       productList.singleWhere((element) => element.name == productName);
+  //
+  //   // print("Price: ${price.price_per_unit}");
+  // }
+
+  void _buildForm() {
+    if (widget.challan.id != 0) {
       customerName = widget.challan.customerName;
-      productName =widget.challan.productName;
     }
     // customerDropdown = KDropdown(dropDownList: customerList, label: "Customer", initialValue: customerName, width: 250,);
     // productDropdown = KDropdown(dropDownList: productList, label: "Product", initialValue: productName, width: 250,);
-    challanNumberController = TextEditingController(text:widget.challan.challanNo);
-    challanDateController = TextEditingController(text:DateFormat("d-M-y").format(widget.challan.challanDate!));
-    challanPricePerUnitController = TextEditingController(text: widget.challan.pricePerUnit.toString());
-    challanUnitController = TextEditingController(text: widget.challan.productUnit);
-    challanQuantityController = TextEditingController(text: widget.challan.quantity.toString());
-    challanAmountController = TextEditingController(text: widget.challan.totalAmount.toString());
+    challanNumberController =
+        TextEditingController(text: widget.challan.challanNo);
+    challanDateController = TextEditingController(
+        text: DateFormat("d-M-y").format(widget.challan.challanDate!));
+    challanTotalController =
+        TextEditingController(text: widget.challan.total.toString());
+    challanTaxAmountController =
+        TextEditingController(text: widget.challan.taxAmount.toString());
+    challanChallanAmountController =
+        TextEditingController(text: widget.challan.challanAmount.toString());
+    challanInvoiceNoController =
+        TextEditingController(text: widget.challan.invoiceNo.toString());
   }
-  void _resetForm(){
+
+  void _resetForm() {
     setState(() {
       print("Reset Start");
+      lineItem = 0;
       customerName = "-----";
-      productName = "-----";
+      _challanProductList.clear();
+      // widgetList.clear();
       // customerDropdown.initialValueChanged(widget.challan.customerName);
       challanNumberController.text = widget.challan.challanNo;
-      challanDateController.text = DateFormat("d-M-y").format(widget.challan.challanDate!);
-      challanPricePerUnitController.text = widget.challan.pricePerUnit.toString();
-      challanUnitController.text = widget.challan.productUnit;
-      challanQuantityController.text = widget.challan.quantity.toString();
-      challanAmountController.text = widget.challan.totalAmount.toString();
+      challanDateController.text =
+          DateFormat("d-M-y").format(widget.challan.challanDate!);
+
+      // challanPricePerUnitController.text =
+      //     widget.challan.pricePerUnit.toString();
+      // challanUnitController.text = widget.challan.productUnit;
+      // challanQuantityController.text = widget.challan.quantity.toString();
+      // challanAmountController.text = widget.challan.totalAmount.toString();
       print("Reset End");
     });
   }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-
       // widget.challan.customerName = customerDropdown.getSelectedValue() == ""? widget.challan.customerName : customerDropdown.getSelectedValue();
       // widget.challan.productName = productDropdown.getSelectedValue() == ""? widget.challan.productName : productDropdown.getSelectedValue();
       widget.challan.customerName = customerName;
-      widget.challan.productName = productName;
-      widget.challan.challanNo = challanNumberController.text;
-      widget.challan.challanDate = DateFormat("d-M-y").parse(challanDateController.text);
-      widget.challan.pricePerUnit = double.parse(challanPricePerUnitController.text);
-      widget.challan.productUnit = challanUnitController.text;
-      widget.challan.quantity = double.parse(challanQuantityController.text);
-      widget.challan.totalAmount = double.parse(challanAmountController.text);
+      // widget.challan.productName = productName;
+      // widget.challan.challanNo = challanNumberController.text;
+      // widget.challan.challanDate =
+      //     DateFormat("d-M-y").parse(challanDateController.text);
+      // widget.challan.pricePerUnit =
+      //     double.parse(challanPricePerUnitController.text);
+      // widget.challan.productUnit = challanUnitController.text;
+      // widget.challan.quantity = double.parse(challanQuantityController.text);
+      // widget.challan.totalAmount = double.parse(challanAmountController.text);
 
       print("Customer Name: ${widget.challan.customerName}");
 
       if (widget.challan.id != 0) {
-        Provider.of<ChallanProvider>(context, listen: false).updateChallan(
-            widget.challan);
+        Provider.of<ChallanProvider>(context, listen: false)
+            .updateChallan(widget.challan);
         print("Product Updated");
-      }
-      else {
-        Provider.of<ChallanProvider>(context, listen: false).createChallan(
-            widget.challan);
+      } else {
+        Provider.of<ChallanProvider>(context, listen: false)
+            .createChallan(widget.challan);
       }
       Navigator.of(context).pop();
-    }
-    else {
+    } else {
       print("Validation Failed");
     }
   }
 
   @override
-  void dispose(){
+  void dispose() {
     challanNumberController.dispose();
     challanDateController.dispose();
-    challanPricePerUnitController.dispose();
-    challanQuantityController.dispose();
-    challanAmountController.dispose();
+    super.dispose();
+  }
+
+  void _addLineItem() {
+    setState(() {
+      _challanProductList.add(ChallanProduct());
+    });
+    // widgetList.add(ChallanProductWidget(productList: productList,challanProduct: challanProduct, onProductChange: _onProductChange,));
+    // addLineItemOnClick();
+  }
+
+  void challanProductAdd(){
+
+  }
+
+  void addLineItemOnClick() {
+    setState(() {
+      lineItem++;
+      // print("Line Item $lineItem. Widget List Length: ${widgetList.length}");
+    });
+  }
+
+  Widget _getChallanProductWidgets(){
+    print("CHallan Product List Length ${_challanProductList.length}");
+    return Column(children: _challanProductList.map((challanProductItem) => ChallanProductWidget(
+      productList: productList,
+      challanProduct: challanProductItem,
+      challanProductListPos: (_challanProductList.length -1),
+      deleteChallaProductFromList: _deleteChallaProductFromList,
+    )).toList());
+  }
+
+  void _deleteChallaProductFromList(int pos){
+    setState(() {
+      _challanProductList.removeAt(pos);
+    });
   }
 
 }

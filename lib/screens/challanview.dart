@@ -31,9 +31,11 @@ class _ViewChallanState extends State<ViewChallan> {
 
   @override
   Widget build(BuildContext context) {
+    ChallanProvider challanProvider = ChallanProvider();
+    challanProvider.challanTest(challanProvider);
     return Consumer<ChallanProvider>(builder: (ctx, provider, child) {
       return FutureBuilder(
-        future: provider.getChallanList(),
+        future: provider.getChallanListByParameters(active: 1),
         builder: (context, AsyncSnapshot<List<Challan>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator();
@@ -123,12 +125,10 @@ Widget _displayChallan(BuildContext context){
             KTableCellHeader(header: "Challan #", context: context, cellWidth: containerWidth * 0.08,),
             KTableCellHeader(header: "Challan Date", context: context, cellWidth: containerWidth * 0.08,),
             KTableCellHeader(header: "Customer Name", context: context, cellWidth: containerWidth * 0.14,),
-            KTableCellHeader(header: "Product Name", context: context, cellWidth: containerWidth * 0.14,),
-            KTableCellHeader(header: "Price Per Unit", context: context, cellWidth: containerWidth * 0.1,),
-            KTableCellHeader(header: "Unit", context: context, cellWidth: containerWidth * 0.08,),
-            KTableCellHeader(header: "Quantity", context: context, cellWidth: containerWidth * 0.06,),
-            KTableCellHeader(header: "Amount", context: context, cellWidth: containerWidth * .1,),
-            KTableCellHeader(header: "Invoice #", context: context, cellWidth: containerWidth * 0.07,),
+            KTableCellHeader(header: "Amount", context: context, cellWidth: containerWidth * 0.1,),
+            KTableCellHeader(header: "Tax", context: context, cellWidth: containerWidth * 0.1,),
+            KTableCellHeader(header: "Grand Total", context: context, cellWidth: containerWidth * 0.1,),
+            KTableCellHeader(header: "Invoice #", context: context, cellWidth: containerWidth * 0.12,),
             KTableCellHeader(header: "", context: context, cellWidth: containerWidth *.05, isLastPos: true,),
           ],
         ),
@@ -140,12 +140,10 @@ Widget _displayChallan(BuildContext context){
               KTableCellHeader(header: challanList[i].challanNo, context: context, cellWidth: containerWidth * 0.08,),
               KTableCellHeader(header: DateFormat("d-M-y").format(challanList[i].challanDate!), context: context, cellWidth: containerWidth * 0.08,),
               KTableCellHeader(header: challanList[i].customerName, context: context, cellWidth: containerWidth * 0.14,),
-              KTableCellHeader(header: challanList[i].productName, context: context, cellWidth: containerWidth * 0.14,),
-              KTableCellHeader(header: challanList[i].pricePerUnit.toString(), context: context, cellWidth: containerWidth * 0.1,),
-              KTableCellHeader(header: challanList[i].productUnit, context: context, cellWidth: containerWidth * 0.08,),
-              KTableCellHeader(header: challanList[i].quantity.toString(), context: context, cellWidth: containerWidth * 0.06,),
-              KTableCellHeader(header: challanList[i].totalAmount.toString(), context: context, cellWidth: containerWidth * .1,),
-              KTableCellHeader(header: challanList[i].invoiceNo, context: context, cellWidth: containerWidth * 0.07,),
+              KTableCellHeader(header: challanList[i].total.toString(), context: context, cellWidth: containerWidth * 0.1,),
+              KTableCellHeader(header: challanList[i].taxAmount.toString(), context: context, cellWidth: containerWidth * 0.1,),
+              KTableCellHeader(header: challanList[i].challanAmount.toString(), context: context, cellWidth: containerWidth * 0.1,),
+              KTableCellHeader(header: challanList[i].invoiceNo, context: context, cellWidth: containerWidth * 0.12,),
               _displayIcons(i),
             ],
           ),

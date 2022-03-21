@@ -72,6 +72,7 @@ class LocalDBRepo {
 		await db.delete("PAYMENT");
 		await db.delete("PRODUCT");
 		await db.delete("CHALLAN");
+		await db.delete("CHALLAN_PRODUCTS");
 	}
 
 	Future<String> _getDBDirectoryPath() async {
@@ -226,13 +227,25 @@ class LocalDBRepo {
 				"challan_no TEXT,"
 				"challan_date TEXT,"
 				"customer_name TEXT,"
-				"product_id INT,"
-				"product_name TEXT,"
-				"price_per_unit REAL,"
-				"product_unit,"
-				"quantity REAL,"
-				"total_amount REAL,"
+				"total REAL,"
+				"tax_amount REAL,"
+				"challan_amount REAL,"
 				"invoice_number TEXT,"
+				"active TINYINT(1)"
+				")");
+
+		await db.execute("CREATE TABLE CHALLAN_PRODUCTS("
+				"id INTEGER PRIMARY KEY AUTOINCREMENT,"
+				"challan_id INT,"
+				"product_name TEXT,"
+				"hsn TEXT,"
+				"gst_percent REAL,"
+				"price_per_unit REAL,"
+				"product_unit TEXT,"
+				"quantity REAL,"
+				"product_total REAL,"
+				"product_tax REAL,"
+				"product_amount REAL,"
 				"active TINYINT(1)"
 				")");
 

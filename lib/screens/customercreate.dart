@@ -1,4 +1,5 @@
 import 'package:erpapp/kwidgets/dtextfield.dart';
+import 'package:erpapp/kwidgets/ksubmitresetbuttons.dart';
 import 'package:erpapp/widgets/alertdialognav.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -118,8 +119,7 @@ class _CustomerCreateState extends State<CustomerCreate> {
               child: Column(
                 children: [
                   Text(
-                    widget.customer.id == 0 ?
-                    "New Customer" : "Edit Customer",
+                    widget.customer.id == 0 ? "New Customer" : "Edit Customer",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
@@ -201,49 +201,9 @@ class _CustomerCreateState extends State<CustomerCreate> {
                   // SizedBox(
                   //   height: 20,
                   // ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 200,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.red, // background
-                            onPrimary: Colors.white, // foreground
-                          ),
-                          onPressed: _resetForm,
-                          child: Text(
-                            "Reset",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 30,
-                      ),
-                      Container(
-                        height: 40,
-                        width: 200,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.green, // background
-                            onPrimary: Colors.white, // foreground
-                          ),
-                          onPressed: _submitForm,
-                          child: Text(
-                            "Submit",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  KSubmitResetButtons(
+                    resetForm: _resetForm,
+                    submitForm: _submitForm,
                   ),
                 ],
               ),
@@ -295,7 +255,6 @@ class _CustomerCreateState extends State<CustomerCreate> {
     stateController.dispose();
     gstController.dispose();
     creditPeriodController.dispose();
-    _formKey.currentState!.dispose();
     super.dispose();
   }
 }
