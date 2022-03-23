@@ -5,18 +5,19 @@ import '../kwidgets/ktextfield.dart';
 import '../model/product.dart';
 import '../model/challan_product.dart';
 
-
 class ChallanProductWidget extends StatefulWidget {
   List<Product> productList;
   ChallanProduct challanProduct;
   int challanProductListPos;
   Function deleteChallanProductFromList;
+  bool? isInvoice;
   ChallanProductWidget({
     Key? key,
     required this.productList,
     required this.challanProduct,
     required this.challanProductListPos,
     required this.deleteChallanProductFromList,
+    this.isInvoice = false,
   }) : super(key: key);
 
   @override
@@ -28,6 +29,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
   String productName = "";
   bool isChallan = false;
 
+  late final productNameController;
   late final pricePerUnitController;
   late final unitController;
   late final quantityController;
@@ -38,7 +40,11 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
 
   @override
   void initState() {
-    _dropdownInitialValue = widget.challanProduct.id != 0? widget.challanProduct.productName : _dropdownInitialValue;
+    _dropdownInitialValue = widget.challanProduct.id != 0
+        ? widget.challanProduct.productName
+        : _dropdownInitialValue;
+    productNameController =
+        TextEditingController(text: widget.challanProduct.productName);
     pricePerUnitController = TextEditingController(
         text: widget.challanProduct.pricePerUnit.toString());
     unitController =
@@ -63,13 +69,20 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          KDropdown(
-            dropDownList: widget.productList.map((e) => e.name).toList(),
-            label: "Product",
-            initialValue: _dropdownInitialValue,
-            width: 250,
-            onChangeDropDown: onProductChange,
-          ),
+          widget.isInvoice!
+              ? KTextField(
+                  label: "Product",
+                  controller: productNameController,
+                  width: 250,
+                  isDisabled: widget.isInvoice!,
+                )
+              : KDropdown(
+                  dropDownList: widget.productList.map((e) => e.name).toList(),
+                  label: "Product",
+                  initialValue: _dropdownInitialValue,
+                  width: 250,
+                  onChangeDropDown: onProductChange,
+                ),
           KTextField(
             label: "Price Per Unit",
             isMandatory: true,
@@ -77,12 +90,14 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
             controller: pricePerUnitController,
             // validator: challanPricePerUnitValidator,
             valueUpdated: pricePerUnitValueChanged,
+            isDisabled: widget.isInvoice!,
           ),
           KTextField(
             label: "Unit",
             isMandatory: true,
             width: 70,
             controller: unitController,
+            isDisabled: widget.isInvoice!,
             // validator: challanUnitValidator,
           ),
           KTextField(
@@ -90,6 +105,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
             isMandatory: true,
             width: 80,
             controller: quantityController,
+            isDisabled: widget.isInvoice!,
             // validator: challanQuantityValidator,
             valueUpdated: quantityValueChanged,
           ),

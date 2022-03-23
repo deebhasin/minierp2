@@ -33,9 +33,9 @@ class ChallanCreate extends StatefulWidget {
 
 class _ChallanCreateState extends State<ChallanCreate> {
   final _formKey = GlobalKey<FormState>();
+  bool _isInvoice = false;
 
-  // late KDropdown customerDropdown;
-  // late KDropdown productDropdown;
+  late final customerNameController;
   late final challanNumberController;
   late final challanDateController;
   late final challanTotalController;
@@ -71,10 +71,9 @@ class _ChallanCreateState extends State<ChallanCreate> {
 
   @override
   void initState() {
+    _isInvoice = widget.challan.invoiceNo != "" ? true : false;
     _buildForm();
     _getdropdownList();
-    // _challanProductList = widget.challan.challanProductList??[];
-    // _challanProductList.length == 0? _challanProductList.add(ChallanProduct()) : _challanProductList;
     super.initState();
   }
 
@@ -116,7 +115,11 @@ class _ChallanCreateState extends State<ChallanCreate> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    widget.challan.id == 0 ? "New Challan" : "Edit Challan",
+                    widget.challan.id == 0
+                        ? "New Challan"
+                        : _isInvoice
+                            ? "View Invoice"
+                            : "Edit Challan",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -126,14 +129,21 @@ class _ChallanCreateState extends State<ChallanCreate> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                KDropdown(
-                  dropDownList:
-                      customerList.map((e) => e.company_name).toList(),
-                  label: "Customer",
-                  initialValue: customerName,
-                  width: 250,
-                  onChangeDropDown: _onCompanyChange,
-                ),
+                _isInvoice
+                    ? KTextField(
+                        label: "Customer",
+                        controller: customerNameController,
+                        width: 250,
+                        isDisabled: true,
+                      )
+                    : KDropdown(
+                        dropDownList:
+                            customerList.map((e) => e.company_name).toList(),
+                        label: "Customer",
+                        initialValue: customerName,
+                        width: 250,
+                        onChangeDropDown: _onCompanyChange,
+                      ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -143,6 +153,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
                       isMandatory: true,
                       controller: challanNumberController,
                       validator: challanNumberValidator,
+                      isDisabled: _isInvoice,
                     ),
                     const SizedBox(
                       height: 30,
@@ -153,6 +164,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
                       width: 150,
                       controller: challanDateController,
                       validator: challanDateValidator,
+                      isDisabled: _isInvoice,
                     ),
                   ],
                 ),
@@ -169,58 +181,62 @@ class _ChallanCreateState extends State<ChallanCreate> {
             const SizedBox(
               height: 30,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  width: 20,
-                ),
-                SizedBox(
-                  width: 80,
-                  height: 25,
-                  child: ElevatedButton(
-                    onPressed: _addLineItem,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(
-                          Icons.add,
-                          color: Colors.blue,
-                          size: 20,
-                        ),
-                        // const SizedBox(width: 5,),
-                        Text(
-                          "Add",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Colors.blue,
+            _isInvoice
+                ? Container()
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      SizedBox(
+                        width: 80,
+                        height: 25,
+                        child: ElevatedButton(
+                          onPressed: _addLineItem,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(
+                                Icons.add,
+                                color: Colors.blue,
+                                size: 20,
+                              ),
+                              // const SizedBox(width: 5,),
+                              Text(
+                                "Add",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ],
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            primary: Color.fromRGBO(0, 0, 0, .05),
+                            shadowColor: Colors.transparent,
+                            side: const BorderSide(
+                              width: 2,
+                              color: Colors.blue,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
                           ),
                         ),
-                      ],
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      primary: Color.fromRGBO(0, 0, 0, .05),
-                      shadowColor: Colors.transparent,
-                      side: const BorderSide(
-                        width: 2,
-                        color: Colors.blue,
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
+                    ],
                   ),
-                ),
-              ],
-            ),
             const SizedBox(
               height: 30,
             ),
-            KSubmitResetButtons(
-              resetForm: _resetForm,
-              submitForm: _submitForm,
-            ),
+            _isInvoice
+                ? Container()
+                : KSubmitResetButtons(
+                    resetForm: _resetForm,
+                    submitForm: _submitForm,
+                  ),
             const SizedBox(
               height: 30,
             ),
@@ -249,20 +265,12 @@ class _ChallanCreateState extends State<ChallanCreate> {
     this.customerName = customerName;
   }
 
-  // void _onProductChange(String productName) {
-  //   this.productNameInitialValueList[lineItem] = productName;
-  //   final product =
-  //       productList.singleWhere((element) => element.name == productName);
-  //
-  //   // print("Price: ${price.price_per_unit}");
-  // }
-
   void _buildForm() {
     if (widget.challan.id != 0) {
       customerName = widget.challan.customerName;
     }
-    // customerDropdown = KDropdown(dropDownList: customerList, label: "Customer", initialValue: customerName, width: 250,);
-    // productDropdown = KDropdown(dropDownList: productList, label: "Product", initialValue: productName, width: 250,);
+    customerNameController =
+        TextEditingController(text: widget.challan.customerName);
     challanNumberController =
         TextEditingController(text: widget.challan.challanNo);
     challanDateController = TextEditingController(
@@ -280,20 +288,18 @@ class _ChallanCreateState extends State<ChallanCreate> {
   void _resetForm() {
     print("Reset Start");
     lineItem = 0;
-    customerName = widget.challan.id != 0? widget.challan.customerName : "-----";
-    // widgetList.clear();
-    // customerDropdown.initialValueChanged(widget.challan.customerName);
+    customerName =
+        widget.challan.id != 0 ? widget.challan.customerName : "-----";
     challanNumberController.text = widget.challan.challanNo;
     challanDateController.text =
         DateFormat("d-M-y").format(widget.challan.challanDate!);
 
     _challanProductList = List.from(_challanProductListOld);
     _getChallanProductWidgets();
-    print("_challanProductList Reset to _challanProductListOld with Length: ${_challanProductList.length}");
+    print(
+        "_challanProductList Reset to _challanProductListOld with Length: ${_challanProductList.length}");
     print("Reset End");
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   Future<void> _submitForm() async {
@@ -308,37 +314,41 @@ class _ChallanCreateState extends State<ChallanCreate> {
       widget.challan.taxAmount = 0;
       widget.challan.challanAmount = 0;
 
-      for (ChallanProduct _element in _challanProductList){
+      for (ChallanProduct _element in _challanProductList) {
         widget.challan.total += _element.totalBeforeTax;
         widget.challan.taxAmount += _element.taxAmount;
         widget.challan.challanAmount += _element.totalAmount;
-
       }
 
-      Provider.of<ChallanProductProvider>(context, listen: false).deleteChallanProductNotInList(_challanProductList, widget.challan.id);
+      Provider.of<ChallanProductProvider>(context, listen: false)
+          .deleteChallanProductNotInList(
+              _challanProductList, widget.challan.id);
 
       if (widget.challan.id != 0) {
         Provider.of<ChallanProvider>(context, listen: false)
             .updateChallan(widget.challan);
 
-        for(ChallanProduct _element in _challanProductList){
-          if(_element.challanId ==0){
+        for (ChallanProduct _element in _challanProductList) {
+          if (_element.challanId == 0) {
             _element.challanId = widget.challan.id;
-            Provider.of<ChallanProductProvider>(context, listen: false).createChallanProduct(_element);
-          }
-          else{
-            Provider.of<ChallanProductProvider>(context, listen: false).updateChallanProduct(_element);
+            Provider.of<ChallanProductProvider>(context, listen: false)
+                .createChallanProduct(_element);
+          } else {
+            Provider.of<ChallanProductProvider>(context, listen: false)
+                .updateChallanProduct(_element);
           }
         }
 
         print("Product Updated");
       } else {
-        int _challanId = await Provider.of<ChallanProvider>(context, listen: false)
-            .createChallan(widget.challan);
-        for(ChallanProduct _element in _challanProductList){
-            _element.challanId = _challanId;
-            Provider.of<ChallanProductProvider>(context, listen: false).createChallanProduct(_element);
-          }
+        int _challanId =
+            await Provider.of<ChallanProvider>(context, listen: false)
+                .createChallan(widget.challan);
+        for (ChallanProduct _element in _challanProductList) {
+          _element.challanId = _challanId;
+          Provider.of<ChallanProductProvider>(context, listen: false)
+              .createChallanProduct(_element);
+        }
       }
       Navigator.of(context).pop();
     } else {
@@ -357,26 +367,24 @@ class _ChallanCreateState extends State<ChallanCreate> {
     setState(() {
       _challanProductList.add(ChallanProduct());
     });
-    // widgetList.add(ChallanProductWidget(productList: productList,challanProduct: challanProduct, onProductChange: _onProductChange,));
-    // addLineItemOnClick();
   }
 
   Widget _getChallanProductWidgets() {
-    // print("CHallan Product List Length ${_challanProductList.length}");
-    // lineItem = 0;
     return Column(
         children: _challanProductList
             .map((challanProductItem) => ChallanProductWidget(
                   key: ObjectKey(challanProductItem),
                   productList: productList,
                   challanProduct: challanProductItem,
-                  challanProductListPos: _challanProductList.indexOf(challanProductItem),
+                  challanProductListPos:
+                      _challanProductList.indexOf(challanProductItem),
                   deleteChallanProductFromList: _deleteChallanProductFromList,
+                  isInvoice: _isInvoice,
                 ))
             .toList());
   }
 
-  void _deleteChallanProductFromList(int pos ) {
+  void _deleteChallanProductFromList(int pos) {
     setState(() {
       _challanProductList.removeAt((pos));
       print("Position in List ${pos.toString()}");

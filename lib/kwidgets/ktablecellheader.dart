@@ -78,13 +78,13 @@ class KTableCellHeader extends StatelessWidget {
   ) {
     return Row(
       children: [
-        isInvoice
-            ? Icon(
-                Icons.edit_off,
-                size: 16,
-                color: Colors.grey,
-              )
-            : InkWell(
+        // isInvoice
+        //     ? Icon(
+        //         Icons.remove_red_eye_outlined,
+        //         size: 16,
+        //         color: Colors.grey,
+        //       )
+             InkWell(
                 onTap: () {
                   showDialog(
                       context: context,
@@ -97,7 +97,7 @@ class KTableCellHeader extends StatelessWidget {
                         }
                       });
                 },
-                child: Icon(
+                child: Icon( isInvoice? Icons.remove_red_eye_outlined :
                   Icons.edit,
                   size: 16,
                   color: Colors.green,
@@ -106,6 +106,11 @@ class KTableCellHeader extends StatelessWidget {
         const SizedBox(
           width: 8,
         ),
+        isInvoice? Icon(
+          Icons.no_cell_outlined,
+          size: 16,
+          color: Colors.red,
+        ) :
         InkWell(
           onTap: () => deleteAction!(id),
           child: Icon(
