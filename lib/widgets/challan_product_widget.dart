@@ -1,21 +1,22 @@
-import 'package:erpapp/model/challan_product.dart';
 import 'package:flutter/material.dart';
 
 import '../kwidgets/kdropdown.dart';
 import '../kwidgets/ktextfield.dart';
 import '../model/product.dart';
+import '../model/challan_product.dart';
+
 
 class ChallanProductWidget extends StatefulWidget {
   List<Product> productList;
   ChallanProduct challanProduct;
   int challanProductListPos;
-  Function deleteChallaProductFromList;
+  Function deleteChallanProductFromList;
   ChallanProductWidget({
     Key? key,
     required this.productList,
     required this.challanProduct,
     required this.challanProductListPos,
-    required this.deleteChallaProductFromList,
+    required this.deleteChallanProductFromList,
   }) : super(key: key);
 
   @override
@@ -37,6 +38,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
 
   @override
   void initState() {
+    _dropdownInitialValue = widget.challanProduct.id != 0? widget.challanProduct.productName : _dropdownInitialValue;
     pricePerUnitController = TextEditingController(
         text: widget.challanProduct.pricePerUnit.toString());
     unitController =
@@ -145,13 +147,14 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
                 width: 8,
               ),
               InkWell(
-                onTap: () => widget.deleteChallaProductFromList(widget.challanProductListPos),
+                onTap: () => _deleteAction(),
                 child: Icon(
                   Icons.delete,
                   size: 16,
                   color: Colors.red,
                 ),
               ),
+              // Text(widget.challanProductListPos.toString()),
             ],
           ),
         ],
@@ -164,6 +167,8 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
     Product product = widget.productList
         .where((element) => element.name == productName)
         .toList()[0];
+    widget.challanProduct.productName = product.name;
+    widget.challanProduct.productUnit = product.unit;
     pricePerUnitController.text = product.price_per_unit.toString();
     unitController.text = product.unit;
     productGstPercentController.text = product.GST;
@@ -206,11 +211,16 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
     }
   }
 
-  void _deleteAction(int id) {
+  void _deleteAction() {
+    // print("Challan Product Widget _deleteAction Id: $id");
+
     // Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
+    print("Line Item in Challan Product ${widget.challanProductListPos}");
+    widget.deleteChallanProductFromList(widget.challanProductListPos);
   }
 
   Widget _editAction(int id) {
+    print("Challan Product Widget _editAction Id: $id");
     return Container();
     // Challan challan;
     // return Consumer<ChallanProvider>(builder: (ctx, provider, child) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/challan_product_provider.dart';
 import 'challancreate.dart';
 import '../kwidgets/kcreatebutton.dart';
 import '../kwidgets/ktablecellheader.dart';
@@ -164,6 +165,7 @@ Widget _displayChallan(BuildContext context){
 
   void deleteAction(int id){
     Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
+    Provider.of<ChallanProductProvider>(context, listen: false).deleteChallanProductbyChallanId(id);
   }
 
   Widget editAction(int id){
