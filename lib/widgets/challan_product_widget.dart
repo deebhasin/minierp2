@@ -89,7 +89,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
             width: 130,
             controller: pricePerUnitController,
             // validator: challanPricePerUnitValidator,
-            valueUpdated: pricePerUnitValueChanged,
+            valueUpdated: _pricePerUnitValueChanged,
             isDisabled: widget.isInvoice!,
           ),
           KTextField(
@@ -107,7 +107,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
             controller: quantityController,
             isDisabled: widget.isInvoice!,
             // validator: challanQuantityValidator,
-            valueUpdated: quantityValueChanged,
+            valueUpdated: _quantityValueChanged,
           ),
           KTextField(
             label: "Total",
@@ -119,7 +119,8 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
             label: "GST %",
             width: 70,
             controller: productGstPercentController,
-            isDisabled: true,
+            isDisabled: widget.isInvoice!,
+            valueUpdated: _gstPercentValueChanged,
           ),
           KTextField(
             label: "GST",
@@ -133,46 +134,49 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
             controller: productTotalAmountController,
             isDisabled: true,
           ),
-          Row(
-            children: [
-              isChallan
-                  ? Icon(
-                      Icons.edit_off,
-                      size: 16,
-                      color: Colors.grey,
-                    )
-                  : InkWell(
-                      onTap: () {
-                        showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (BuildContext context) {
-                              return _editAction(widget.challanProduct.id) !=
-                                      null
-                                  ? _editAction(widget.challanProduct.id)
-                                  : Container();
-                            });
-                      },
+          widget.isInvoice!
+              ? Container()
+              : Row(
+                  children: [
+                    isChallan
+                        ? Icon(
+                            Icons.edit_off,
+                            size: 16,
+                            color: Colors.grey,
+                          )
+                        : InkWell(
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) {
+                                    return _editAction(
+                                                widget.challanProduct.id) !=
+                                            null
+                                        ? _editAction(widget.challanProduct.id)
+                                        : Container();
+                                  });
+                            },
+                            child: Icon(
+                              Icons.edit,
+                              size: 16,
+                              color: Colors.green,
+                            ),
+                          ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    InkWell(
+                      onTap: () => _deleteAction(),
                       child: Icon(
-                        Icons.edit,
+                        Icons.delete,
                         size: 16,
-                        color: Colors.green,
+                        color: Colors.red,
                       ),
                     ),
-              const SizedBox(
-                width: 8,
-              ),
-              InkWell(
-                onTap: () => _deleteAction(),
-                child: Icon(
-                  Icons.delete,
-                  size: 16,
-                  color: Colors.red,
+                    // Text(widget.challanProductListPos.toString()),
+                  ],
                 ),
-              ),
-              // Text(widget.challanProductListPos.toString()),
-            ],
-          ),
         ],
       ),
     );
@@ -197,34 +201,44 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
     productTotalAmountController.text = "0.0";
   }
 
-  void pricePerUnitValueChanged(String value) {
+  void _pricePerUnitValueChanged(String value) {
     if (productName != "") {
-      widget.challanProduct.pricePerUnit =
-          double.parse(pricePerUnitController.text);
-      productTotalBeforeTaxController.text =
-          widget.challanProduct.totalBeforeTax.toString();
-      productTaxAmountController.text =
-          widget.challanProduct.taxAmount.toString();
-      productTotalAmountController.text =
-          widget.challanProduct.totalAmount.toString();
+      _onValuesChanged();
     } else {
       pricePerUnitController.text =
           widget.challanProduct.pricePerUnit.toString();
     }
   }
 
-  void quantityValueChanged(String value) {
+  void _quantityValueChanged(String value) {
     if (productName != "") {
-      widget.challanProduct.quantity = double.parse(quantityController.text);
-      productTotalBeforeTaxController.text =
-          widget.challanProduct.totalBeforeTax.toString();
-      productTaxAmountController.text =
-          widget.challanProduct.taxAmount.toString();
-      productTotalAmountController.text =
-          widget.challanProduct.totalAmount.toString();
+      _onValuesChanged();
     } else {
-      quantityController.text = widget.challanProduct.quantity;
+      quantityController.text = widget.challanProduct.quantity.toString();
     }
+  }
+
+  void _gstPercentValueChanged(String value) {
+    if (productName != "") {
+      _onValuesChanged();
+    } else {
+      productGstPercentController.text = widget.challanProduct.gstPercent.toString();
+    }
+  }
+
+  void _onValuesChanged() {
+    widget.challanProduct.pricePerUnit =
+        double.parse(pricePerUnitController.text);
+    widget.challanProduct.productUnit = unitController.text;
+    widget.challanProduct.quantity = double.parse(quantityController.text);
+    productTotalBeforeTaxController.text =
+        widget.challanProduct.totalBeforeTax.toString();
+    widget.challanProduct.gstPercent =
+        double.parse(productGstPercentController.text);
+    productTaxAmountController.text =
+        widget.challanProduct.taxAmount.toString();
+    productTotalAmountController.text =
+        widget.challanProduct.totalAmount.toString();
   }
 
   void _deleteAction() {

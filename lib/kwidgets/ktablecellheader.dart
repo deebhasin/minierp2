@@ -100,7 +100,7 @@ class KTableCellHeader extends StatelessWidget {
                 child: Icon( isInvoice? Icons.remove_red_eye_outlined :
                   Icons.edit,
                   size: 16,
-                  color: Colors.green,
+                  color: isInvoice? Colors.blue : Colors.green,
                 ),
               ),
         const SizedBox(
@@ -109,7 +109,7 @@ class KTableCellHeader extends StatelessWidget {
         isInvoice? Icon(
           Icons.no_cell_outlined,
           size: 16,
-          color: Colors.red,
+          color: Colors.blueGrey,
         ) :
         InkWell(
           onTap: () => deleteAction!(id),
