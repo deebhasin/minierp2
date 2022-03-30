@@ -10,7 +10,7 @@ import '../screens/challanview.dart';
 import '../screens/customersview.dart';
 import '../model/organization.dart';
 import '../providers/org_provider.dart';
-import '../screens/productsview.dart';
+import '../screens/productview.dart';
 import '../screens/invoiceview.dart';
 
 import '../widgets/sidebar.dart';

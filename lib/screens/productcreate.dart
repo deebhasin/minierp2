@@ -1,3 +1,4 @@
+import 'package:erpapp/kwidgets/kdropdown.dart';
 import 'package:erpapp/kwidgets/ksubmitresetbuttons.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -23,39 +24,45 @@ class ProductCreate extends StatefulWidget {
 class _ProductCreateState extends State<ProductCreate> {
   late double containerWidth;
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController idController;
-  late final nameController;
-  late final unitController;
-  late final pricePerUnitController;
-  late final hsnController;
-  late final gstController;
-  late final activeController;
+  late final _nameController;
+  late final _unitController;
+  late final _pricePerUnitController;
+  late final _hsnController;
+  late final _gstController;
+  late final _activeController;
 
-  final nameValidator = MultiValidator([
+  late bool _isActiveInitialValue;
+
+  List<String> _statusList = ["true", "false"];
+
+  final _nameValidator = MultiValidator([
     RequiredValidator(errorText: 'Company Name is required'),
-    MinLengthValidator(8,
-        errorText: 'Company Name must be at least 8 digits long'),
+    MinLengthValidator(8, errorText: 'Must be at least 8 digits long'),
     // PatternValidator(r'(?=.*?[#?!@$%^&*-])', errorText: 'passwords must have at least one special character')
   ]);
-  final hsnValidator = RequiredValidator(errorText: 'HSN is required');
-  final gstValidator = RequiredValidator(errorText: 'GST is required');
-  final activeValidator =
+  final _hsnValidator = RequiredValidator(errorText: 'HSN is required');
+  final _pricePerUnitValidator =
+      PatternValidator(r'\d+?$', errorText: "This should be number");
+  final _gstValidator = MultiValidator([
+    RequiredValidator(errorText: 'GST is required'),
+      PatternValidator(r'\d+?$', errorText: "This should be number"),
+  ]);
+  final _activeValidator =
       RequiredValidator(errorText: 'Active Status is required');
 
   @override
   void initState() {
-    String pricePerUnit = "";
-    if (widget.product.price_per_unit != null) {
-      pricePerUnit = widget.product.price_per_unit.toString();
-    }
-    idController = TextEditingController(text: widget.product.id.toString());
-    nameController = TextEditingController(text: widget.product.name);
-    unitController = TextEditingController(text: widget.product.unit);
-    pricePerUnitController = TextEditingController(text: pricePerUnit);
-    hsnController = TextEditingController(text: widget.product.HSN);
-    gstController = TextEditingController(text: widget.product.GST);
-    activeController =
+    _nameController = TextEditingController(text: widget.product.name);
+    _unitController = TextEditingController(text: widget.product.unit);
+    _pricePerUnitController = TextEditingController(
+        text: widget.product.pricePerUnit == 0
+            ? ""
+            : widget.product.pricePerUnit.toString());
+    _hsnController = TextEditingController(text: widget.product.HSN);
+    _gstController = TextEditingController(text: widget.product.GST);
+    _activeController =
         TextEditingController(text: widget.product.isActive.toString());
+    _isActiveInitialValue = widget.product.isActive;
     super.initState();
   }
 
@@ -63,8 +70,6 @@ class _ProductCreateState extends State<ProductCreate> {
   Widget build(BuildContext context) {
     containerWidth =
         (MediaQuery.of(context).size.width - KVariables.sidebarWidth);
-    // if(widget.id == 0){
-    //   customer = Customer(company_name: "");
     return _productCreate();
   }
 
@@ -115,22 +120,22 @@ class _ProductCreateState extends State<ProductCreate> {
                       label: "Product Name",
                       isMandatory: true,
                       width: 250,
-                      controller: nameController,
-                      validator: nameValidator,
+                      controller: _nameController,
+                      validator: _nameValidator,
                     ),
                     KTextField(
                       label: "HSN Code",
                       isMandatory: true,
                       width: 250,
-                      controller: hsnController,
-                      validator: hsnValidator,
+                      controller: _hsnController,
+                      validator: _hsnValidator,
                     ),
                     KTextField(
                       label: "GST (%)",
                       isMandatory: true,
                       width: 250,
-                      controller: gstController,
-                      validator: gstValidator,
+                      controller: _gstController,
+                      validator: _gstValidator,
                     ),
                   ],
                 ),
@@ -141,19 +146,21 @@ class _ProductCreateState extends State<ProductCreate> {
                     KTextField(
                       label: "Unit",
                       width: 250,
-                      controller: unitController,
+                      controller: _unitController,
                     ),
                     KTextField(
                       label: "Price",
                       width: 250,
-                      controller: pricePerUnitController,
+                      controller: _pricePerUnitController,
+                      validator: _pricePerUnitValidator,
                     ),
-                    KTextField(
+                    KDropdown(
+                      dropDownList: _statusList,
                       label: "Active",
-                      isMandatory: true,
-                      width: 250,
-                      controller: activeController,
-                      validator: activeValidator,
+                      initialValue: _isActiveInitialValue == true? _statusList[0] : _statusList[1],
+                      isShowSearchBox: false,
+                      maxHeight: 100,
+                      onChangeDropDown: _onActiveChanged,
                     ),
                   ],
                 ),
@@ -172,41 +179,42 @@ class _ProductCreateState extends State<ProductCreate> {
     );
   }
 
+  void _onActiveChanged(String status) {
+    _isActiveInitialValue = status == "true" ? true : false;
+    print("_onActiveChanged: $_isActiveInitialValue");
+  }
+
   void _resetForm() {
     setState(() {
       // idController.text = "";
-      nameController.text = widget.product.name;
-      unitController.text = widget.product.unit;
-      pricePerUnitController.text = widget.product.price_per_unit.toString();
-      hsnController.text = widget.product.HSN;
-      gstController.text = widget.product.GST;
-      activeController.text = widget.product.isActive;
+      _nameController.text = widget.product.name;
+      _unitController.text = widget.product.unit;
+      _pricePerUnitController.text = widget.product.pricePerUnit == 0
+          ? ""
+          : widget.product.pricePerUnit.toString();
+      _hsnController.text = widget.product.HSN;
+      _gstController.text = widget.product.GST;
+      _isActiveInitialValue = widget.product.isActive;
+      print("Is Active in Product Reset: $_isActiveInitialValue");
     });
   }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      // Customer customer = Customer(
-
-      widget.product.name = nameController.text;
-      widget.product.unit = unitController.text;
-      widget.product.price_per_unit = pricePerUnitController.text == ""
-          ? null
-          : double.parse(pricePerUnitController.text);
-      widget.product.HSN = hsnController.text;
-      widget.product.GST = gstController.text;
-      widget.product.isActive = int.parse(activeController.text);
+      widget.product.name = _nameController.text;
+      widget.product.unit = _unitController.text;
+      widget.product.pricePerUnit = _pricePerUnitController.text == ""
+          ? 0
+          : double.parse(_pricePerUnitController.text);
+      widget.product.HSN = _hsnController.text;
+      widget.product.GST = _gstController.text;
+      widget.product.isActive = _isActiveInitialValue;
 
       print("ID: ${widget.product.id}");
 
-      if (widget.product.id != 0) {
-        Provider.of<ProductProvider>(context, listen: false)
-            .updateProduct(widget.product);
-        print("Product Updated");
-      } else {
-        Provider.of<ProductProvider>(context, listen: false)
-            .createProduct(widget.product);
-      }
+      Provider.of<ProductProvider>(context, listen: false)
+          .saveProduct(widget.product);
+
       Navigator.of(context).pop();
     } else {
       print("Validation Failed");

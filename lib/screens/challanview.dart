@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/challan_product_provider.dart';
 import 'challancreate.dart';
 import '../kwidgets/kcreatebutton.dart';
 import '../kwidgets/ktablecellheader.dart';
 import '../providers/challan_provider.dart';
-
 
 class ViewChallan extends StatefulWidget {
   final double width;
@@ -32,8 +30,7 @@ class _ViewChallanState extends State<ViewChallan> {
 
   @override
   Widget build(BuildContext context) {
-    ChallanProvider challanProvider = ChallanProvider();
-    challanProvider.challanTest(challanProvider);
+
     return Consumer<ChallanProvider>(builder: (ctx, provider, child) {
       return FutureBuilder(
         future: provider.getChallanListByParameters(active: 1),
@@ -165,7 +162,6 @@ Widget _displayChallan(BuildContext context){
 
   void deleteAction(int id){
     Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
-    Provider.of<ChallanProductProvider>(context, listen: false).deleteChallanProductbyChallanId(id);
   }
 
   Widget editAction(int id){

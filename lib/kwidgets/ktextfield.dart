@@ -19,7 +19,7 @@ class KTextField extends StatelessWidget {
     Key? key,
     required this.label,
     this.width = 400,
-    this.height = 80,
+    this.height = 90,
     this.multiLine = 1,
     this.isDisabled = false,
     required this.controller,
@@ -66,7 +66,7 @@ class KTextField extends StatelessWidget {
               width: 1,
             ),
             TextFormField(
-              cursorColor: Colors.greenAccent,
+              // cursorColor: Colors.greenAccent,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               inputFormatters: [
                 LengthLimitingTextInputFormatter(maxLength),
@@ -79,10 +79,13 @@ class KTextField extends StatelessWidget {
               validator: validator ?? DefaultFieldValidator(),
               style: const TextStyle(fontSize: 15),
               textAlignVertical: TextAlignVertical.bottom,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: UnderlineInputBorder(),
                 isDense: true,
-                contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 3),
+                // contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 3),
+                contentPadding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                fillColor: isDisabled? Color.fromRGBO(0, 0, 0, 0.05) : Colors.transparent,
+                filled: true,
               ),
             ),
           ]),

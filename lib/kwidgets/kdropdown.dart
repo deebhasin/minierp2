@@ -1,5 +1,7 @@
+import 'package:erpapp/utils/default_fieldvalidator.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:form_field_validator/form_field_validator.dart';
 
 class KDropdown extends StatelessWidget {
   final List<String> dropDownList;
@@ -8,7 +10,11 @@ class KDropdown extends StatelessWidget {
   final double height;
   String initialValue;
   final Function? onChangeDropDown;
+  final FieldValidator? validator;
   String selectedValue = "";
+  bool isShowSearchBox;
+  double maxHeight;
+  bool isMandatory;
   KDropdown({
     Key? key,
     required this.dropDownList,
@@ -17,21 +23,16 @@ class KDropdown extends StatelessWidget {
     this.height = 25,
     this.initialValue = "-----",
     this.onChangeDropDown,
+    this.isShowSearchBox = true,
+    this.maxHeight = 200,
+    this.validator,
+    this.isMandatory = false,
   }) : super(key: key);
 
   String getSelectedValue() {
     return selectedValue;
   }
 
-  void updateDropdownText(String selectedValue) {
-    if (selectedValue != "NoValue") {
-      selectedValue = selectedValue;
-      print("DropDown Selected Value: $selectedValue");
-      onChangeDropDown!(selectedValue);
-    }
-    // print("Selection: $dropdownValue");
-    // showDropdownList();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +40,24 @@ class KDropdown extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+        Row(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            isMandatory ? Text(
+              " *",
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
+            ) : Container(),
+          ],
         ),
         Container(
           width: width + height,
@@ -59,11 +72,14 @@ class KDropdown extends StatelessWidget {
           ),
           child: DropdownSearch(
             dialogMaxWidth: width + height,
-            showSearchBox: true,
+            maxHeight: maxHeight,
+            showSearchBox: isShowSearchBox,
             selectedItem: initialValue,
+            validator: validator ?? DefaultFieldValidator(),
+            // validator: (value) => value == "-----"? "$label Required" : null,
             popupBackgroundColor: const Color.fromRGBO(242, 243, 247, 1),
             popupElevation: 0,
-            onChanged: (value) => updateDropdownText(value.toString()),
+            onChanged: (value) => onChangeDropDown!(value.toString()),
             popupShape: const Border(
               left: BorderSide(color: Colors.grey),
               top: BorderSide(color: Colors.grey),

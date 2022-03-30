@@ -7,6 +7,7 @@ class KDateTextForm extends StatefulWidget {
   late DateTime? rangeTo;
   late DateTime? initialDate;
   late Function? selectedDate;
+
   KDateTextForm({
     Key? key,
     required this.label,
@@ -24,7 +25,7 @@ class _KDateTextFormState extends State<KDateTextForm> {
   late final dateinput;
   @override
   void initState() {
-    dateinput = TextEditingController();
+    dateinput = TextEditingController(text: DateFormat("dd-MM-yyyy").format(DateTime.now()));
     widget.rangeFrom != null? widget.rangeFrom : DateTime(2000);
     widget.rangeTo != null? widget.rangeTo : DateTime.now();
     widget.initialDate != null? widget.initialDate : DateTime.now();
@@ -53,11 +54,7 @@ class _KDateTextFormState extends State<KDateTextForm> {
       initialDate: DateTime.now(),
       firstDate:DateTime(2000), //DateTime.now() - not to allow to choose before today.
       lastDate: DateTime.now(),
-      // initialDate: DateFormat("d-M-y").parse(widget.initialDate!.toString()),
-      // firstDate:DateFormat("d-M-y").parse(widget.rangeFrom!.toString()), //DateTime.now() - not to allow to choose before today.
-      // lastDate: DateFormat("d-M-y").parse(widget.rangeTo!.toString()),
     );
-    // _pickedDate = DateFormat("d-M-y").parse(_pickedDate.toString());
 
     if (_pickedDate != null) {
       print(_pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000

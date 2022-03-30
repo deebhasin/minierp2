@@ -7,7 +7,7 @@ class ChallanProduct{
   double pricePerUnit;
   String productUnit;
   double quantity;
-  int active;
+  bool isActive;
 
   ChallanProduct({
     this.id = 0,
@@ -18,7 +18,7 @@ class ChallanProduct{
     this.pricePerUnit = 0,
     this.productUnit = "",
     this.quantity = 0,
-    this.active = 1,
+    this.isActive = true,
 });
 
   ChallanProduct.fromMap(Map<String, dynamic> res)
@@ -30,7 +30,7 @@ class ChallanProduct{
   pricePerUnit = res["price_per_unit"],
   productUnit = res["product_unit"],
   quantity = res["quantity"],
-  active = res["active"];
+  isActive = res["active"] == 1? true : false;
 
   Map<String, Object?> toMap() {
     return {
@@ -41,7 +41,10 @@ class ChallanProduct{
       'price_per_unit': pricePerUnit,
       'product_unit': productUnit,
       'quantity': quantity,
-      'active': active,
+      "product_total": totalBeforeTax,
+      "product_tax": taxAmount,
+      "product_amount": totalAmount,
+      'active': isActive == true? 1 : 0,
     };
   }
 

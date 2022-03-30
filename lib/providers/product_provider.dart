@@ -38,7 +38,11 @@ class ProductProvider with ChangeNotifier{
     return product;
   }
 
-  Future <int> createProduct(Product product) async{
+  Future<int> saveProduct(Product product) async {
+    return product.id == 0? createProduct(product) : updateProduct(product);
+  }
+
+  Future<int> createProduct(Product product) async{
     int result = 0;
     print("Creating Product in Product Provider");
 
@@ -70,17 +74,19 @@ class ProductProvider with ChangeNotifier{
     print("Deleted Product of ID: $id in Product Provider");
   }
 
-  Future<void> updateProduct(Product product) async{
+  Future<int> updateProduct(Product product) async{
+    int result = 0;
     print("Updating Product of ID: ${product.id} in Product Provider");
 
     try {
-      await LocalDBRepo().db.update("PRODUCT", product.toMap(), where: "id = ?", whereArgs:[product.id]);
+      result = await LocalDBRepo().db.update("PRODUCT", product.toMap(), where: "id = ?", whereArgs:[product.id]);
     } on Exception catch (e, s) {
       handleException("Error while updating Product Id: ${product.id} $e", e, s);
     }
     notifyListeners();
 
     print("Updated Product of ID: ${product.id} in Product Provider");
+    return result;
   }
 
 

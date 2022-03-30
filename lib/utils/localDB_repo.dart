@@ -217,9 +217,9 @@ class LocalDBRepo {
 			"name TEXT,"
 			"unit TEXT,"
 			"price_per_unit REAL,"
-			"HSN TEXT,"
-			"GST TEXT,"
-			"ACTIVE TINYINT(1)"
+			"hsn TEXT,"
+			"gst TEXT,"
+			"active TINYINT(1)"
 			")");
 
 		await db.execute("CREATE TABLE CHALLAN ("
@@ -234,7 +234,7 @@ class LocalDBRepo {
 				"active TINYINT(1)"
 				")");
 
-		await db.execute("CREATE TABLE CHALLAN_PRODUCTS("
+		await db.execute("CREATE TABLE CHALLAN_PRODUCT("
 				"id INTEGER PRIMARY KEY AUTOINCREMENT,"
 				"challan_id INT,"
 				"product_name TEXT,"

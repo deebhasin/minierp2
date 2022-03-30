@@ -1,30 +1,35 @@
+// enum Status{
+//   inActive,
+//   active,
+// }
+
 class Product{
   int id;
   String name;
   String unit;
-  double? price_per_unit;
+  double pricePerUnit;
   String HSN;
   String GST;
-  int isActive;
+  bool isActive;
 
   Product({
     this.id = 0,
-    required this.name,
+    this.name = "",
     this.unit = "",
-    this.price_per_unit,
+    this.pricePerUnit = 0,
     this.HSN = "",
     this.GST = "",
-    this.isActive = 1,
+    this.isActive = true,
 });
 
   Product.fromMap(Map<String, dynamic> res)
       : id = res["id"],
         name = res["name"],
         unit = res["unit"],
-        price_per_unit = res["price_per_unit"],
-        HSN = res["HSN"],
-        GST = res["GST"],
-        isActive = res["ACTIVE"];
+        pricePerUnit = res["price_per_unit"],
+        HSN = res["hsn"],
+        GST = res["gst"],
+        isActive = res["active"] == 1? true : false;
 
 
   Map<String, Object?> toMap() {
@@ -32,10 +37,10 @@ class Product{
       // 'id':id,
       'name': name,
       'unit': unit,
-      'price_per_unit': price_per_unit,
-      'HSN': HSN,
-      'GST': GST,
-      'Active': isActive,
+      'price_per_unit': pricePerUnit,
+      'hsn': HSN,
+      'gst': GST,
+      'active': isActive == true? 1 : 0,
     };
   }
 }

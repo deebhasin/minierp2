@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../model/product.dart';
@@ -13,7 +14,7 @@ import '../screens/productcreate.dart';
 class ProductsView extends StatefulWidget {
   final double width;
 
-  const ProductsView({Key? key,
+  ProductsView({Key? key,
     this.width = 50}) : super(key: key);
 
   @override
@@ -23,6 +24,8 @@ class ProductsView extends StatefulWidget {
 class _ProductsViewState extends State<ProductsView> {
   late List<Product> productList;
   late double containerWidth;
+
+  final currencyFormat = NumberFormat("#,##0.00", "en_US");
 
   @override
   void initState() {
@@ -161,7 +164,7 @@ class _ProductsViewState extends State<ProductsView> {
                 KTableCellHeader(header: productList[i].unit,
                   context: context,
                   cellWidth: containerWidth * 0.14,),
-                KTableCellHeader(header: productList[i].price_per_unit == null? "" : productList[i].price_per_unit.toString() ,
+                KTableCellHeader(header: "\u{20B9} ${currencyFormat.format(productList[i].pricePerUnit)}",
                   context: context,
                   cellWidth: containerWidth * 0.14,),
                 KTableCellHeader(header: productList[i].HSN,
@@ -191,7 +194,7 @@ class _ProductsViewState extends State<ProductsView> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context){
-          return ProductCreate(product: Product(name: ""));
+          return ProductCreate(product: Product());
         }
     );
   }

@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class KSubmitResetButtons extends StatelessWidget {
   final VoidCallback resetForm;
   final VoidCallback submitForm;
+  final bool isReset;
   const KSubmitResetButtons({
     Key? key,
     required this.resetForm,
     required this.submitForm,
+    this.isReset = true,
   }) : super(key: key);
 
   @override
@@ -17,7 +19,7 @@ class KSubmitResetButtons extends StatelessWidget {
         Container(
           height: 40,
           width: 200,
-          child: ElevatedButton(
+          child: isReset? ElevatedButton(
             style: ElevatedButton.styleFrom(
               primary: Colors.red, // background
               onPrimary: Colors.white, // foreground
@@ -30,7 +32,7 @@ class KSubmitResetButtons extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-          ),
+          ) : Container(width: 1,),
         ),
         SizedBox(
           width: 30,

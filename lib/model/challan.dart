@@ -12,7 +12,7 @@ class Challan {
   double challanAmount;
   String invoiceNo;
   late List<ChallanProduct>? challanProductList;
-  int active;
+  bool isActive;
 
   Challan({
     this.id = 0,
@@ -24,7 +24,7 @@ class Challan {
     this.challanAmount = 0,
     this.invoiceNo = "",
     this.challanProductList,
-    this.active = 1,
+    this.isActive = true,
 }){
     this.challanDate = DateTime.now();
     this.challanProductList = [];
@@ -40,7 +40,7 @@ class Challan {
         challanAmount = res["challan_amount"],
         invoiceNo = res["invoice_number"],
         challanProductList = [],
-        active = res["active"];
+        isActive = res["active"] == 1? true : false;
 
   Map<String, Object?> toMap() {
     return {
@@ -52,7 +52,7 @@ class Challan {
       'tax_amount': taxAmount,
       'challan_amount': challanAmount,
       'invoice_number': invoiceNo,
-      'active': active,
+      'active': isActive == true? 1 : 0,
     };
   }
 }

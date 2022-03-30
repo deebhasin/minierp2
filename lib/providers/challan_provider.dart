@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
+import '../model/challan_product.dart';
 import '../utils/localDB_repo.dart';
 import '../model/challan.dart';
 
@@ -119,26 +121,6 @@ class ChallanProvider with ChangeNotifier {
     return challanList;
   }
 
-  // Future<List<Challan>> getActiveChallanList() async {
-  //   late List<Challan> challanList;
-  //   print("In Challan Provider GetChallanList Start");
-  //
-  //   try {
-  //     final List<Map<String, Object?>> queryResult =
-  //         await LocalDBRepo().db.query(
-  //       'CHALLAN',
-  //       where: "active = ?",
-  //       whereArgs: [1],
-  //     );
-  //     challanList = queryResult.map((e) => Challan.fromMap(e)).toList();
-  //     print("Challan List Length: ${challanList.length}");
-  //   } on Exception catch (e, s) {
-  //     handleException("Error while fetching Challan List $e", e, s);
-  //     challanList = [];
-  //   }
-  //   return challanList;
-  // }
-
   Future<List<String>> getChallanListwithGSTbyCompanyName(
       String customerName) async {
     late List<String> gstList;
@@ -173,107 +155,45 @@ class ChallanProvider with ChangeNotifier {
           .query('CHALLAN', where: "id = ?", whereArgs: [id]);
       challan = queryResult.map((e) => Challan.fromMap(e)).toList()[0];
       print("getting Challan with Id: $id in Challan Provider}");
+      List<ChallanProduct> challanProductList =
+          await _getChallanProductListByChallanId(id);
+      challan.challanProductList = challanProductList;
     } on Exception catch (e, s) {
       handleException("Error while fetching Challan with Id $id $e", e, s);
     }
     return challan;
   }
 
-  // Future<List<Challan>> getChallanByCompanyName(String companyName) async {
-  //   late List<Challan> challanList;
-  //   print("In Challan Provider getChallanByCompanyName Start");
-  //
-  //   try {
-  //     final List<Map<String, Object?>> queryResult = await LocalDBRepo()
-  //         .db
-  //         .query('CHALLAN',
-  //             where: "customer_name = ?", whereArgs: [companyName]);
-  //     challanList = queryResult.map((e) => Challan.fromMap(e)).toList();
-  //     print(
-  //         "getting Challan with Company Name: $companyName in Challan Provider}");
-  //   } on Exception catch (e, s) {
-  //     handleException(
-  //         "Error while fetching Challan with Company Name $companyName $e",
-  //         e,
-  //         s);
-  //   }
-  //   return challanList;
-  // }
-  //
-  // Future<List<Challan>> getActiveChallanByCompanyName(
-  //     String companyName) async {
-  //   late List<Challan> challanList;
-  //   print("In Challan Provider getChallanByCompanyName Start");
-  //
-  //   try {
-  //     final List<Map<String, Object?>> queryResult = await LocalDBRepo()
-  //         .db
-  //         .query('CHALLAN',
-  //             where: "customer_name = ? and active = ?",
-  //             whereArgs: [companyName, 1]);
-  //     challanList = queryResult.map((e) => Challan.fromMap(e)).toList();
-  //     print(
-  //         "getting Challan with Company Name: $companyName in Challan Provider}");
-  //   } on Exception catch (e, s) {
-  //     handleException(
-  //         "Error while fetching Challan with Company Name $companyName $e",
-  //         e,
-  //         s);
-  //   }
-  //   return challanList;
-  // }
-  //
-  // Future<List<Challan>> getActiveChallanByCompanyNameWithoutInvoiceNumber(
-  //     String companyName) async {
-  //   late List<Challan> challanList;
-  //   print("In Challan Provider getChallanByCompanyName Start");
-  //
-  //   try {
-  //     final List<Map<String, Object?>> queryResult = await LocalDBRepo()
-  //         .db
-  //         .query('CHALLAN',
-  //             where: "customer_name = ? and invoice_number = ? and active = ?",
-  //             whereArgs: [companyName, "", 1]);
-  //     challanList = queryResult.map((e) => Challan.fromMap(e)).toList();
-  //     print(
-  //         "getting Challan with Company Name: $companyName in Challan Provider}");
-  //   } on Exception catch (e, s) {
-  //     handleException(
-  //         "Error while fetching Challan with Company Name $companyName $e",
-  //         e,
-  //         s);
-  //   }
-  //   return challanList;
-  // }
-  //
-  // Future<List<Challan>>
-  //     getActiveChallanByCompanyNameWithoutInvoiceNumberBetweenDates(
-  //         String companyName, DateTime fromDate, DateTime toDate) async {
-  //   late List<Challan> challanList;
-  //   String _fromDateString = "";
-  //   String _toDateString = "";
-  //   _fromDateString = DateFormat("yyyy-MM-dd").format(fromDate);
-  //   _toDateString = DateFormat("yyyy-MM-dd").format(toDate);
-  //   print("In Challan Provider getChallanByCompanyName Start");
-  //
-  //   try {
-  //     final List<
-  //         Map<String,
-  //             Object?>> queryResult = await LocalDBRepo().db.query('CHALLAN',
-  //         where:
-  //             "customer_name = ? and invoice_number = ? and active = ? and challan_date between ? and ?",
-  //         whereArgs: [companyName, "", 1, _fromDateString, _toDateString]);
-  //     challanList = queryResult.map((e) => Challan.fromMap(e)).toList();
-  //     print(
-  //         "getting Challan with Company Name: $companyName in Challan Provider}");
-  //   } on Exception catch (e, s) {
-  //     handleException(
-  //         "Error while fetching getActiveChallanByCompanyNameWithoutInvoiceNumberBetweenDates with Company Name $companyName and Dates between $_fromDateString and $_toDateString $e",
-  //         e,
-  //         s);
-  //   }
-  //   return challanList;
-  // }
+  Future<List<ChallanProduct>> _getChallanProductListByChallanId(
+      int challanId) async {
+    List<ChallanProduct> challanProductList = [];
+    print("In Challan Product getChallanProductListByChallanNumber");
+
+    try {
+      final List<Map<String, Object?>> queryResult =
+          await LocalDBRepo().db.query(
+        'CHALLAN_PRODUCT',
+        where: "challan_id = ?",
+        whereArgs: [challanId],
+      );
+      challanProductList =
+          queryResult.map((e) => ChallanProduct.fromMap(e)).toList();
+      print(
+          "Challan Product List Length in getChallanProductListByChallanNumber: ${challanProductList.length}");
+    } on Exception catch (e, s) {
+      handleException(
+          "Error while fetching Challan Product List in getChallanProductListByChallanNumber $e",
+          e,
+          s);
+      challanProductList = [];
+    }
+    return challanProductList;
+  }
+
+  void challanSave(Challan challan) {
+    challan.id == 0 ? createChallan(challan) : updateChallan(challan);
+  }
+
 
   Future<int> createChallan(Challan challan) async {
     int id = 0;
@@ -281,9 +201,36 @@ class ChallanProvider with ChangeNotifier {
     try {
       id = await LocalDBRepo().db.insert("CHALLAN", challan.toMap());
       print("Creating Challan with Id: $id in Challan Provider}");
+
+      challan.challanProductList!.every((_challanProduct){
+        if(_challanProduct.productName != "") {
+          _challanProduct.challanId = id;
+          print(
+              "Challan Id in CreateChallan for Challan Product ${_challanProduct.challanId}");
+          createChallanProduct(_challanProduct);
+        }
+        return true;
+      });
+
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Creating Challan $e", e, s);
+    }
+    return id;
+  }
+
+  Future<int> createChallanProduct(ChallanProduct challanProduct) async {
+    int id = 0;
+    print("In Challan Product Provider Create Challan Product Start");
+    try {
+      id = await LocalDBRepo()
+          .db
+          .insert("CHALLAN_PRODUCT", challanProduct.toMap());
+      print(
+          "Creating Challan Product with Id: $id in Challan Product Provider}");
+      notifyListeners();
+    } on Exception catch (e, s) {
+      handleException("Error while Creating Challan Product $e", e, s);
     }
     return id;
   }
@@ -294,28 +241,47 @@ class ChallanProvider with ChangeNotifier {
       await LocalDBRepo().db.update("CHALLAN", challan.toMap(),
           where: "id = ?", whereArgs: [challan.id]);
       print("Updating Challan with Id: ${challan.id} in Challan Provider}");
+
+      print("Challan Update Challan Product Length: ${challan.challanProductList!.length}");
+      deleteChallanProductbyChallanId(challan.id);
+      print("Challan Update Challan Product Length after Delete: ${challan.challanProductList!.length}");
+
+      challan.challanProductList!.every((_challanProduct){
+        if(_challanProduct.productName != "") {
+          _challanProduct.challanId = challan.id;
+          print(
+              "Challan Id in CreateChallan for Challan Product ${_challanProduct.challanId}");
+          createChallanProduct(_challanProduct);
+        }
+        return true;
+      });
+
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Updating Challan $e", e, s);
     }
   }
 
-  Future<void> updateInvoiceNumberInChallan(List<int> idList, String invoiceNumber) async{
+  Future<void> updateInvoiceNumberInChallan(
+      List<int> idList, String invoiceNumber) async {
     var invoiceMap = Map();
     String whereArgs = "";
-    for(int i = 0; i < idList.length; i++){
+    for (int i = 0; i < idList.length; i++) {
       whereArgs += idList[i].toString();
-      if(i != idList.length -1){
+      if (i != idList.length - 1) {
         whereArgs += ",";
       }
     }
     invoiceMap = {"invoice_number": invoiceNumber};
-    print("In Update of invoice in Challan in Challan Provider Update Challan Start");
+    print(
+        "In Update of invoice in Challan in Challan Provider Update Challan Start");
     try {
-      await LocalDBRepo().db.rawQuery("UPDATE CHALLAN SET invoice_number = '$invoiceNumber' where id in ($whereArgs);");
+      await LocalDBRepo().db.rawQuery(
+          "UPDATE CHALLAN SET invoice_number = '$invoiceNumber' where id in ($whereArgs);");
       // await LocalDBRepo().db.update("CHALLAN",invoiceMap,
       //     where: "id in (?)", whereArgs: idList);
-      print("Updating Invoice Number in Challan with Id: $whereArgs Challan Provider}");
+      print(
+          "Updating Invoice Number in Challan with Id: $whereArgs Challan Provider}");
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Updating Challan $e", e, s);
@@ -329,9 +295,93 @@ class ChallanProvider with ChangeNotifier {
           .db
           .delete("CHALLAN", where: "id = ?", whereArgs: [id]);
       print("Deleting Challan with Id: $id in Challan Provider}");
+      deleteChallanProductbyChallanId(id);
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Deleting Challan $e", e, s);
+    }
+  }
+
+  Future<void> deleteChallanProductbyChallanId(int id) async {
+    print("In Challan Product Provider deleteChallanProductbyChallanId Start");
+    try {
+      await LocalDBRepo()
+          .db
+          .delete("CHALLAN_PRODUCT", where: "challan_id = ?", whereArgs: [id]);
+      print(
+          "Deleting Challan Product in deleteChallanProductbyChallanId with Id: $id in Challan Product Provider}");
+      notifyListeners();
+    } on Exception catch (e, s) {
+      handleException("Error while Deleting Challan Product $e", e, s);
+    }
+  }
+
+  Future<ChallanProduct> getChallanProductById(int id) async {
+    late ChallanProduct challanProduct;
+    print("In Challan Product Provider GetChallanById Start");
+
+    try {
+      final List<Map<String, Object?>> queryResult = await LocalDBRepo()
+          .db
+          .query('CHALLAN_PRODUCT', where: "id = ?", whereArgs: [id]);
+      challanProduct =
+      queryResult.map((e) => ChallanProduct.fromMap(e)).toList()[0];
+      print(
+          "getting Challan Product with Id: $id in Challan Product Provider}");
+    } on Exception catch (e, s) {
+      handleException(
+          "Error while fetching Challan Product with Id $id $e", e, s);
+    }
+    return challanProduct;
+  }
+
+  Future<void> updateChallanProduct(ChallanProduct challanProduct) async {
+    print("In Challan Product Provider Update Challan Product Start");
+    try {
+      await LocalDBRepo().db.update("CHALLAN_PRODUCT", challanProduct.toMap(),
+          where: "id = ?", whereArgs: [challanProduct.id]);
+      print(
+          "Updating Challan Product with Id: ${challanProduct.id} in Challan Product Provider}");
+      notifyListeners();
+    } on Exception catch (e, s) {
+      handleException("Error while Updating Challan Product $e", e, s);
+    }
+  }
+
+  Future<void> deleteChallanProduct(int id) async {
+    print("In Challan Product Provider Delete Challan Product Start");
+    try {
+      await LocalDBRepo()
+          .db
+          .delete("CHALLAN_PRODUCT", where: "id = ?", whereArgs: [id]);
+      print(
+          "Deleting Challan Product with Id: $id in Challan Product Provider}");
+      notifyListeners();
+    } on Exception catch (e, s) {
+      handleException("Error while Deleting Challan Product $e", e, s);
+    }
+  }
+
+  Future<void> deleteChallanProductNotInList(List<ChallanProduct> _challanProductList, int _challanId) async {
+    print("In Challan Product Provider Delete Challan Product Start");
+
+    String _notInCheck = "";
+
+    for(int i = 0; i < _challanProductList.length; i++){
+      _notInCheck += _challanProductList[i].id.toString();
+      _notInCheck += i < (_challanProductList.length - 1)? "," : "";
+    }
+
+    try {
+      await LocalDBRepo()
+          .db
+          .rawQuery("DELETE FROM CHALLAN_PRODUCT WHERE challan_id = $_challanId AND id not in (${_notInCheck});");
+      // .query("CHALLAN_PRODUCT", where: "challan_id = ? AND id not in (?)", whereArgs: [_challanId, _notInCheck]);
+      print(
+          "Deleting Challan Product with Id: $_challanProductList in Challan Product Provider}");
+      notifyListeners();
+    } on Exception catch (e, s) {
+      handleException("Error while Deleting Challan Product $e", e, s);
     }
   }
 
@@ -355,7 +405,8 @@ class ChallanProvider with ChangeNotifier {
 
     // int id = await challanProvider.createChallan(challan);
     // List<Challan> challanList = await challanProvider.getChallanList();
-    List<Challan> challanList = await challanProvider.getChallanListByParameters(active: 1);
+    List<Challan> challanList =
+        await challanProvider.getChallanListByParameters(active: 1);
 
     // challan = await challanProvider.getChallanById(id);
     // challan.customerName = "Khisco";

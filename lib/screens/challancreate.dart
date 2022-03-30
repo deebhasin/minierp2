@@ -1,24 +1,25 @@
-import 'dart:convert';
-
-import 'package:erpapp/kwidgets/ksubmitresetbuttons.dart';
-import 'package:erpapp/kwidgets/ktextfield.dart';
-import 'package:erpapp/model/challan.dart';
-import 'package:erpapp/model/customer.dart';
-import 'package:erpapp/model/product.dart';
-import 'package:erpapp/providers/challan_product_provider.dart';
-import 'package:erpapp/providers/challan_provider.dart';
-import 'package:erpapp/providers/customer_provider.dart';
-import 'package:erpapp/providers/product_provider.dart';
-import 'package:erpapp/widgets/alertdialognav.dart';
-import 'package:erpapp/widgets/challan_product_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/challan_provider.dart';
+import '../providers/customer_provider.dart';
+import '../providers/product_provider.dart';
+import '../widgets/alertdialognav.dart';
+import '../widgets/challan_product_widget.dart';
+
+import '../model/challan_product.dart';
+import '../model/challan.dart';
+import '../model/customer.dart';
+import '../model/product.dart';
+
 import '../kwidgets/kvariables.dart';
 import '../kwidgets/kdropdown.dart';
-import '../model/challan_product.dart';
+import '../kwidgets/KDateTextForm.dart';
+import '../kwidgets/ksubmitresetbuttons.dart';
+import '../kwidgets/ktextfield.dart';
+import '../kwidgets/kvalidator.dart';
 
 class ChallanCreate extends StatefulWidget {
   Challan challan;
@@ -34,6 +35,11 @@ class ChallanCreate extends StatefulWidget {
 class _ChallanCreateState extends State<ChallanCreate> {
   final _formKey = GlobalKey<FormState>();
   bool _isInvoice = false;
+  final currencyFormat = NumberFormat("#,##0.00", "en_US");
+
+  double _totalBeforeTax = 0;
+  double _taxAmount = 0;
+  double _challanAmount = 0;
 
   late final customerNameController;
   late final challanNumberController;
@@ -44,18 +50,20 @@ class _ChallanCreateState extends State<ChallanCreate> {
   late final challanInvoiceNoController;
 
   late final productNameController;
+  DateTime _selectedDate = DateTime.now();
 
   int lineItem = 0;
+  List<Challan> _challanList = [];
   List<ChallanProduct> _challanProductList = [];
-  List<ChallanProduct> _challanProductListOld = [];
 
   String customerName = "-----";
   late double containerWidth;
   List<Customer> customerList = [];
   List<Product> productList = [];
 
-  final challanNumberValidator =
-      RequiredValidator(errorText: 'Challan Number is required');
+  final _customerNameValidator =
+      KDropDownFieldValidator(errorText: 'Customer is required');
+  MultiValidator challanNumberValidator = MultiValidator([]);
   final challanDateValidator =
       RequiredValidator(errorText: 'Challan Date is required');
   final challanPricePerUnitValidator = MultiValidator([
@@ -72,8 +80,17 @@ class _ChallanCreateState extends State<ChallanCreate> {
   @override
   void initState() {
     _isInvoice = widget.challan.invoiceNo != "" ? true : false;
+    _challanProductList = widget.challan.challanProductList!;
+    print("Challan Product List Length in Init: ${_challanProductList.length}");
+    for (int i = _challanProductList.length; i < 3; i++) {
+      _challanProductList.add(ChallanProduct());
+      print("List Counter: $i");
+    }
+    print("Challan Product List Length in Init: ${_challanProductList.length}");
     _buildForm();
+    _updateTotals();
     _getdropdownList();
+
     super.initState();
   }
 
@@ -118,7 +135,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
                     widget.challan.id == 0
                         ? "New Challan"
                         : _isInvoice
-                            ? "View Invoice"
+                            ? "View Challan"
                             : "Edit Challan",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
@@ -143,6 +160,9 @@ class _ChallanCreateState extends State<ChallanCreate> {
                         initialValue: customerName,
                         width: 250,
                         onChangeDropDown: _onCompanyChange,
+                        validator: _customerNameValidator,
+                        isMandatory: true,
+                        // validator: customerName != "-----"? DefaultFieldValidator() : _customerNameValidator,
                       ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,16 +175,9 @@ class _ChallanCreateState extends State<ChallanCreate> {
                       validator: challanNumberValidator,
                       isDisabled: _isInvoice,
                     ),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                    KTextField(
+                    KDateTextForm(
                       label: "Challan Date",
-                      isMandatory: true,
-                      width: 150,
-                      controller: challanDateController,
-                      validator: challanDateValidator,
-                      isDisabled: _isInvoice,
+                      selectedDate: _challanDateSelected,
                     ),
                   ],
                 ),
@@ -181,62 +194,111 @@ class _ChallanCreateState extends State<ChallanCreate> {
             const SizedBox(
               height: 30,
             ),
-            _isInvoice
-                ? Container()
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      SizedBox(
-                        width: 80,
-                        height: 25,
-                        child: ElevatedButton(
-                          onPressed: _addLineItem,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(
-                                Icons.add,
-                                color: Colors.blue,
-                                size: 20,
-                              ),
-                              // const SizedBox(width: 5,),
-                              Text(
-                                "Add",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: Colors.blue,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _isInvoice
+                    ? Container(
+                        width: containerWidth * 0.7,
+                      )
+                    : Container(
+                        width: containerWidth * 0.7,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: 80,
+                                  height: 25,
+                                  child: ElevatedButton(
+                                    onPressed: _addLineItem,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: const [
+                                        Icon(
+                                          Icons.add,
+                                          color: Colors.blue,
+                                          size: 20,
+                                        ),
+                                        // const SizedBox(width: 5,),
+                                        Text(
+                                          "Add",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14,
+                                            color: Colors.blue,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      primary: Color.fromRGBO(0, 0, 0, .05),
+                                      shadowColor: Colors.transparent,
+                                      side: const BorderSide(
+                                        width: 2,
+                                        color: Colors.blue,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            primary: Color.fromRGBO(0, 0, 0, .05),
-                            shadowColor: Colors.transparent,
-                            side: const BorderSide(
-                              width: 2,
-                              color: Colors.blue,
+                              ],
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                KSubmitResetButtons(
+                                  isReset: false,
+                                  resetForm: () {},
+                                  submitForm: _submitForm,
+                                ),
+                              ],
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-            const SizedBox(
-              height: 30,
+                Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: const [
+                        Text("Sub Total: \u{20B9} "),
+                        Text("Tax: \u{20B9} "),
+                        Text("Total: \u{20B9} "),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          "${currencyFormat.format(_totalBeforeTax)}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "${currencyFormat.format(_taxAmount)}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "${currencyFormat.format(_challanAmount)}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
             ),
-            _isInvoice
-                ? Container()
-                : KSubmitResetButtons(
-                    resetForm: _resetForm,
-                    submitForm: _submitForm,
-                  ),
             const SizedBox(
               height: 30,
             ),
@@ -246,16 +308,12 @@ class _ChallanCreateState extends State<ChallanCreate> {
     );
   }
 
-  _getdropdownList() async {
+  Future<void> _getdropdownList() async {
     customerList = await Provider.of<CustomerProvider>(context, listen: false)
         .getCustomerList();
     productList = await Provider.of<ProductProvider>(context, listen: false)
         .getProductList();
-    _challanProductListOld =
-        await Provider.of<ChallanProductProvider>(context, listen: false)
-            .getChallanProductListByChallanId(widget.challan.id);
-    _challanProductList = List.from(_challanProductListOld);
-    print("CHallanProductList Length: $_challanProductList");
+    print("CHallanProductList Length: ${_challanProductList.length}");
     setState(() {});
     print(
         "Customer List: ${customerList.length} and Product List: ${productList.length}");
@@ -265,7 +323,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
     this.customerName = customerName;
   }
 
-  void _buildForm() {
+  void _buildForm() async {
     if (widget.challan.id != 0) {
       customerName = widget.challan.customerName;
     }
@@ -283,22 +341,40 @@ class _ChallanCreateState extends State<ChallanCreate> {
         TextEditingController(text: widget.challan.challanAmount.toString());
     challanInvoiceNoController =
         TextEditingController(text: widget.challan.invoiceNo.toString());
+
+    _challanList = await Provider.of<ChallanProvider>(context, listen: false)
+        .getChallanList();
+
+    challanNumberValidator = MultiValidator([
+      RequiredValidator(errorText: 'Challan Number is required'),
+      KCheckChallanNumberValidator(
+        errorText: "Challan Number exists",
+        challanList: _challanList,
+        isEdit: widget.challan.id != 0 ? true : false,
+      ),
+    ]);
   }
 
-  void _resetForm() {
-    print("Reset Start");
-    lineItem = 0;
-    customerName =
-        widget.challan.id != 0 ? widget.challan.customerName : "-----";
-    challanNumberController.text = widget.challan.challanNo;
-    challanDateController.text =
-        DateFormat("d-M-y").format(widget.challan.challanDate!);
+  void _challanDateSelected(DateTime _pickedDate) {
+    setState(() {
+      _selectedDate = _pickedDate;
+    });
+    print("From Date: $_selectedDate");
+  }
 
-    _challanProductList = List.from(_challanProductListOld);
-    _getChallanProductWidgets();
-    print(
-        "_challanProductList Reset to _challanProductListOld with Length: ${_challanProductList.length}");
-    print("Reset End");
+  void _updateTotals() {
+    _totalBeforeTax = 0;
+    _taxAmount = 0;
+    _challanAmount = 0;
+    print("Update Totalts Begin");
+    for (ChallanProduct _element in _challanProductList) {
+      _totalBeforeTax += _element.totalBeforeTax;
+      _taxAmount += _element.taxAmount;
+      _challanAmount += _element.totalAmount;
+    }
+    print("Total Before Tax: $_totalBeforeTax");
+    print("Tax Amount: $_taxAmount");
+    print("Challan Total: $_challanAmount");
     setState(() {});
   }
 
@@ -313,43 +389,17 @@ class _ChallanCreateState extends State<ChallanCreate> {
       widget.challan.total = 0;
       widget.challan.taxAmount = 0;
       widget.challan.challanAmount = 0;
+      widget.challan.challanProductList = List.from(_challanProductList);
 
-      for (ChallanProduct _element in _challanProductList) {
-        widget.challan.total += _element.totalBeforeTax;
-        widget.challan.taxAmount += _element.taxAmount;
-        widget.challan.challanAmount += _element.totalAmount;
-      }
+      widget.challan.total += _totalBeforeTax;
+      widget.challan.taxAmount += _taxAmount;
+      widget.challan.challanAmount += _challanAmount;
 
-      Provider.of<ChallanProductProvider>(context, listen: false)
-          .deleteChallanProductNotInList(
-              _challanProductList, widget.challan.id);
+      // print("Challan Create on Submit Challan Product List Size: ${widget.challan.challanProductList![2].totalAmount}");
 
-      if (widget.challan.id != 0) {
-        Provider.of<ChallanProvider>(context, listen: false)
-            .updateChallan(widget.challan);
+      Provider.of<ChallanProvider>(context, listen: false)
+          .challanSave(widget.challan);
 
-        for (ChallanProduct _element in _challanProductList) {
-          if (_element.challanId == 0) {
-            _element.challanId = widget.challan.id;
-            Provider.of<ChallanProductProvider>(context, listen: false)
-                .createChallanProduct(_element);
-          } else {
-            Provider.of<ChallanProductProvider>(context, listen: false)
-                .updateChallanProduct(_element);
-          }
-        }
-
-        print("Product Updated");
-      } else {
-        int _challanId =
-            await Provider.of<ChallanProvider>(context, listen: false)
-                .createChallan(widget.challan);
-        for (ChallanProduct _element in _challanProductList) {
-          _element.challanId = _challanId;
-          Provider.of<ChallanProductProvider>(context, listen: false)
-              .createChallanProduct(_element);
-        }
-      }
       Navigator.of(context).pop();
     } else {
       print("Validation Failed");
@@ -380,6 +430,8 @@ class _ChallanCreateState extends State<ChallanCreate> {
                       _challanProductList.indexOf(challanProductItem),
                   deleteChallanProductFromList: _deleteChallanProductFromList,
                   isInvoice: _isInvoice,
+                  checkRedundentLineItem: _checkRedundentLineItem,
+                  updateTotals: _updateTotals,
                 ))
             .toList());
   }
@@ -387,7 +439,22 @@ class _ChallanCreateState extends State<ChallanCreate> {
   void _deleteChallanProductFromList(int pos) {
     setState(() {
       _challanProductList.removeAt((pos));
+      _updateTotals();
       print("Position in List ${pos.toString()}");
     });
+  }
+
+  bool _checkRedundentLineItem(String _productNameCheck, int index) {
+    bool checkStatus;
+    checkStatus = _challanProductList.any((element) =>
+        element.productName == _productNameCheck &&
+        _challanProductList.indexOf(element) != index);
+    print("REdundency Statussss: $checkStatus");
+    print("Challan Product List Length: ${_challanProductList.length}");
+    print("Index: $index");
+    _challanProductList.forEach((element){
+      print(element.productName);
+    });
+    return checkStatus;
   }
 }
