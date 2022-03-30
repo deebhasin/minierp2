@@ -10,9 +10,7 @@ import '../providers/challan_provider.dart';
 
 class ViewChallan extends StatefulWidget {
   final double width;
-  ViewChallan({Key? key,
-    this.width = 50
-  }) : super(key: key);
+  ViewChallan({Key? key, this.width = 50}) : super(key: key);
 
   @override
   State<ViewChallan> createState() => _ViewChallanState();
@@ -21,6 +19,7 @@ class ViewChallan extends StatefulWidget {
 class _ViewChallanState extends State<ViewChallan> {
   late List<Challan> challanList;
   late double containerWidth;
+  final currencyFormat = NumberFormat("#,##0.00", "en_US");
 
   @override
   void initState() {
@@ -30,7 +29,6 @@ class _ViewChallanState extends State<ViewChallan> {
 
   @override
   Widget build(BuildContext context) {
-
     return Consumer<ChallanProvider>(builder: (ctx, provider, child) {
       return FutureBuilder(
         future: provider.getChallanListByParameters(active: 1),
@@ -47,13 +45,11 @@ class _ViewChallanState extends State<ViewChallan> {
             } else if (snapshot.hasData) {
               challanList = snapshot.data!;
 
-              if(challanList.isEmpty){
+              if (challanList.isEmpty) {
                 return _noData(context);
-              }
-              else {
+              } else {
                 return _displayChallan(context);
               }
-
             } else
               return _noData(context);
           }
@@ -65,7 +61,9 @@ class _ViewChallanState extends State<ViewChallan> {
   Widget _noData(context) {
     return Column(
       children: [
-        KCreateButton(callFunction: challanCreate,),
+        KCreateButton(
+          callFunction: challanCreate,
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
@@ -97,10 +95,12 @@ class _ViewChallanState extends State<ViewChallan> {
     );
   }
 
-Widget _displayChallan(BuildContext context){
+  Widget _displayChallan(BuildContext context) {
     return Column(
       children: [
-        KCreateButton(callFunction: challanCreate,),
+        KCreateButton(
+          callFunction: challanCreate,
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
@@ -119,29 +119,98 @@ Widget _displayChallan(BuildContext context){
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            KTableCellHeader(header: "#", context: context, cellWidth: containerWidth *.03,),
-            KTableCellHeader(header: "Challan #", context: context, cellWidth: containerWidth * 0.08,),
-            KTableCellHeader(header: "Challan Date", context: context, cellWidth: containerWidth * 0.08,),
-            KTableCellHeader(header: "Customer Name", context: context, cellWidth: containerWidth * 0.14,),
-            KTableCellHeader(header: "Amount", context: context, cellWidth: containerWidth * 0.1,),
-            KTableCellHeader(header: "Tax", context: context, cellWidth: containerWidth * 0.1,),
-            KTableCellHeader(header: "Grand Total", context: context, cellWidth: containerWidth * 0.1,),
-            KTableCellHeader(header: "Invoice #", context: context, cellWidth: containerWidth * 0.12,),
-            KTableCellHeader(header: "", context: context, cellWidth: containerWidth *.05, isLastPos: true,),
+            KTableCellHeader(
+              header: "#",
+              context: context,
+              cellWidth: containerWidth * .03,
+            ),
+            KTableCellHeader(
+              header: "Challan #",
+              context: context,
+              cellWidth: containerWidth * 0.08,
+            ),
+            KTableCellHeader(
+              header: "Challan Date",
+              context: context,
+              cellWidth: containerWidth * 0.08,
+            ),
+            KTableCellHeader(
+              header: "Customer Name",
+              context: context,
+              cellWidth: containerWidth * 0.14,
+            ),
+            KTableCellHeader(
+              header: "Amount",
+              context: context,
+              cellWidth: containerWidth * 0.1,
+            ),
+            KTableCellHeader(
+              header: "Tax",
+              context: context,
+              cellWidth: containerWidth * 0.1,
+            ),
+            KTableCellHeader(
+              header: "Grand Total",
+              context: context,
+              cellWidth: containerWidth * 0.1,
+            ),
+            KTableCellHeader(
+              header: "Invoice #",
+              context: context,
+              cellWidth: containerWidth * 0.12,
+            ),
+            KTableCellHeader(
+              header: "",
+              context: context,
+              cellWidth: containerWidth * .05,
+              isLastPos: true,
+            ),
           ],
         ),
-        for(var i = 0; i < challanList.length; i++)
+        for (var i = 0; i < challanList.length; i++)
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              KTableCellHeader(header: challanList[i].id.toString(), context: context, cellWidth: containerWidth *.03,),
-              KTableCellHeader(header: challanList[i].challanNo, context: context, cellWidth: containerWidth * 0.08,),
-              KTableCellHeader(header: DateFormat("d-M-y").format(challanList[i].challanDate!), context: context, cellWidth: containerWidth * 0.08,),
-              KTableCellHeader(header: challanList[i].customerName, context: context, cellWidth: containerWidth * 0.14,),
-              KTableCellHeader(header: challanList[i].total.toString(), context: context, cellWidth: containerWidth * 0.1,),
-              KTableCellHeader(header: challanList[i].taxAmount.toString(), context: context, cellWidth: containerWidth * 0.1,),
-              KTableCellHeader(header: challanList[i].challanAmount.toString(), context: context, cellWidth: containerWidth * 0.1,),
-              KTableCellHeader(header: challanList[i].invoiceNo, context: context, cellWidth: containerWidth * 0.12,),
+              KTableCellHeader(
+                header: challanList[i].id.toString(),
+                context: context,
+                cellWidth: containerWidth * .03,
+              ),
+              KTableCellHeader(
+                header: challanList[i].challanNo,
+                context: context,
+                cellWidth: containerWidth * 0.08,
+              ),
+              KTableCellHeader(
+                header: DateFormat("d-M-y").format(challanList[i].challanDate!),
+                context: context,
+                cellWidth: containerWidth * 0.08,
+              ),
+              KTableCellHeader(
+                header: challanList[i].customerName,
+                context: context,
+                cellWidth: containerWidth * 0.14,
+              ),
+              KTableCellHeader(
+                header: currencyFormat.format(challanList[i].total),
+                context: context,
+                cellWidth: containerWidth * 0.1,
+              ),
+              KTableCellHeader(
+                header: currencyFormat.format(challanList[i].taxAmount),
+                context: context,
+                cellWidth: containerWidth * 0.1,
+              ),
+              KTableCellHeader(
+                header: currencyFormat.format(challanList[i].challanAmount),
+                context: context,
+                cellWidth: containerWidth * 0.1,
+              ),
+              KTableCellHeader(
+                header: challanList[i].invoiceNo,
+                context: context,
+                cellWidth: containerWidth * 0.12,
+              ),
               _displayIcons(i),
             ],
           ),
@@ -149,22 +218,22 @@ Widget _displayChallan(BuildContext context){
     );
   }
 
-  challanCreate(BuildContext context){
+  challanCreate(BuildContext context) {
     showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context){
-
-          return ChallanCreate(challan: Challan(),);
-        }
-    );
+        builder: (BuildContext context) {
+          return ChallanCreate(
+            challan: Challan(),
+          );
+        });
   }
 
-  void deleteAction(int id){
+  void deleteAction(int id) {
     Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
   }
 
-  Widget editAction(int id){
+  Widget editAction(int id) {
     Challan challan;
     return Consumer<ChallanProvider>(builder: (ctx, provider, child) {
       return FutureBuilder(
@@ -183,7 +252,9 @@ Widget _displayChallan(BuildContext context){
               challan = snapshot.data!;
               // customer.forEach((row) => print(row));
               // return displayCustomer(context);
-              return ChallanCreate(challan: challan,);
+              return ChallanCreate(
+                challan: challan,
+              );
             } else
               return Container();
           }
@@ -192,23 +263,26 @@ Widget _displayChallan(BuildContext context){
     });
   }
 
-  Widget _displayIcons(int i){
-    return challanList[i].invoiceNo == ""?
-    KTableCellHeader(header: "",
-      context: context,
-      cellWidth: containerWidth *.05,
-      id: challanList[i].id,
-      deleteAction: deleteAction,
-      editAction: editAction,
-      isLastPos: true,) :
-    KTableCellHeader(header: "",
-      isInvoice: true,
-      context: context,
-      cellWidth: containerWidth *.05,
-      id: challanList[i].id,
-      deleteAction: deleteAction,
-      editAction: editAction,
-      isLastPos: true,);
+  Widget _displayIcons(int i) {
+    return challanList[i].invoiceNo == ""
+        ? KTableCellHeader(
+            header: "",
+            context: context,
+            cellWidth: containerWidth * .05,
+            id: challanList[i].id,
+            deleteAction: deleteAction,
+            editAction: editAction,
+            isLastPos: true,
+          )
+        : KTableCellHeader(
+            header: "",
+            isInvoice: true,
+            context: context,
+            cellWidth: containerWidth * .05,
+            id: challanList[i].id,
+            deleteAction: deleteAction,
+            editAction: editAction,
+            isLastPos: true,
+          );
   }
-
 }

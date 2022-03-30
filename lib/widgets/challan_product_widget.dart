@@ -25,7 +25,9 @@ class ChallanProductWidget extends StatefulWidget {
     this.isInvoice = false,
     this.checkRedundentLineItem,
     this.updateTotals,
-  }) : super(key: key);
+  }): super(key: key){
+    print("Challan Product Position: ${challanProduct.productName} : $challanProductListPos");
+  }
 
   @override
   State<ChallanProductWidget> createState() => _ChallanProductWidgetState();
@@ -46,7 +48,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
   late final productTaxAmountController;
   late final productTotalAmountController;
 
-  late final productNameValidator;
+  late MultiValidator productNameValidator;
   final pricePerUnitValidator = MultiValidator([
     RequiredValidator(errorText: "Required"),
     PatternValidator(r'\d+?$', errorText: "Not Number"),
@@ -87,15 +89,16 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
     productTotalAmountController = TextEditingController(
         text: currencyFormat.format(widget.challanProduct.totalAmount));
 
-    productNameValidator = MultiValidator([
-      // KDropDownFieldValidator(errorText: "Required"),
-      KDropDownFieldCheckReduncencyValidator(errorText: "Already Used",index: widget.challanProductListPos, checkRedundency: widget.checkRedundentLineItem!),
-    ]);
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    productNameValidator = MultiValidator([
+      // KDropDownFieldValidator(errorText: "Required"),
+      KDropDownFieldCheckReduncencyValidator(errorText: "Already Used",index: widget.challanProductListPos, checkRedundency: widget.checkRedundentLineItem!),
+    ]);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       crossAxisAlignment: CrossAxisAlignment.center,

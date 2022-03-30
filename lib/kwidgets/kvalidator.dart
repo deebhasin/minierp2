@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 
 import '../model/challan.dart';
+import '../model/product.dart';
 import '../providers/challan_provider.dart';
 
 class KZeroValidator extends TextFieldValidator {
@@ -89,6 +90,37 @@ class KCheckChallanNumberValidator extends FieldValidator<String?> {
         : !status
             ? true
             : false;
+  }
+
+  @override
+  String? call(value) {
+    return isValid(value) ? null : errorText;
+  }
+}
+
+class KCheckProductNameValidator extends FieldValidator<String?> {
+  final String errorText;
+  final List<Product> productList;
+  final bool isEdit;
+  bool status = true;
+
+  KCheckProductNameValidator({
+    required this.errorText,
+    required this.productList,
+    required this.isEdit,
+  }) : super(errorText);
+
+  @override
+  bool isValid(value) {
+    status = productList.any((_product) => _product.name == value);
+    print("KCheckProductNameValidator. Value: $value : Status: $status PRoduct List Length: ${productList.length}");
+
+
+    return isEdit
+        ? true
+        :  !status
+        ? true
+        : false;
   }
 
   @override

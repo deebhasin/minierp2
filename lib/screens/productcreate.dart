@@ -1,5 +1,6 @@
 import 'package:erpapp/kwidgets/kdropdown.dart';
 import 'package:erpapp/kwidgets/ksubmitresetbuttons.dart';
+import 'package:erpapp/kwidgets/kvalidator.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
@@ -32,20 +33,17 @@ class _ProductCreateState extends State<ProductCreate> {
   late final _activeController;
 
   late bool _isActiveInitialValue;
+  List<Product> _productList = [];
 
   List<String> _statusList = ["true", "false"];
 
-  final _nameValidator = MultiValidator([
-    RequiredValidator(errorText: 'Company Name is required'),
-    MinLengthValidator(8, errorText: 'Must be at least 8 digits long'),
-    // PatternValidator(r'(?=.*?[#?!@$%^&*-])', errorText: 'passwords must have at least one special character')
-  ]);
+  late final _nameValidator;
   final _hsnValidator = RequiredValidator(errorText: 'HSN is required');
   final _pricePerUnitValidator =
       PatternValidator(r'\d+?$', errorText: "This should be number");
   final _gstValidator = MultiValidator([
     RequiredValidator(errorText: 'GST is required'),
-      PatternValidator(r'\d+?$', errorText: "This should be number"),
+    PatternValidator(r'\d+?$', errorText: "This should be number"),
   ]);
   final _activeValidator =
       RequiredValidator(errorText: 'Active Status is required');
@@ -63,6 +61,16 @@ class _ProductCreateState extends State<ProductCreate> {
     _activeController =
         TextEditingController(text: widget.product.isActive.toString());
     _isActiveInitialValue = widget.product.isActive;
+    _getProductsList();
+    _nameValidator = MultiValidator([
+      RequiredValidator(errorText: 'Company Name is required'),
+      MinLengthValidator(8, errorText: 'Must be at least 8 digits long'),
+      KCheckProductNameValidator(
+          errorText: "Product Name Aready Exists",
+          productList: _productList,
+          isEdit: widget.product.id != 0 ? true : false),
+      // PatternValidator(r'(?=.*?[#?!@$%^&*-])', errorText: 'passwords must have at least one special character')
+    ]);
     super.initState();
   }
 
@@ -157,7 +165,9 @@ class _ProductCreateState extends State<ProductCreate> {
                     KDropdown(
                       dropDownList: _statusList,
                       label: "Active",
-                      initialValue: _isActiveInitialValue == true? _statusList[0] : _statusList[1],
+                      initialValue: _isActiveInitialValue == true
+                          ? _statusList[0]
+                          : _statusList[1],
                       isShowSearchBox: false,
                       maxHeight: 100,
                       onChangeDropDown: _onActiveChanged,
@@ -177,6 +187,12 @@ class _ProductCreateState extends State<ProductCreate> {
         ),
       ),
     );
+  }
+
+  void _getProductsList() async {
+    _productList = await Provider.of<ProductProvider>(context, listen: false)
+        .getProductList();
+    print("Product List Length in getProuductList: ${_productList.length}");
   }
 
   void _onActiveChanged(String status) {
@@ -217,7 +233,7 @@ class _ProductCreateState extends State<ProductCreate> {
 
       Navigator.of(context).pop();
     } else {
-      print("Validation Failed");
+      print("Product Validation Failed");
     }
   }
 }

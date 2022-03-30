@@ -379,7 +379,8 @@ class _ChallanCreateState extends State<ChallanCreate> {
   }
 
   Future<void> _submitForm() async {
-    if (_formKey.currentState!.validate()) {
+    // if (_formKey.currentState!.validate() && !_hasErrors) {
+      if (_formKey.currentState!.validate()) {
       widget.challan.customerName = customerName;
       widget.challan.challanNo = challanNumberController.text;
       widget.challan.challanDate =
