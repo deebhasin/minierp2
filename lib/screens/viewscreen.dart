@@ -1,7 +1,10 @@
 import 'package:desktop_window/desktop_window.dart';
+import 'package:erpapp/providers/customer_provider.dart';
+import 'package:erpapp/providers/product_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/challan_provider.dart';
 import '../widgets/company_logo_name.dart';
 import '../widgets/top_nav.dart';
 import '../kwidgets/ktabbar.dart';
@@ -18,20 +21,20 @@ import '../widgets/sidebar.dart';
 class ViewScreen extends StatefulWidget {
   const ViewScreen({Key? key}) : super(key: key);
 
-
   @override
   State<ViewScreen> createState() => _ViewScreenState();
 }
 
 class _ViewScreenState extends State<ViewScreen> {
-
   late OrgProvider _orgProvider;
   late Organization _org;
   String displayPage = "Dashboard";
   static const int _sidebarWidth = 200;
   @override
   Widget build(BuildContext context) {
-
+    Provider.of<CustomerProvider>(context, listen: false).customerCache();
+    Provider.of<ProductProvider>(context, listen: false).productCache();
+    Provider.of<ChallanProvider>(context, listen: false).challanCache();
 
     return Consumer<OrgProvider>(builder: (ctx, provider, child) {
       return FutureBuilder(
@@ -56,64 +59,71 @@ class _ViewScreenState extends State<ViewScreen> {
     });
   }
 
-
-
-Widget body() {
-     String _companyName = _org.name;
-     String _companyLogo = _org.logo;
+  Widget body() {
+    String _companyName = _org.name;
+    String _companyLogo = _org.logo;
     _setDesktopFullScreen();
 
-    Widget dynamicPage(){
+    Widget dynamicPage() {
       Widget displayWidget;
-      switch(displayPage){
-        case "Dashboard" :
+      switch (displayPage) {
+        case "Dashboard":
           {
             displayWidget = const KTabBar(
               sidebar: _sidebarWidth,
             );
           }
           break;
-        case "Challan" :
+        case "Challan":
           {
-            displayWidget = ViewChallan(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
+            displayWidget = ViewChallan(
+              width: (MediaQuery.of(context).size.width - _sidebarWidth),
+            );
           }
           break;
-        case "Invoice" :
+        case "Invoice":
           {
-            displayWidget = InvoiceView(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
+            displayWidget = InvoiceView(
+              width: (MediaQuery.of(context).size.width - _sidebarWidth),
+            );
           }
           break;
-        // case "Payments" :
-        //   {
-        //     displayWidget = const ViewChallan();
-        //   }
+          // case "Payments" :
+          //   {
+          //     displayWidget = const ViewChallan();
+          //   }
           break;
-        case "Customers" :
+        case "Customers":
           {
-            displayWidget = CustomersView(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
+            displayWidget = CustomersView(
+              width: (MediaQuery.of(context).size.width - _sidebarWidth),
+            );
           }
           break;
 
-        case "Products" :
+        case "Products":
           {
-            displayWidget = ProductsView(width: (MediaQuery.of(context).size.width - _sidebarWidth),);
+            displayWidget = ProductsView(
+              width: (MediaQuery.of(context).size.width - _sidebarWidth),
+            );
           }
           break;
-        default: displayWidget = Center(
-          child: Text(
-            "No Selection Made OR Page for $displayPage not Created",
-            style: const TextStyle(
-              color: Colors.red,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
+        default:
+          displayWidget = Center(
+            child: Text(
+              "No Selection Made OR Page for $displayPage not Created",
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
             ),
-          ),
-        );
+          );
       }
       return displayWidget;
     }
 
-    void setDisplayPage(String selection){
+    void setDisplayPage(String selection) {
       setState(() {
         displayPage = selection;
       });
@@ -125,7 +135,10 @@ Widget body() {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Sidebar(sidebarWidth: _sidebarWidth, setDisplayPage: setDisplayPage,),
+            Sidebar(
+              sidebarWidth: _sidebarWidth,
+              setDisplayPage: setDisplayPage,
+            ),
           ],
         ),
         Container(
@@ -134,17 +147,20 @@ Widget body() {
           // decoration: BoxDecoration(
           //   border: Border.all(color: Colors.red),
           // ),
-          child: Stack( // STACK IS CREATED SO THAT THE FOOTER CAN BE POSITIONED
+          child: Stack(
+            // STACK IS CREATED SO THAT THE FOOTER CAN BE POSITIONED
             children: [
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const TopNavBar(sidebar: _sidebarWidth),
-                   CompanyLogoName(sidebarWidth: _sidebarWidth, companyLogo: _companyLogo, companyName: _companyName),
+                  CompanyLogoName(
+                      sidebarWidth: _sidebarWidth,
+                      companyLogo: _companyLogo,
+                      companyName: _companyName),
                   // KTabBar(sidebar: _sidebarWidth,),
                   dynamicPage(),
-
                 ],
               ),
               const Positioned(
@@ -154,12 +170,11 @@ Widget body() {
             ],
           ),
         ),
-
       ],
     );
   }
 
   _setDesktopFullScreen() {
-     DesktopWindow.setFullScreen(true);
+    DesktopWindow.setFullScreen(true);
   }
 }

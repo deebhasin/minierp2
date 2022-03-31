@@ -8,6 +8,17 @@ import '../utils/localDB_repo.dart';
 import '../model/challan.dart';
 
 class ChallanProvider with ChangeNotifier {
+
+  List<Challan> _challanList = [];
+
+  List<Challan> get challanList{
+    return [..._challanList];
+  }
+
+  Future<void> challanCache() async{
+    _challanList = await getChallanList();
+  }
+
   int active = 1;
   Future<List<Challan>> getChallanList() async {
     late List<Challan> challanList;
@@ -211,7 +222,7 @@ class ChallanProvider with ChangeNotifier {
         }
         return true;
       });
-
+      challanCache();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Creating Challan $e", e, s);
@@ -255,7 +266,7 @@ class ChallanProvider with ChangeNotifier {
         }
         return true;
       });
-
+      challanCache();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Updating Challan $e", e, s);
@@ -282,6 +293,7 @@ class ChallanProvider with ChangeNotifier {
       //     where: "id in (?)", whereArgs: idList);
       print(
           "Updating Invoice Number in Challan with Id: $whereArgs Challan Provider}");
+      challanCache();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Updating Challan $e", e, s);
@@ -296,6 +308,7 @@ class ChallanProvider with ChangeNotifier {
           .delete("CHALLAN", where: "id = ?", whereArgs: [id]);
       print("Deleting Challan with Id: $id in Challan Provider}");
       deleteChallanProductbyChallanId(id);
+      challanCache();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Deleting Challan $e", e, s);
@@ -310,6 +323,7 @@ class ChallanProvider with ChangeNotifier {
           .delete("CHALLAN_PRODUCT", where: "challan_id = ?", whereArgs: [id]);
       print(
           "Deleting Challan Product in deleteChallanProductbyChallanId with Id: $id in Challan Product Provider}");
+      challanCache();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Deleting Challan Product $e", e, s);
@@ -342,6 +356,7 @@ class ChallanProvider with ChangeNotifier {
           where: "id = ?", whereArgs: [challanProduct.id]);
       print(
           "Updating Challan Product with Id: ${challanProduct.id} in Challan Product Provider}");
+      challanCache();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Updating Challan Product $e", e, s);

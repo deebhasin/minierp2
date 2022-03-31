@@ -59,7 +59,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
   String customerName = "-----";
   late double containerWidth;
   List<Customer> customerList = [];
-  List<Product> productList = [];
+  List<Product> _productList = [];
 
   final _customerNameValidator =
       KDropDownFieldValidator(errorText: 'Customer is required');
@@ -162,6 +162,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
                         onChangeDropDown: _onCompanyChange,
                         validator: _customerNameValidator,
                         isMandatory: true,
+                        isShowSearchBox: false,
                         // validator: customerName != "-----"? DefaultFieldValidator() : _customerNameValidator,
                       ),
                 Column(
@@ -309,21 +310,21 @@ class _ChallanCreateState extends State<ChallanCreate> {
   }
 
   Future<void> _getdropdownList() async {
-    customerList = await Provider.of<CustomerProvider>(context, listen: false)
-        .getCustomerList();
-    productList = await Provider.of<ProductProvider>(context, listen: false)
-        .getProductList();
+    customerList =
+        Provider.of<CustomerProvider>(context, listen: false).customerList;
+    _productList =
+        Provider.of<ProductProvider>(context, listen: false).productList;
     print("CHallanProductList Length: ${_challanProductList.length}");
     setState(() {});
     print(
-        "Customer List: ${customerList.length} and Product List: ${productList.length}");
+        "Customer List: ${customerList.length} and Product List: ${_productList.length}");
   }
 
   void _onCompanyChange(String customerName) {
     this.customerName = customerName;
   }
 
-  void _buildForm() async {
+  void _buildForm() {
     if (widget.challan.id != 0) {
       customerName = widget.challan.customerName;
     }
@@ -342,8 +343,8 @@ class _ChallanCreateState extends State<ChallanCreate> {
     challanInvoiceNoController =
         TextEditingController(text: widget.challan.invoiceNo.toString());
 
-    _challanList = await Provider.of<ChallanProvider>(context, listen: false)
-        .getChallanList();
+    _challanList = Provider.of<ChallanProvider>(context, listen: false)
+        .challanList;
 
     challanNumberValidator = MultiValidator([
       RequiredValidator(errorText: 'Challan Number is required'),
@@ -380,7 +381,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
 
   Future<void> _submitForm() async {
     // if (_formKey.currentState!.validate() && !_hasErrors) {
-      if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate()) {
       widget.challan.customerName = customerName;
       widget.challan.challanNo = challanNumberController.text;
       widget.challan.challanDate =
@@ -425,7 +426,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
         children: _challanProductList
             .map((challanProductItem) => ChallanProductWidget(
                   key: ObjectKey(challanProductItem),
-                  productList: productList,
+                  productList: _productList,
                   challanProduct: challanProductItem,
                   challanProductListPos:
                       _challanProductList.indexOf(challanProductItem),
@@ -453,7 +454,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
     print("REdundency Statussss: $checkStatus");
     print("Challan Product List Length: ${_challanProductList.length}");
     print("Index: $index");
-    _challanProductList.forEach((element){
+    _challanProductList.forEach((element) {
       print(element.productName);
     });
     return checkStatus;

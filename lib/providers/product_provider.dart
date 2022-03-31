@@ -6,6 +6,16 @@ import '../utils/localDB_repo.dart';
 
 class ProductProvider with ChangeNotifier{
 
+  List<Product> _productList = [];
+
+  List<Product> get productList{
+    return [..._productList];
+  }
+
+  Future<void> productCache() async{
+    _productList = await getProductList();
+  }
+
   Future<List<Product>> getProductList() async{
     late List<Product> productList;
     print("Fetching Product List from Product Provider.");

@@ -25,8 +25,9 @@ class ChallanProductWidget extends StatefulWidget {
     this.isInvoice = false,
     this.checkRedundentLineItem,
     this.updateTotals,
-  }): super(key: key){
-    print("Challan Product Position: ${challanProduct.productName} : $challanProductListPos");
+  }) : super(key: key) {
+    print(
+        "Challan Product Position: ${challanProduct.productName} : $challanProductListPos");
   }
 
   @override
@@ -78,17 +79,16 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
         text: currencyFormat.format(widget.challanProduct.pricePerUnit));
     unitController =
         TextEditingController(text: widget.challanProduct.productUnit);
-    quantityController =
-        TextEditingController(text: currencyFormat.format(widget.challanProduct.quantity));
+    quantityController = TextEditingController(
+        text: currencyFormat.format(widget.challanProduct.quantity));
     productTotalBeforeTaxController = TextEditingController(
         text: currencyFormat.format(widget.challanProduct.totalBeforeTax));
     productGstPercentController = TextEditingController(
         text: currencyFormat.format(widget.challanProduct.gstPercent));
-    productTaxAmountController =
-        TextEditingController(text: currencyFormat.format(widget.challanProduct.taxAmount));
+    productTaxAmountController = TextEditingController(
+        text: currencyFormat.format(widget.challanProduct.taxAmount));
     productTotalAmountController = TextEditingController(
         text: currencyFormat.format(widget.challanProduct.totalAmount));
-
 
     super.initState();
   }
@@ -97,7 +97,10 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
   Widget build(BuildContext context) {
     productNameValidator = MultiValidator([
       // KDropDownFieldValidator(errorText: "Required"),
-      KDropDownFieldCheckReduncencyValidator(errorText: "Already Used",index: widget.challanProductListPos, checkRedundency: widget.checkRedundentLineItem!),
+      KDropDownFieldCheckReduncencyValidator(
+          errorText: "Already Used",
+          index: widget.challanProductListPos,
+          checkRedundency: widget.checkRedundentLineItem!),
     ]);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -119,6 +122,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
                 // validator: productName != ""? productNameValidator : null,
                 validator: productNameValidator,
                 isMandatory: true,
+                isShowSearchBox: false,
               ),
         KTextField(
           label: "Price Per Unit",
@@ -176,19 +180,20 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
         widget.isInvoice!
             ? Container()
             : InkWell(
-              onTap: () => _deleteAction(),
-              child: Icon(
-                Icons.delete,
-                size: 16,
-                color: Colors.red,
+                onTap: () => _deleteAction(),
+                child: Icon(
+                  Icons.delete,
+                  size: 16,
+                  color: Colors.red,
+                ),
               ),
-            ),
       ],
     );
   }
 
   void onProductChange(String _productName) {
-    if(!widget.checkRedundentLineItem!(_productName, widget.challanProductListPos)){
+    if (!widget.checkRedundentLineItem!(
+        _productName, widget.challanProductListPos)) {
       productName = _productName;
       Product product = widget.productList
           .where((element) => element.name == _productName)
@@ -200,13 +205,12 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
       quantityController.text = currencyFormat.format(0);
       productGstPercentController.text = product.GST;
       widget.challanProduct.gstPercent = double.parse(product.GST);
-      widget.challanProduct.pricePerUnit =
-          double.parse(currencyFormat.parse(pricePerUnitController.text).toString());
+      widget.challanProduct.pricePerUnit = double.parse(
+          currencyFormat.parse(pricePerUnitController.text).toString());
       quantityController.text = currencyFormat.format(0);
       productTotalBeforeTaxController.text = currencyFormat.format(0);
       productTaxAmountController.text = currencyFormat.format(0);
       productTotalAmountController.text = currencyFormat.format(0);
-
     }
     setState(() {});
   }
@@ -224,7 +228,8 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
     if (productName != "") {
       _onValuesChanged();
     } else {
-      quantityController.text = currencyFormat.format(widget.challanProduct.quantity);
+      quantityController.text =
+          currencyFormat.format(widget.challanProduct.quantity);
     }
   }
 
@@ -247,14 +252,15 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
 
   void _onValuesChanged() {
     print("Value Changed");
-    widget.challanProduct.pricePerUnit =
-        double.parse(currencyFormat.parse(pricePerUnitController.text).toString());
+    widget.challanProduct.pricePerUnit = double.parse(
+        currencyFormat.parse(pricePerUnitController.text).toString());
     widget.challanProduct.productUnit = unitController.text;
-    widget.challanProduct.quantity = double.parse(currencyFormat.parse(quantityController.text).toString());
+    widget.challanProduct.quantity =
+        double.parse(currencyFormat.parse(quantityController.text).toString());
     productTotalBeforeTaxController.text =
         currencyFormat.format(widget.challanProduct.totalBeforeTax);
-    widget.challanProduct.gstPercent =
-        double.parse(currencyFormat.parse(productGstPercentController.text).toString());
+    widget.challanProduct.gstPercent = double.parse(
+        currencyFormat.parse(productGstPercentController.text).toString());
     productTaxAmountController.text =
         currencyFormat.format(widget.challanProduct.taxAmount);
     productTotalAmountController.text =

@@ -7,6 +7,16 @@ import '../utils/localDB_repo.dart';
 
 class CustomerProvider with ChangeNotifier {
 
+  List<Customer> _customerList = [];
+
+  List<Customer> get customerList{
+    return [..._customerList];
+  }
+
+  Future<void> customerCache() async{
+    _customerList = await getCustomerList();
+  }
+
   Future<List<Customer>> getCustomerList() async {
      late List<Customer> customerList;
      print("In Customer Provider GetCustomer Start");
@@ -76,6 +86,7 @@ class CustomerProvider with ChangeNotifier {
         where: "id = ?",
         whereArgs: [id],
       );
+      customerCache();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while deleting customer $e", e, s);
