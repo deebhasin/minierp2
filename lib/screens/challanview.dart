@@ -1,8 +1,10 @@
 import 'package:erpapp/model/challan.dart';
 import 'package:flutter/material.dart';
+import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../kwidgets/k_horizontal_data_table.dart';
 import 'challancreate.dart';
 import '../kwidgets/kcreatebutton.dart';
 import '../kwidgets/ktablecellheader.dart';
@@ -17,7 +19,7 @@ class ViewChallan extends StatefulWidget {
 }
 
 class _ViewChallanState extends State<ViewChallan> {
-  late List<Challan> challanList;
+  late List<Challan> _challanList;
   late double containerWidth;
   final currencyFormat = NumberFormat("#,##0.00", "en_US");
 
@@ -43,9 +45,9 @@ class _ViewChallanState extends State<ViewChallan> {
               return Center(child: Text("An error occured.\n$snapshot"));
               // return noData(context);
             } else if (snapshot.hasData) {
-              challanList = snapshot.data!;
+              _challanList = snapshot.data!;
 
-              if (challanList.isEmpty) {
+              if (_challanList.isEmpty) {
                 return _noData(context);
               } else {
                 return _displayChallan(context);
@@ -116,104 +118,109 @@ class _ViewChallanState extends State<ViewChallan> {
           ],
         ),
         const Divider(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            KTableCellHeader(
-              header: "#",
-              context: context,
-              cellWidth: containerWidth * .03,
-            ),
-            KTableCellHeader(
-              header: "Challan #",
-              context: context,
-              cellWidth: containerWidth * 0.08,
-            ),
-            KTableCellHeader(
-              header: "Challan Date",
-              context: context,
-              cellWidth: containerWidth * 0.08,
-            ),
-            KTableCellHeader(
-              header: "Customer Name",
-              context: context,
-              cellWidth: containerWidth * 0.14,
-            ),
-            KTableCellHeader(
-              header: "Amount",
-              context: context,
-              cellWidth: containerWidth * 0.1,
-            ),
-            KTableCellHeader(
-              header: "Tax",
-              context: context,
-              cellWidth: containerWidth * 0.1,
-            ),
-            KTableCellHeader(
-              header: "Grand Total",
-              context: context,
-              cellWidth: containerWidth * 0.1,
-            ),
-            KTableCellHeader(
-              header: "Invoice #",
-              context: context,
-              cellWidth: containerWidth * 0.12,
-            ),
-            KTableCellHeader(
-              header: "",
-              context: context,
-              cellWidth: containerWidth * .05,
-              isLastPos: true,
-            ),
-          ],
+        KHorizontalDataTable(
+          leftHandSideColumnWidth: 100,
+          rightHandSideColumnWidth: 600,
+          challanList: _challanList,
         ),
-        for (var i = 0; i < challanList.length; i++)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              KTableCellHeader(
-                header: challanList[i].id.toString(),
-                context: context,
-                cellWidth: containerWidth * .03,
-              ),
-              KTableCellHeader(
-                header: challanList[i].challanNo,
-                context: context,
-                cellWidth: containerWidth * 0.08,
-              ),
-              KTableCellHeader(
-                header: DateFormat("d-M-y").format(challanList[i].challanDate!),
-                context: context,
-                cellWidth: containerWidth * 0.08,
-              ),
-              KTableCellHeader(
-                header: challanList[i].customerName,
-                context: context,
-                cellWidth: containerWidth * 0.14,
-              ),
-              KTableCellHeader(
-                header: currencyFormat.format(challanList[i].total),
-                context: context,
-                cellWidth: containerWidth * 0.1,
-              ),
-              KTableCellHeader(
-                header: currencyFormat.format(challanList[i].taxAmount),
-                context: context,
-                cellWidth: containerWidth * 0.1,
-              ),
-              KTableCellHeader(
-                header: currencyFormat.format(challanList[i].challanAmount),
-                context: context,
-                cellWidth: containerWidth * 0.1,
-              ),
-              KTableCellHeader(
-                header: challanList[i].invoiceNo,
-                context: context,
-                cellWidth: containerWidth * 0.12,
-              ),
-              _displayIcons(i),
-            ],
-          ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     KTableCellHeader(
+        //       header: "#",
+        //       context: context,
+        //       cellWidth: containerWidth * .03,
+        //     ),
+        //     KTableCellHeader(
+        //       header: "Challan #",
+        //       context: context,
+        //       cellWidth: containerWidth * 0.08,
+        //     ),
+        //     KTableCellHeader(
+        //       header: "Challan Date",
+        //       context: context,
+        //       cellWidth: containerWidth * 0.08,
+        //     ),
+        //     KTableCellHeader(
+        //       header: "Customer Name",
+        //       context: context,
+        //       cellWidth: containerWidth * 0.14,
+        //     ),
+        //     KTableCellHeader(
+        //       header: "Amount",
+        //       context: context,
+        //       cellWidth: containerWidth * 0.1,
+        //     ),
+        //     KTableCellHeader(
+        //       header: "Tax",
+        //       context: context,
+        //       cellWidth: containerWidth * 0.1,
+        //     ),
+        //     KTableCellHeader(
+        //       header: "Grand Total",
+        //       context: context,
+        //       cellWidth: containerWidth * 0.1,
+        //     ),
+        //     KTableCellHeader(
+        //       header: "Invoice #",
+        //       context: context,
+        //       cellWidth: containerWidth * 0.12,
+        //     ),
+        //     KTableCellHeader(
+        //       header: "",
+        //       context: context,
+        //       cellWidth: containerWidth * .05,
+        //       isLastPos: true,
+        //     ),
+        //   ],
+        // ),
+        // for (var i = 0; i < challanList.length; i++)
+        //   Row(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: [
+        //       KTableCellHeader(
+        //         header: challanList[i].id.toString(),
+        //         context: context,
+        //         cellWidth: containerWidth * .03,
+        //       ),
+        //       KTableCellHeader(
+        //         header: challanList[i].challanNo,
+        //         context: context,
+        //         cellWidth: containerWidth * 0.08,
+        //       ),
+        //       KTableCellHeader(
+        //         header: DateFormat("d-M-y").format(challanList[i].challanDate!),
+        //         context: context,
+        //         cellWidth: containerWidth * 0.08,
+        //       ),
+        //       KTableCellHeader(
+        //         header: challanList[i].customerName,
+        //         context: context,
+        //         cellWidth: containerWidth * 0.14,
+        //       ),
+        //       KTableCellHeader(
+        //         header: currencyFormat.format(challanList[i].total),
+        //         context: context,
+        //         cellWidth: containerWidth * 0.1,
+        //       ),
+        //       KTableCellHeader(
+        //         header: currencyFormat.format(challanList[i].taxAmount),
+        //         context: context,
+        //         cellWidth: containerWidth * 0.1,
+        //       ),
+        //       KTableCellHeader(
+        //         header: currencyFormat.format(challanList[i].challanAmount),
+        //         context: context,
+        //         cellWidth: containerWidth * 0.1,
+        //       ),
+        //       KTableCellHeader(
+        //         header: challanList[i].invoiceNo,
+        //         context: context,
+        //         cellWidth: containerWidth * 0.12,
+        //       ),
+        //       _displayIcons(i),
+        //     ],
+        //   ),
       ],
     );
   }
@@ -264,12 +271,12 @@ class _ViewChallanState extends State<ViewChallan> {
   }
 
   Widget _displayIcons(int i) {
-    return challanList[i].invoiceNo == ""
+    return _challanList[i].invoiceNo == ""
         ? KTableCellHeader(
             header: "",
             context: context,
             cellWidth: containerWidth * .05,
-            id: challanList[i].id,
+            id: _challanList[i].id,
             deleteAction: deleteAction,
             editAction: editAction,
             isLastPos: true,
@@ -279,7 +286,7 @@ class _ViewChallanState extends State<ViewChallan> {
             isInvoice: true,
             context: context,
             cellWidth: containerWidth * .05,
-            id: challanList[i].id,
+            id: _challanList[i].id,
             deleteAction: deleteAction,
             editAction: editAction,
             isLastPos: true,

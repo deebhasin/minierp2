@@ -11,7 +11,7 @@ class Challan {
   double taxAmount;
   double challanAmount;
   String invoiceNo;
-  late List<ChallanProduct>? challanProductList;
+  List<ChallanProduct> challanProductList = [];
   bool isActive;
 
   Challan({
@@ -23,11 +23,11 @@ class Challan {
     this.taxAmount = 0,
     this.challanAmount = 0,
     this.invoiceNo = "",
-    this.challanProductList,
+    // this.challanProductList,
     this.isActive = true,
 }){
     this.challanDate = DateTime.now();
-    this.challanProductList = [];
+    // challanProductList = [];
   }
 
   Challan.fromMap(Map<String, dynamic> res)

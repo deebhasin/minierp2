@@ -8,17 +8,6 @@ import '../utils/localDB_repo.dart';
 import '../model/challan.dart';
 
 class ChallanProvider with ChangeNotifier {
-
-  List<Challan> _challanList = [];
-
-  List<Challan> get challanList{
-    return [..._challanList];
-  }
-
-  Future<void> challanCache() async{
-    _challanList = await getChallanList();
-  }
-
   int active = 1;
   Future<List<Challan>> getChallanList() async {
     late List<Challan> challanList;
@@ -201,28 +190,41 @@ class ChallanProvider with ChangeNotifier {
     return challanProductList;
   }
 
-  void challanSave(Challan challan) {
-    challan.id == 0 ? createChallan(challan) : updateChallan(challan);
+  Future<bool> checkChallanNumber(String challanNo) async{
+    bool _isChallanNo = false;
+    print("In Challan Provider checkChallanNumber Start");
+
+    try {
+      final List<Map<String, Object?>> queryResult = await LocalDBRepo()
+          .db
+          .query('CHALLAN', where: "challan_no = ?", whereArgs: [challanNo]);
+      List<Challan> _challanList = queryResult.map((e) => Challan.fromMap(e)).toList();
+      print("getting Challan List with Challan No: $challanNo in Challan Provider}");
+
+      _isChallanNo = _challanList.length > 0? true : false;
+
+      print("IN Challan PRovider _isChallan: $_isChallanNo");
+
+    } on Exception catch (e, s) {
+      handleException("Error while fetching Challan with ChallanNo $challanNo $e", e, s);
+    }
+    return _isChallanNo;
   }
 
 
-  Future<int> createChallan(Challan challan) async {
+  void challanSave(Challan challan) {
+    challan.id == 0 ? _createChallan(challan) : _updateChallan(challan);
+  }
+
+
+  Future<int> _createChallan(Challan challan) async {
     int id = 0;
     print("In Challan Provider Create Challan Start");
     try {
       id = await LocalDBRepo().db.insert("CHALLAN", challan.toMap());
       print("Creating Challan with Id: $id in Challan Provider}");
 
-      challan.challanProductList!.every((_challanProduct){
-        if(_challanProduct.productName != "") {
-          _challanProduct.challanId = id;
-          print(
-              "Challan Id in CreateChallan for Challan Product ${_challanProduct.challanId}");
-          createChallanProduct(_challanProduct);
-        }
-        return true;
-      });
-      challanCache();
+      await _createChallanProduct(id, challan.challanProductList);
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Creating Challan $e", e, s);
@@ -230,47 +232,49 @@ class ChallanProvider with ChangeNotifier {
     return id;
   }
 
-  Future<int> createChallanProduct(ChallanProduct challanProduct) async {
+
+
+  Future<int> _createChallanProduct(int challanId, List<ChallanProduct> challanProductList) async {
     int id = 0;
+
     print("In Challan Product Provider Create Challan Product Start");
     try {
-      id = await LocalDBRepo()
-          .db
-          .insert("CHALLAN_PRODUCT", challanProduct.toMap());
+
+      challanProductList.forEach((challanProduct) async{
+        challanProduct.challanId = challanId;
+        id = await LocalDBRepo()
+            .db
+            .insert("CHALLAN_PRODUCT", challanProduct.toMap());
+      });
+
       print(
           "Creating Challan Product with Id: $id in Challan Product Provider}");
-      notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Creating Challan Product $e", e, s);
     }
     return id;
   }
 
-  Future<void> updateChallan(Challan challan) async {
+  Future<void> _updateChallan(Challan challan) async {
     print("In Challan Provider Update Challan Start");
     try {
       await LocalDBRepo().db.update("CHALLAN", challan.toMap(),
           where: "id = ?", whereArgs: [challan.id]);
       print("Updating Challan with Id: ${challan.id} in Challan Provider}");
 
-      print("Challan Update Challan Product Length: ${challan.challanProductList!.length}");
-      deleteChallanProductbyChallanId(challan.id);
-      print("Challan Update Challan Product Length after Delete: ${challan.challanProductList!.length}");
+      print("Challan Update Challan Product Length: ${challan.challanProductList.length}");
+      print("Challan Update Challan Product Length after Delete: ${challan.challanProductList.length}");
 
-      challan.challanProductList!.every((_challanProduct){
-        if(_challanProduct.productName != "") {
-          _challanProduct.challanId = challan.id;
-          print(
-              "Challan Id in CreateChallan for Challan Product ${_challanProduct.challanId}");
-          createChallanProduct(_challanProduct);
-        }
-        return true;
-      });
-      challanCache();
+      _updateChallanProduct(challan.id, challan.challanProductList);
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Updating Challan $e", e, s);
     }
+  }
+
+  Future<void> _updateChallanProduct(int challanId, List<ChallanProduct> challanProductList) async {
+    await _deleteChallanProductbyChallanId(challanId);
+    await _createChallanProduct(challanId, challanProductList);
   }
 
   Future<void> updateInvoiceNumberInChallan(
@@ -293,7 +297,6 @@ class ChallanProvider with ChangeNotifier {
       //     where: "id in (?)", whereArgs: idList);
       print(
           "Updating Invoice Number in Challan with Id: $whereArgs Challan Provider}");
-      challanCache();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Updating Challan $e", e, s);
@@ -307,15 +310,14 @@ class ChallanProvider with ChangeNotifier {
           .db
           .delete("CHALLAN", where: "id = ?", whereArgs: [id]);
       print("Deleting Challan with Id: $id in Challan Provider}");
-      deleteChallanProductbyChallanId(id);
-      challanCache();
+      await _deleteChallanProductbyChallanId(id);
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Deleting Challan $e", e, s);
     }
   }
 
-  Future<void> deleteChallanProductbyChallanId(int id) async {
+  Future<void> _deleteChallanProductbyChallanId(int id) async {
     print("In Challan Product Provider deleteChallanProductbyChallanId Start");
     try {
       await LocalDBRepo()
@@ -323,7 +325,6 @@ class ChallanProvider with ChangeNotifier {
           .delete("CHALLAN_PRODUCT", where: "challan_id = ?", whereArgs: [id]);
       print(
           "Deleting Challan Product in deleteChallanProductbyChallanId with Id: $id in Challan Product Provider}");
-      challanCache();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Deleting Challan Product $e", e, s);
@@ -356,7 +357,6 @@ class ChallanProvider with ChangeNotifier {
           where: "id = ?", whereArgs: [challanProduct.id]);
       print(
           "Updating Challan Product with Id: ${challanProduct.id} in Challan Product Provider}");
-      challanCache();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Updating Challan Product $e", e, s);

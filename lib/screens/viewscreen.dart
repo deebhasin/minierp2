@@ -32,9 +32,9 @@ class _ViewScreenState extends State<ViewScreen> {
   static const int _sidebarWidth = 200;
   @override
   Widget build(BuildContext context) {
-    Provider.of<CustomerProvider>(context, listen: false).customerCache();
-    Provider.of<ProductProvider>(context, listen: false).productCache();
-    Provider.of<ChallanProvider>(context, listen: false).challanCache();
+
+    Provider.of<CustomerProvider>(context, listen: false).cacheCustomer();
+    Provider.of<ProductProvider>(context, listen: false).cacheProductList();
 
     return Consumer<OrgProvider>(builder: (ctx, provider, child) {
       return FutureBuilder(

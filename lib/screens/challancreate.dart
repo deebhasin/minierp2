@@ -3,6 +3,7 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../kwidgets/k_popup_alert.dart';
 import '../providers/challan_provider.dart';
 import '../providers/customer_provider.dart';
 import '../providers/product_provider.dart';
@@ -53,13 +54,17 @@ class _ChallanCreateState extends State<ChallanCreate> {
   DateTime _selectedDate = DateTime.now();
 
   int lineItem = 0;
-  List<Challan> _challanList = [];
   List<ChallanProduct> _challanProductList = [];
+  late bool _isChallanNo;
 
   String customerName = "-----";
   late double containerWidth;
   List<Customer> customerList = [];
   List<Product> _productList = [];
+
+  String _challanNumberErrorMessage = "";
+  List<String> _errorMsgList = [];
+  bool _hasErrors = false;
 
   final _customerNameValidator =
       KDropDownFieldValidator(errorText: 'Customer is required');
@@ -80,7 +85,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
   @override
   void initState() {
     _isInvoice = widget.challan.invoiceNo != "" ? true : false;
-    _challanProductList = widget.challan.challanProductList!;
+    _challanProductList = widget.challan.challanProductList;
     print("Challan Product List Length in Init: ${_challanProductList.length}");
     for (int i = _challanProductList.length; i < 3; i++) {
       _challanProductList.add(ChallanProduct());
@@ -175,6 +180,8 @@ class _ChallanCreateState extends State<ChallanCreate> {
                       controller: challanNumberController,
                       validator: challanNumberValidator,
                       isDisabled: _isInvoice,
+                      // errMsg: _challanNumberErrorMessage,
+                      valueUpdated: (String){},
                     ),
                     KDateTextForm(
                       label: "Challan Date",
@@ -343,16 +350,13 @@ class _ChallanCreateState extends State<ChallanCreate> {
     challanInvoiceNoController =
         TextEditingController(text: widget.challan.invoiceNo.toString());
 
-    _challanList = Provider.of<ChallanProvider>(context, listen: false)
-        .challanList;
-
     challanNumberValidator = MultiValidator([
       RequiredValidator(errorText: 'Challan Number is required'),
-      KCheckChallanNumberValidator(
-        errorText: "Challan Number exists",
-        challanList: _challanList,
-        isEdit: widget.challan.id != 0 ? true : false,
-      ),
+      // KCheckChallanNumberValidator(
+      //   errorText: "Challan Number exists",
+      //   challanList: _challanList,
+      //   isEdit: widget.challan.id != 0 ? true : false,
+      // ),
     ]);
   }
 
@@ -380,8 +384,15 @@ class _ChallanCreateState extends State<ChallanCreate> {
   }
 
   Future<void> _submitForm() async {
-    // if (_formKey.currentState!.validate() && !_hasErrors) {
-    if (_formKey.currentState!.validate()) {
+    _hasErrors = false;
+    _errorMsgList.clear();
+    await _checkChallanNumberError();
+    _checkLineItemError();
+    // _challanNumberErrorMessage = _formKey.currentState!.validate()? _challanNumberErrorMessage : "";
+    if(_hasErrors) _popupAlert(_errorMsgList);
+    print("Check Errors Has Errors: $_challanNumberErrorMessage");
+    if (_formKey.currentState!.validate() && !_hasErrors) {
+      // if (_formKey.currentState!.validate()) {
       widget.challan.customerName = customerName;
       widget.challan.challanNo = challanNumberController.text;
       widget.challan.challanDate =
@@ -426,7 +437,6 @@ class _ChallanCreateState extends State<ChallanCreate> {
         children: _challanProductList
             .map((challanProductItem) => ChallanProductWidget(
                   key: ObjectKey(challanProductItem),
-                  productList: _productList,
                   challanProduct: challanProductItem,
                   challanProductListPos:
                       _challanProductList.indexOf(challanProductItem),
@@ -459,4 +469,48 @@ class _ChallanCreateState extends State<ChallanCreate> {
     });
     return checkStatus;
   }
+
+  Future<void> _checkChallanNumberError() async{
+    _isChallanNo = false;
+    _isChallanNo =  await Provider.of<ChallanProvider>(context, listen: false).checkChallanNumber(challanNumberController.text);
+    // setState(() {
+      if(widget.challan.id == 0){
+        _hasErrors = _isChallanNo;
+      }
+      else{
+        if(challanNumberController.text != widget.challan.challanNo){
+          _hasErrors = _isChallanNo;
+          print("Error in Edit: $_hasErrors");
+        }
+      }
+
+      _challanNumberErrorMessage = _hasErrors ? "Challan Number exists" : "";
+      if(_hasErrors) _errorMsgList.add(_challanNumberErrorMessage);
+      print("Check Error Challan Id: ${widget.challan.id}");
+      print(":Has Errors: $_hasErrors");
+      print("ISChallanNumber: $_isChallanNo");
+      print("_challanNumberErrorMessage: $_challanNumberErrorMessage");
+    // });
+  }
+
+  void _checkLineItemError() {
+    bool isLineItemEmpty = false;
+    isLineItemEmpty = _challanProductList.every((element) => element.totalAmount <= 0);
+    if(isLineItemEmpty) {
+      _errorMsgList.add("Line Items are not Addedd to Challan.");
+      _hasErrors = true;
+    }
+  }
+
+  void _popupAlert(List<String> _errorMsgList){
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return KPopupAlert(
+            errorMsgList: _errorMsgList,
+          );
+        });
+  }
+
 }

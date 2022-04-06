@@ -13,7 +13,7 @@ class CustomerProvider with ChangeNotifier {
     return [..._customerList];
   }
 
-  Future<void> customerCache() async{
+  Future<void> cacheCustomer() async{
     _customerList = await getCustomerList();
   }
 
@@ -47,10 +47,10 @@ class CustomerProvider with ChangeNotifier {
   }
 
   Future<int> saveCustomer(Customer customer) async {
-    return customer.id == 0? createCustomer(customer) : updateCustomer(customer);
+    return customer.id == 0? _createCustomer(customer) : _updateCustomer(customer);
   }
 
-  Future<int> createCustomer(Customer customer) async {
+  Future<int> _createCustomer(Customer customer) async {
     int id = 0;
     try {
       print("Creating New Customer in Customer Provider");
@@ -59,14 +59,13 @@ class CustomerProvider with ChangeNotifier {
           customer.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace
       );
-
       print("Inserted new customer with id $id and name ${customer.company_name}");
+      await cacheCustomer();
       notifyListeners();
 
     } on Exception catch (e, s) {
       handleException("Error while creating customer $e", e, s);
     }
-
     return id;
   }
 
@@ -86,14 +85,14 @@ class CustomerProvider with ChangeNotifier {
         where: "id = ?",
         whereArgs: [id],
       );
-      customerCache();
+      await cacheCustomer();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while deleting customer $e", e, s);
     }
   }
 
-    Future<int> updateCustomer(Customer customer) async {
+    Future<int> _updateCustomer(Customer customer) async {
       print("Updating Customer with id ${customer.id} in Customer Provider");
       try {
         await LocalDBRepo().db.update(
@@ -102,6 +101,7 @@ class CustomerProvider with ChangeNotifier {
           where: "id = ?",
           whereArgs: [customer.id],
         );
+        await cacheCustomer();
         notifyListeners();
       } on Exception catch (e,s) {
         handleException("Error while updating customer $e", e, s);

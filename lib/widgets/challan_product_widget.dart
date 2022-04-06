@@ -1,6 +1,8 @@
+import 'package:erpapp/providers/product_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../kwidgets/kdropdown.dart';
 import '../kwidgets/ktextfield.dart';
@@ -9,7 +11,7 @@ import '../model/product.dart';
 import '../model/challan_product.dart';
 
 class ChallanProductWidget extends StatefulWidget {
-  List<Product> productList;
+  // List<Product> productList;
   ChallanProduct challanProduct;
   int challanProductListPos;
   Function deleteChallanProductFromList;
@@ -18,7 +20,6 @@ class ChallanProductWidget extends StatefulWidget {
   Function? updateTotals;
   ChallanProductWidget({
     Key? key,
-    required this.productList,
     required this.challanProduct,
     required this.challanProductListPos,
     required this.deleteChallanProductFromList,
@@ -37,6 +38,7 @@ class ChallanProductWidget extends StatefulWidget {
 class _ChallanProductWidgetState extends State<ChallanProductWidget> {
   String _dropdownInitialValue = "-----";
   String productName = "";
+  late List<Product> _productList;
   bool isChallan = false;
   final currencyFormat = NumberFormat("#,##0.00", "en_US");
 
@@ -89,7 +91,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
         text: currencyFormat.format(widget.challanProduct.taxAmount));
     productTotalAmountController = TextEditingController(
         text: currencyFormat.format(widget.challanProduct.totalAmount));
-
+    _productList = Provider.of<ProductProvider>(context,listen: false).productList;
     super.initState();
   }
 
@@ -114,7 +116,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
                 isDisabled: widget.isInvoice!,
               )
             : KDropdown(
-                dropDownList: widget.productList.map((e) => e.name).toList(),
+                dropDownList: _productList.map((e) => e.name).toList(),
                 label: "Product",
                 initialValue: _dropdownInitialValue,
                 width: 250,
@@ -195,7 +197,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
     if (!widget.checkRedundentLineItem!(
         _productName, widget.challanProductListPos)) {
       productName = _productName;
-      Product product = widget.productList
+      Product product = _productList
           .where((element) => element.name == _productName)
           .toList()[0];
       widget.challanProduct.productName = product.name;

@@ -14,6 +14,7 @@ class KTextField extends StatelessWidget {
   final FieldValidator? validator;
   final bool isMandatory;
   final Function? valueUpdated;
+  final String errMsg;
 
   KTextField({
     Key? key,
@@ -27,15 +28,16 @@ class KTextField extends StatelessWidget {
     this.isMandatory = false,
     this.maxLength = 200,
     this.valueUpdated,
+    this.errMsg = "",
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     String mandatorySign = isMandatory ? "*" : "";
-    height = multiLine == 1?  height : (height + multiLine*17) ;
+    height = multiLine == 1 ? height : (height + multiLine * 17);
 
     return Container(
-      height: height,
+      height: height + 10,
       width: width,
       // decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
       child: Column(
@@ -84,15 +86,25 @@ class KTextField extends StatelessWidget {
                 isDense: true,
                 // contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 3),
                 contentPadding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                fillColor: isDisabled? Color.fromRGBO(0, 0, 0, 0.05) : Colors.transparent,
+                fillColor: isDisabled
+                    ? Color.fromRGBO(0, 0, 0, 0.05)
+                    : Colors.transparent,
                 filled: true,
               ),
             ),
-            // Text("Error", style: TextStyle(color: Colors.red),),
+            SizedBox(height: 2,),
+            Text(
+              errMsg,
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 11,
+              ),
+            ),
           ]),
     );
   }
-  void valueUpdatedTest(String val){
+
+  void valueUpdatedTest(String val) {
     print("Testing On Changed of TextFormField");
   }
 }

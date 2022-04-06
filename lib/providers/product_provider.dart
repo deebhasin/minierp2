@@ -8,11 +8,9 @@ class ProductProvider with ChangeNotifier{
 
   List<Product> _productList = [];
 
-  List<Product> get productList{
-    return [..._productList];
-  }
+  List<Product> get productList => _productList;
 
-  Future<void> productCache() async{
+  Future<void> cacheProductList() async{
     _productList = await getProductList();
   }
 
@@ -60,6 +58,7 @@ class ProductProvider with ChangeNotifier{
       result = await LocalDBRepo().db.insert('PRODUCT', product.toMap());
 
       print("Created Product with id: $result in Product Provider");
+      await cacheProductList();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while creating Product $e", e, s);
@@ -76,6 +75,7 @@ class ProductProvider with ChangeNotifier{
         where: "id = ?",
         whereArgs: [id],
       );
+      await cacheProductList();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while deleting Product Id: $id $e", e, s);
@@ -93,6 +93,7 @@ class ProductProvider with ChangeNotifier{
     } on Exception catch (e, s) {
       handleException("Error while updating Product Id: ${product.id} $e", e, s);
     }
+    await cacheProductList();
     notifyListeners();
 
     print("Updated Product of ID: ${product.id} in Product Provider");
