@@ -1,12 +1,17 @@
 import 'package:erpapp/model/challan.dart';
 import 'package:flutter/material.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/challan_provider.dart';
+import '../screens/challancreate.dart';
 
 class KHorizontalDataTable extends StatefulWidget {
-  final List<Challan> challanList;
+  List<Challan> challanList;
   final double leftHandSideColumnWidth;
   final double rightHandSideColumnWidth;
-  const KHorizontalDataTable({
+  KHorizontalDataTable({
     Key? key,
     required this.leftHandSideColumnWidth,
     required this.rightHandSideColumnWidth,
@@ -20,15 +25,18 @@ class KHorizontalDataTable extends StatefulWidget {
 class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
   HDTRefreshController _hdtRefreshController = HDTRefreshController();
 
-  static const int sortName = 0;
-  static const int sortStatus = 1;
-  bool isAscending = true;
-  int sortType = sortName;
+  final currencyFormat = NumberFormat("#,##0.00", "en_US");
+
+  bool _isChallanNoAscending = false;
+  bool _isChallanDateAscending = false;
+  bool _isCustomerNameAscending = false;
+  bool _isInvoiceNoAscending = false;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.95,
+      color: Colors.green,
+      width: MediaQuery.of(context).size.width * 0.6,
       child: HorizontalDataTable(
         leftHandSideColumnWidth: widget.leftHandSideColumnWidth,
         rightHandSideColumnWidth: widget.rightHandSideColumnWidth,
@@ -36,7 +44,7 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
         headerWidgets: _getTitleWidget(),
         leftSideItemBuilder: _generateFirstColumnRow,
         rightSideItemBuilder: _generateRightHandSideColumnRow,
-        itemCount: user.userInfo.length,
+        itemCount: widget.challanList.length,
         rowSeparatorWidget: const Divider(
           color: Colors.black54,
           height: 1.0,
@@ -79,20 +87,34 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
 
   List<Widget> _getTitleWidget() {
     return [
-      _getTitleItemWidget('#', 100),
-      _getTitleItemWidget('Beta', 100),
+      Row(
+        children: [
+          _getTitleItemWidget('#', 40),
+          TextButton(
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+            ),
+            child: _getTitleItemWidget(
+              'Challan # ' + (_isChallanNoAscending ? '↓' : '↑'),
+              100,
+            ),
+            onPressed: () {
+              _sortChallanNo();
+              setState(() {});
+            },
+          ),
+        ],
+      ),
       TextButton(
         style: TextButton.styleFrom(
           padding: EdgeInsets.zero,
         ),
         child: _getTitleItemWidget(
-            'Challan No' +
-                (sortType == sortName ? (isAscending ? '↓' : '↑') : ''),
-            100),
+          'Challan Date ' + (_isChallanDateAscending ? '↓' : '↑'),
+          100,
+        ),
         onPressed: () {
-          sortType = sortName;
-          isAscending = !isAscending;
-          user.sortName(isAscending);
+          _sortChallanDate();
           setState(() {});
         },
       ),
@@ -101,24 +123,46 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
           padding: EdgeInsets.zero,
         ),
         child: _getTitleItemWidget(
-            'Status' +
-                (sortType == sortStatus ? (isAscending ? '↓' : '↑') : ''),
-            100),
+          'Customer Name ' + (_isCustomerNameAscending ? '↓' : '↑'),
+          150,
+        ),
         onPressed: () {
-          sortType = sortStatus;
-          isAscending = !isAscending;
-          user.sortStatus(isAscending);
+          _sortCustomerName();
           setState(() {});
         },
       ),
-      _getTitleItemWidget('Register', 100),
-      _getTitleItemWidget('Termination', 200),
+      _getTitleItemWidget(
+        'Amount Before Tax',
+        150,
+      ),
+      _getTitleItemWidget(
+        'Tax',
+        100,
+      ),
+      _getTitleItemWidget(
+        'Grand Total',
+        100,
+      ),
+      TextButton(
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.zero,
+        ),
+        child: _getTitleItemWidget(
+          'Invoice # ' + (_isInvoiceNoAscending ? '↓' : '↑'),
+          120,
+        ),
+        onPressed: () {
+          _sortInvoiceNo();
+          setState(() {});
+        },
+      ),
+      // _getTitleItemWidget('', 100),
     ];
   }
 
   Widget _getTitleItemWidget(String label, double width) {
     return Container(
-      color: Colors.grey,
+      // color: Colors.grey,
       child: Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
       width: width,
       height: 30,
@@ -128,107 +172,199 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
   }
 
   Widget _generateFirstColumnRow(BuildContext context, int index) {
-    return Container(
-      child: Text(widget.challanList[index].challanNo),
-      width: 100,
-      height: 52,
-      padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-      alignment: Alignment.centerLeft,
+    return Row(
+      children: [
+        Container(
+          child: Text((index + 1).toString()),
+          width: 40,
+          height: 30,
+          padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.center,
+        ),
+        Container(
+          child: Text(widget.challanList[index].challanNo),
+          width: 100,
+          height: 30,
+          padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.center,
+        ),
+      ],
     );
   }
 
   Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
     return Row(
-      children: <Widget>[
+      children: [
         Container(
-          child: Row(
-            children: <Widget>[
-              Icon(
-                  user.userInfo[index].status
-                      ? Icons.notifications_off
-                      : Icons.notifications_active,
-                  color:
-                      user.userInfo[index].status ? Colors.red : Colors.green),
-              Text(user.userInfo[index].status ? 'Disabled' : 'Active')
-            ],
-          ),
+          // color: Colors.grey,
+          child: Text(DateFormat("dd-MM-yyyy")
+              .format(widget.challanList[index].challanDate!)),
           width: 100,
-          height: 52,
-          padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+          height: 30,
+          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
           alignment: Alignment.center,
         ),
         Container(
-          child: Text(user.userInfo[index].phone),
-          width: 200,
-          height: 52,
-          padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.centerLeft,
+          // color: Colors.grey,
+          child: Text(widget.challanList[index].customerName),
+          width: 150,
+          height: 30,
+          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.center,
         ),
         Container(
-          child: Text(user.userInfo[index].registerDate),
+          // color: Colors.grey,
+          child: Text(currencyFormat.format(widget.challanList[index].total)),
+          width: 150,
+          height: 30,
+          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.center,
+        ),
+        Container(
+          // color: Colors.grey,
+          child:
+              Text(currencyFormat.format(widget.challanList[index].taxAmount)),
           width: 100,
-          height: 52,
-          padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.centerLeft,
+          height: 30,
+          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.center,
         ),
         Container(
-          child: Text(user.userInfo[index].terminationDate),
-          width: 200,
-          height: 52,
-          padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.centerLeft,
+          // color: Colors.grey,
+          child: Text(
+              currencyFormat.format(widget.challanList[index].challanAmount)),
+          width: 100,
+          height: 30,
+          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.center,
+        ),
+        Container(
+          // color: Colors.grey,
+          child: Text(widget.challanList[index].invoiceNo),
+          width: 120,
+          height: 30,
+          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.center,
+        ),
+        Container(
+          width: 80,
+          height: 30,
+          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              InkWell(
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        if (editAction(widget.challanList[index].id) != null) {
+                          return editAction(widget.challanList[index].id);
+                        } else {
+                          return Container();
+                        }
+                      });
+                },
+                child: Icon(
+                  widget.challanList[index].invoiceNo != ""
+                      ? Icons.remove_red_eye_outlined
+                      : Icons.edit,
+                  size: 16,
+                  color: widget.challanList[index].invoiceNo != ""
+                      ? Colors.blue
+                      : Colors.green,
+                ),
+              ),
+              widget.challanList[index].invoiceNo != ""
+                  ? Icon(
+                      Icons.no_cell_outlined,
+                      size: 16,
+                      color: Colors.blueGrey,
+                    )
+                  : InkWell(
+                      onTap: () {}, // => deleteAction!(id),
+                      child: Icon(
+                        Icons.delete,
+                        size: 16,
+                        color: Colors.red,
+                      ),
+                    ),
+            ],
+          ),
         ),
       ],
     );
   }
-}
 
-User user = User();
-
-class User {
-  List<UserInfo> userInfo = [];
-
-  void initData(int size) {
-    for (int i = 0; i < size; i++) {
-      userInfo.add(UserInfo(
-          "User_$i", i % 3 == 0, '+001 9999 9999', '2019-01-01', 'N/A'));
-    }
+  void _sortChallanNo() {
+    widget.challanList.sort((a, b) {
+      return _isChallanNoAscending
+          ? a.challanNo.compareTo(b.challanNo)
+          : b.challanNo.compareTo(a.challanNo);
+    });
+    _isChallanNoAscending = !_isChallanNoAscending;
   }
 
-  ///
-  /// Single sort, sort Name's id
-  void sortName(bool isAscending) {
-    userInfo.sort((a, b) {
-      int aId = int.tryParse(a.name.replaceFirst('User_', '')) ?? 0;
-      int bId = int.tryParse(b.name.replaceFirst('User_', '')) ?? 0;
-      return (aId - bId) * (isAscending ? 1 : -1);
+  void _sortChallanDate() {
+    widget.challanList.sort((a, b) {
+      return _isChallanDateAscending
+          ? a.challanDate!.compareTo(b.challanDate!)
+          : b.challanDate!.compareTo(a.challanDate!);
+    });
+    _isChallanDateAscending = !_isChallanDateAscending;
+  }
+
+  void _sortCustomerName() {
+    widget.challanList.sort((a, b) {
+      return _isCustomerNameAscending
+          ? a.customerName!.compareTo(b.customerName!)
+          : b.customerName!.compareTo(a.customerName!);
+    });
+    _isCustomerNameAscending = !_isCustomerNameAscending;
+  }
+
+  void _sortInvoiceNo() {
+    widget.challanList.sort((a, b) {
+      return _isInvoiceNoAscending
+          ? a.invoiceNo!.compareTo(b.invoiceNo!)
+          : b.invoiceNo!.compareTo(a.invoiceNo!);
+    });
+    _isInvoiceNoAscending = !_isInvoiceNoAscending;
+  }
+
+  void deleteAction(int id) {
+    Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
+  }
+
+  Widget editAction(int id) {
+    Challan challan;
+    return Consumer<ChallanProvider>(builder: (ctx, provider, child) {
+      return FutureBuilder(
+        future: provider.getChallanById(id),
+        builder: (context, AsyncSnapshot<Challan> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          } else {
+            if (snapshot.hasError) {
+              //                  if (snapshot.error is ConnectivityError) {
+              //                    return NoConnectionScreen();
+              //                  }
+              return Center(child: Text("An error occured.\n$snapshot"));
+              // return noData(context);
+            } else if (snapshot.hasData) {
+              challan = snapshot.data!;
+              // customer.forEach((row) => print(row));
+              // return displayCustomer(context);
+              return ChallanCreate(
+                challan: challan,
+              );
+            } else
+              return Container();
+          }
+        },
+      );
     });
   }
-
-  ///
-  /// sort with Status and Name as the 2nd Sort
-  void sortStatus(bool isAscending) {
-    userInfo.sort((a, b) {
-      if (a.status == b.status) {
-        int aId = int.tryParse(a.name.replaceFirst('User_', '')) ?? 0;
-        int bId = int.tryParse(b.name.replaceFirst('User_', '')) ?? 0;
-        return (aId - bId);
-      } else if (a.status) {
-        return isAscending ? 1 : -1;
-      } else {
-        return isAscending ? -1 : 1;
-      }
-    });
-  }
-}
-
-class UserInfo {
-  String name;
-  bool status;
-  String phone;
-  String registerDate;
-  String terminationDate;
-
-  UserInfo(this.name, this.status, this.phone, this.registerDate,
-      this.terminationDate);
 }

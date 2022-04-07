@@ -1,13 +1,10 @@
 import 'package:erpapp/model/challan.dart';
 import 'package:flutter/material.dart';
-import 'package:horizontal_data_table/horizontal_data_table.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../kwidgets/k_horizontal_data_table.dart';
 import 'challancreate.dart';
 import '../kwidgets/kcreatebutton.dart';
-import '../kwidgets/ktablecellheader.dart';
 import '../providers/challan_provider.dart';
 
 class ViewChallan extends StatefulWidget {
@@ -21,7 +18,6 @@ class ViewChallan extends StatefulWidget {
 class _ViewChallanState extends State<ViewChallan> {
   late List<Challan> _challanList;
   late double containerWidth;
-  final currencyFormat = NumberFormat("#,##0.00", "en_US");
 
   @override
   void initState() {
@@ -119,8 +115,8 @@ class _ViewChallanState extends State<ViewChallan> {
         ),
         const Divider(),
         KHorizontalDataTable(
-          leftHandSideColumnWidth: 100,
-          rightHandSideColumnWidth: 600,
+          leftHandSideColumnWidth: 140,
+          rightHandSideColumnWidth: 800,
           challanList: _challanList,
         ),
         // Row(
@@ -236,60 +232,4 @@ class _ViewChallanState extends State<ViewChallan> {
         });
   }
 
-  void deleteAction(int id) {
-    Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
-  }
-
-  Widget editAction(int id) {
-    Challan challan;
-    return Consumer<ChallanProvider>(builder: (ctx, provider, child) {
-      return FutureBuilder(
-        future: provider.getChallanById(id),
-        builder: (context, AsyncSnapshot<Challan> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
-          } else {
-            if (snapshot.hasError) {
-              //                  if (snapshot.error is ConnectivityError) {
-              //                    return NoConnectionScreen();
-              //                  }
-              return Center(child: Text("An error occured.\n$snapshot"));
-              // return noData(context);
-            } else if (snapshot.hasData) {
-              challan = snapshot.data!;
-              // customer.forEach((row) => print(row));
-              // return displayCustomer(context);
-              return ChallanCreate(
-                challan: challan,
-              );
-            } else
-              return Container();
-          }
-        },
-      );
-    });
-  }
-
-  Widget _displayIcons(int i) {
-    return _challanList[i].invoiceNo == ""
-        ? KTableCellHeader(
-            header: "",
-            context: context,
-            cellWidth: containerWidth * .05,
-            id: _challanList[i].id,
-            deleteAction: deleteAction,
-            editAction: editAction,
-            isLastPos: true,
-          )
-        : KTableCellHeader(
-            header: "",
-            isInvoice: true,
-            context: context,
-            cellWidth: containerWidth * .05,
-            id: _challanList[i].id,
-            deleteAction: deleteAction,
-            editAction: editAction,
-            isLastPos: true,
-          );
-  }
 }
