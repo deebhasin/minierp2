@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/challan_provider.dart';
 import '../screens/challancreate.dart';
+import 'k_confirmation_popup.dart';
 
 class KHorizontalDataTable extends StatefulWidget {
   List<Challan> challanList;
@@ -284,7 +285,7 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
                       color: Colors.blueGrey,
                     )
                   : InkWell(
-                      onTap: () {}, // => deleteAction!(id),
+                      onTap: () => deleteAction(widget.challanList[index].id),
                       child: Icon(
                         Icons.delete,
                         size: 16,
@@ -319,8 +320,8 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
   void _sortCustomerName() {
     widget.challanList.sort((a, b) {
       return _isCustomerNameAscending
-          ? a.customerName!.compareTo(b.customerName!)
-          : b.customerName!.compareTo(a.customerName!);
+          ? a.customerName.compareTo(b.customerName)
+          : b.customerName.compareTo(a.customerName);
     });
     _isCustomerNameAscending = !_isCustomerNameAscending;
   }
@@ -328,15 +329,22 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
   void _sortInvoiceNo() {
     widget.challanList.sort((a, b) {
       return _isInvoiceNoAscending
-          ? a.invoiceNo!.compareTo(b.invoiceNo!)
-          : b.invoiceNo!.compareTo(a.invoiceNo!);
+          ? a.invoiceNo.compareTo(b.invoiceNo)
+          : b.invoiceNo.compareTo(a.invoiceNo);
     });
     _isInvoiceNoAscending = !_isInvoiceNoAscending;
   }
 
   void deleteAction(int id) {
-    Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return KConfirmationPopup(challanId: id,);
+        });
+    // Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
   }
+
 
   Widget editAction(int id) {
     Challan challan;
@@ -355,8 +363,6 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
               // return noData(context);
             } else if (snapshot.hasData) {
               challan = snapshot.data!;
-              // customer.forEach((row) => print(row));
-              // return displayCustomer(context);
               return ChallanCreate(
                 challan: challan,
               );
