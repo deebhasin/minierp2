@@ -38,6 +38,8 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   late final gstNumberController;
   late final dueDateController;
   late final billingAddressController;
+  late final _dateFromController;
+  late final _dateToController;
 
   late final RequiredValidator invoiceNumberValidator;
   late final RequiredValidator invoiceDateValidator;
@@ -81,6 +83,8 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
         TextEditingController(text: _dueDate == null? "" : DateFormat("d-M-y").format(_dueDate!));
     billingAddressController =
         TextEditingController(text: _billingAddress);
+    _dateFromController = TextEditingController(text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
+    _dateToController = TextEditingController(text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
 
     invoiceNumberValidator = RequiredValidator(errorText: 'Invoice number is required');
     invoiceDateValidator = RequiredValidator(errorText: 'Invoice Date   is required');
@@ -208,14 +212,14 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                             children: [
                               KDateTextForm(
                                 label: "From:",
-                                selectedDate: fromDateSelected,
+                                dateInputController: _dateFromController,
                               ),
                               SizedBox(
                                 width: 50,
                               ),
                               KDateTextForm(
                                 label: "To:",
-                                selectedDate: toDateSelected,
+                                dateInputController: _dateToController,
                               ),
                             ],
                           ),

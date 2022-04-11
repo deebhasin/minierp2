@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-
 class SecondTabPAndL extends StatelessWidget {
   const SecondTabPAndL({Key? key}) : super(key: key);
 
@@ -13,7 +12,6 @@ class SecondTabPAndL extends StatelessWidget {
     const int expenses = 16577;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -25,8 +23,8 @@ class SecondTabPAndL extends StatelessWidget {
               children: [
                 const Text("Last month"),
                 InkWell(
-                    child: const Icon(Icons.keyboard_arrow_down),
-                  onTap: (){},
+                  child: const Icon(Icons.keyboard_arrow_down),
+                  onTap: () {},
                 ),
               ],
             ),
@@ -38,14 +36,14 @@ class SecondTabPAndL extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                  '\u{20B9}${currencyFormat.format(netIncome)}',
+                '\u{20B9}${currencyFormat.format(netIncome)}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
                 ),
               ),
               const Text(
-                  "Net income for December",
+                "Net income for December",
                 style: TextStyle(
                   fontSize: 10,
                 ),
@@ -67,7 +65,6 @@ class SecondTabPAndL extends StatelessWidget {
                     '\u{20B9}${currencyFormat.format(income)}',
                     style: const TextStyle(
                       fontWeight: FontWeight.w500,
-                      // fontSize: 15,
                     ),
                   ),
                   const Text(
@@ -95,9 +92,9 @@ class SecondTabPAndL extends StatelessWidget {
             Text(
               '-\u{20B9}${currencyFormat.format(expenses)}',
               style: const TextStyle(
-                // fontWeight: FontWeight.bold,
-                // fontSize: 15,
-              ),
+                  // fontWeight: FontWeight.bold,
+                  // fontSize: 15,
+                  ),
             ),
             const Text(
               "Expenses",

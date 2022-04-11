@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class KDateTextForm extends StatefulWidget {
+class KDateTextForm extends StatelessWidget {
   final String label;
   late DateTime? rangeFrom;
   late DateTime? rangeTo;
   late DateTime? initialDate;
-  late Function? selectedDate;
+  final TextEditingController dateInputController;
 
   KDateTextForm({
     Key? key,
@@ -14,45 +14,36 @@ class KDateTextForm extends StatefulWidget {
     this.rangeFrom,
     this.rangeTo,
     this.initialDate,
-    this.selectedDate,
+    required this.dateInputController,
   }) : super(key: key);
 
   @override
-  State<KDateTextForm> createState() => _KDateTextFormState();
-}
-
-class _KDateTextFormState extends State<KDateTextForm> {
-  late final dateinput;
-  @override
-  void initState() {
-    dateinput = TextEditingController(text: DateFormat("dd-MM-yyyy").format(DateTime.now()));
-    widget.rangeFrom != null? widget.rangeFrom : DateTime(2000);
-    widget.rangeTo != null? widget.rangeTo : DateTime.now();
-    widget.initialDate != null? widget.initialDate : DateTime.now();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    // late final _dateInputController = TextEditingController(
+    //     text: DateFormat("dd-MM-yyyy").format(DateTime.now()));
+    rangeFrom != null ? rangeFrom : DateTime(2000);
+    rangeTo != null ? rangeTo : DateTime.now();
+
     return Container(
       width: 150,
       child: TextFormField(
-        controller: dateinput,
+        controller: dateInputController,
         readOnly: true,
         decoration: InputDecoration(
           icon: Icon(Icons.calendar_today), //icon of text field
-          labelText: widget.label, //label text of field
+          labelText: label, //label text of field
         ),
-        onTap: selectDate,
+        onTap: () => selectDate(context),
       ),
     );
   }
 
-  void selectDate() async {
+  void selectDate(BuildContext context) async {
     DateTime? _pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate:DateTime(2000), //DateTime.now() - not to allow to choose before today.
+      initialDate: DateFormat('dd-MM-yyyy').parse(dateInputController.text),
+      firstDate: DateTime(
+          2000), //DateTime.now() - not to allow to choose before today.
       lastDate: DateTime.now(),
     );
 
@@ -63,10 +54,9 @@ class _KDateTextFormState extends State<KDateTextForm> {
           _formattedDate); //formatted date output using intl package =>  2021-03-16
       //you can implement different kind of Date Format here according to your requirement
 
-      setState(() {
-        dateinput.text = _formattedDate; //set output date to TextField value.
-        widget.selectedDate!(DateFormat("d-M-y").parse(dateinput.text));
-      });
+      dateInputController.text =
+          _formattedDate; //set output date to TextField value.
+
     } else {
       print("Date is not selected");
     }

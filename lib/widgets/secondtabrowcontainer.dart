@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 class SecondTabRowContainer extends StatelessWidget {
   final Widget child;
-  const SecondTabRowContainer({Key? key, required this.child}) : super(key: key);
+  const SecondTabRowContainer({Key? key, required this.child})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

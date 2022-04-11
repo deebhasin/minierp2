@@ -1,4 +1,3 @@
-import 'package:erpapp/providers/product_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
@@ -9,9 +8,9 @@ import '../kwidgets/ktextfield.dart';
 import '../kwidgets/kvalidator.dart';
 import '../model/product.dart';
 import '../model/challan_product.dart';
+import '../providers/product_provider.dart';
 
 class ChallanProductWidget extends StatefulWidget {
-  // List<Product> productList;
   ChallanProduct challanProduct;
   int challanProductListPos;
   Function deleteChallanProductFromList;
@@ -91,7 +90,8 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
         text: currencyFormat.format(widget.challanProduct.taxAmount));
     productTotalAmountController = TextEditingController(
         text: currencyFormat.format(widget.challanProduct.totalAmount));
-    _productList = Provider.of<ProductProvider>(context,listen: false).productList;
+    _productList =
+        Provider.of<ProductProvider>(context, listen: false).productList;
     super.initState();
   }
 
@@ -115,16 +115,22 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
                 width: 250,
                 isDisabled: widget.isInvoice!,
               )
-            : KDropdown(
-                dropDownList: _productList.map((e) => e.name).toList(),
-                label: "Product",
-                initialValue: _dropdownInitialValue,
-                width: 250,
-                onChangeDropDown: onProductChange,
-                // validator: productName != ""? productNameValidator : null,
-                validator: productNameValidator,
-                isMandatory: true,
-                isShowSearchBox: false,
+            : Column(
+                children: [
+                  KDropdown(
+                    dropDownList: _productList.map((e) => e.name).toList(),
+                    label: "Product",
+                    initialValue: _dropdownInitialValue,
+                    width: 250,
+                    onChangeDropDown: onProductChange,
+                    validator: productNameValidator,
+                    isMandatory: true,
+                    isShowSearchBox: false,
+                  ),
+                  const SizedBox(
+                    height: 50,
+                  ),
+                ],
               ),
         KTextField(
           label: "Price Per Unit",
@@ -204,15 +210,10 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
       widget.challanProduct.productUnit = product.unit;
       pricePerUnitController.text = currencyFormat.format(product.pricePerUnit);
       unitController.text = product.unit;
-      quantityController.text = currencyFormat.format(0);
       productGstPercentController.text = product.GST;
       widget.challanProduct.gstPercent = double.parse(product.GST);
       widget.challanProduct.pricePerUnit = double.parse(
           currencyFormat.parse(pricePerUnitController.text).toString());
-      quantityController.text = currencyFormat.format(0);
-      productTotalBeforeTaxController.text = currencyFormat.format(0);
-      productTaxAmountController.text = currencyFormat.format(0);
-      productTotalAmountController.text = currencyFormat.format(0);
     }
     setState(() {});
   }
@@ -271,41 +272,8 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
   }
 
   void _deleteAction() {
-    // print("Challan Product Widget _deleteAction Id: $id");
-
-    // Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
     print("Line Item in Challan Product ${widget.challanProductListPos}");
     widget.deleteChallanProductFromList(widget.challanProductListPos);
-  }
-
-  Widget _editAction(int id) {
-    print("Challan Product Widget _editAction Id: $id");
-    return Container();
-    // Challan challan;
-    // return Consumer<ChallanProvider>(builder: (ctx, provider, child) {
-    //   return FutureBuilder(
-    //     future: provider.getChallanById(id),
-    //     builder: (context, AsyncSnapshot<Challan> snapshot) {
-    //       if (snapshot.connectionState == ConnectionState.waiting) {
-    //         return CircularProgressIndicator();
-    //       } else {
-    //         if (snapshot.hasError) {
-    //           //                  if (snapshot.error is ConnectivityError) {
-    //           //                    return NoConnectionScreen();
-    //           //                  }
-    //           return Center(child: Text("An error occured.\n$snapshot"));
-    //           // return noData(context);
-    //         } else if (snapshot.hasData) {
-    //           challan = snapshot.data!;
-    //           // customer.forEach((row) => print(row));
-    //           // return displayCustomer(context);
-    //           return ChallanCreate(challan: challan,);
-    //         } else
-    //           return Container();
-    //       }
-    //     },
-    //   );
-    // });
   }
 
   @override

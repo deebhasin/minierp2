@@ -241,10 +241,12 @@ class ChallanProvider with ChangeNotifier {
     try {
 
       challanProductList.forEach((challanProduct) async{
-        challanProduct.challanId = challanId;
-        id = await LocalDBRepo()
-            .db
-            .insert("CHALLAN_PRODUCT", challanProduct.toMap());
+        if(challanProduct.productName != "") {
+          challanProduct.challanId = challanId;
+          id = await LocalDBRepo()
+              .db
+              .insert("CHALLAN_PRODUCT", challanProduct.toMap());
+        }
       });
 
       print(

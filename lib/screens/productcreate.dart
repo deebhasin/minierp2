@@ -1,6 +1,3 @@
-import 'package:erpapp/kwidgets/kdropdown.dart';
-import 'package:erpapp/kwidgets/ksubmitresetbuttons.dart';
-import 'package:erpapp/kwidgets/kvalidator.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +7,9 @@ import '../kwidgets/ktextfield.dart';
 import '../kwidgets/kvariables.dart';
 import '../providers/product_provider.dart';
 import '../widgets/alertdialognav.dart';
+import '../kwidgets/kdropdown.dart';
+import '../kwidgets/ksubmitresetbuttons.dart';
+import '../kwidgets/kvalidator.dart';
 
 class ProductCreate extends StatefulWidget {
   Product product;
@@ -69,7 +69,6 @@ class _ProductCreateState extends State<ProductCreate> {
           errorText: "Product Name Aready Exists",
           productList: _productList,
           isEdit: widget.product.id != 0 ? true : false),
-      // PatternValidator(r'(?=.*?[#?!@$%^&*-])', errorText: 'passwords must have at least one special character')
     ]);
     super.initState();
   }

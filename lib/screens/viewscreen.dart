@@ -1,10 +1,7 @@
 import 'package:desktop_window/desktop_window.dart';
-import 'package:erpapp/providers/customer_provider.dart';
-import 'package:erpapp/providers/product_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/challan_provider.dart';
 import '../widgets/company_logo_name.dart';
 import '../widgets/top_nav.dart';
 import '../kwidgets/ktabbar.dart';
@@ -15,6 +12,8 @@ import '../model/organization.dart';
 import '../providers/org_provider.dart';
 import '../screens/productview.dart';
 import '../screens/invoiceview.dart';
+import '../providers/customer_provider.dart';
+import '../providers/product_provider.dart';
 
 import '../widgets/sidebar.dart';
 
@@ -32,7 +31,6 @@ class _ViewScreenState extends State<ViewScreen> {
   static const int _sidebarWidth = 200;
   @override
   Widget build(BuildContext context) {
-
     Provider.of<CustomerProvider>(context, listen: false).cacheCustomer();
     Provider.of<ProductProvider>(context, listen: false).cacheProductList();
 
@@ -44,9 +42,6 @@ class _ViewScreenState extends State<ViewScreen> {
             return const Scaffold(body: const CircularProgressIndicator());
           } else {
             if (snapshot.hasError) {
-//                  if (snapshot.error is ConnectivityError) {
-//                    return NoConnectionScreen();
-//                  }
               return Center(child: Text("An error occured"));
             } else if (snapshot.hasData) {
               _org = snapshot.data!;
@@ -144,9 +139,6 @@ class _ViewScreenState extends State<ViewScreen> {
         Container(
           width: (MediaQuery.of(context).size.width - _sidebarWidth),
           height: (MediaQuery.of(context).size.height),
-          // decoration: BoxDecoration(
-          //   border: Border.all(color: Colors.red),
-          // ),
           child: Stack(
             // STACK IS CREATED SO THAT THE FOOTER CAN BE POSITIONED
             children: [

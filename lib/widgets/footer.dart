@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class KFooter extends StatelessWidget {
   final int sidebarWidth;
-  const KFooter({Key? key,
+  const KFooter({
+    Key? key,
     required this.sidebarWidth,
   }) : super(key: key);
 

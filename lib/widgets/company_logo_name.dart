@@ -4,10 +4,12 @@ class CompanyLogoName extends StatelessWidget {
   final int sidebarWidth;
   final String companyLogo;
   final String companyName;
-  const CompanyLogoName({Key? key,
-    required this.sidebarWidth,
-    required this.companyLogo,
-    required this.companyName}) : super(key: key);
+  const CompanyLogoName(
+      {Key? key,
+      required this.sidebarWidth,
+      required this.companyLogo,
+      required this.companyName})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class CompanyLogoName extends StatelessWidget {
               height: double.infinity,
             ),
           ),
-           Padding(
+          Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
             child: Text(
               companyName,

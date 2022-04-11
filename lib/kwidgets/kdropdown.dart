@@ -37,64 +37,67 @@ class KDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print("kdropdown widget build called");
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+    return Container(
+      // color: Colors.red,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              isMandatory ? Text(
+                " *",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ) : Container(),
+            ],
+          ),
+          Container(
+            width: width + height,
+            height: height * 1.8,
+            decoration: BoxDecoration(
+              border: Border(
+                left: BorderSide(color: Colors.transparent),
+                top: BorderSide(color: Colors.transparent),
+                right: BorderSide(color: Colors.transparent),
+                bottom: BorderSide(color: Colors.grey),
               ),
             ),
-            isMandatory ? Text(
-              " *",
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
+            child: DropdownSearch(
+              dialogMaxWidth: width + height,
+              maxHeight: maxHeight,
+              showSearchBox: isShowSearchBox,
+              selectedItem: initialValue,
+              validator: validator ?? DefaultFieldValidator(),
+              // validator: (value) => value == "-----"? "$label Required" : null,
+              popupBackgroundColor: const Color.fromRGBO(242, 243, 247, 1),
+              popupElevation: 0,
+              onChanged: (value) => onChangeDropDown!(value.toString()),
+              popupShape: const Border(
+                left: BorderSide(color: Colors.grey),
+                top: BorderSide(color: Colors.grey),
+                right: BorderSide(color: Colors.grey),
+                bottom: BorderSide(color: Colors.grey),
               ),
-            ) : Container(),
-          ],
-        ),
-        Container(
-          width: width + height,
-          // height: height * 2,
-          decoration: BoxDecoration(
-            border: Border(
-              left: BorderSide(color: Colors.transparent),
-              top: BorderSide(color: Colors.transparent),
-              right: BorderSide(color: Colors.transparent),
-              bottom: BorderSide(color: Colors.grey),
+              dropdownSearchBaseStyle: const TextStyle(fontSize: 2),
+              mode: Mode.MENU,
+              items: dropDownList,
+              dropdownSearchDecoration: const InputDecoration(
+                border: InputBorder.none,
+              ),
             ),
           ),
-          child: DropdownSearch(
-            dialogMaxWidth: width + height,
-            maxHeight: maxHeight,
-            showSearchBox: isShowSearchBox,
-            selectedItem: initialValue,
-            validator: validator ?? DefaultFieldValidator(),
-            // validator: (value) => value == "-----"? "$label Required" : null,
-            popupBackgroundColor: const Color.fromRGBO(242, 243, 247, 1),
-            popupElevation: 0,
-            onChanged: (value) => onChangeDropDown!(value.toString()),
-            popupShape: const Border(
-              left: BorderSide(color: Colors.grey),
-              top: BorderSide(color: Colors.grey),
-              right: BorderSide(color: Colors.grey),
-              bottom: BorderSide(color: Colors.grey),
-            ),
-            dropdownSearchBaseStyle: const TextStyle(fontSize: 2),
-            mode: Mode.MENU,
-            items: dropDownList,
-            dropdownSearchDecoration: const InputDecoration(
-              border: InputBorder.none,
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

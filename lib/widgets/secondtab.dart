@@ -17,26 +17,26 @@ class SecondTab extends StatefulWidget {
 }
 
 class _SecondTabState extends State<SecondTab> {
-  void removeItemFromList(String listitem){
+  void removeItemFromList(String listitem) {
     setState(() {
       SecondTab.cardList.removeWhere((item) => item == listitem);
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       shrinkWrap: true,
       // physics: const NeverScrollableScrollPhysics(),
       children: [
-        // for(var item in cardList) const KListTile(listText: item),
-        ...SecondTab.cardList.map((item) => KListTile(listText: item, removeItemFromList: (item) => removeItemFromList(item))).toList(),
-        // const KListTile(),
-        // const KListTile(),
-        // const KListTile(),
-        // const KListTile(),
-        // const KListTile(),
+        ...SecondTab.cardList
+            .map((item) => KListTile(
+                listText: item,
+                removeItemFromList: (item) => removeItemFromList(item)))
+            .toList(),
         SizedBox(
-          width: KTabBar.sizedBoxWidth, //(MediaQuery.of(context).size.width - widget.sidebar) * 0.85,
+          width: KTabBar
+              .sizedBoxWidth, //(MediaQuery.of(context).size.width - widget.sidebar) * 0.85,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 8),
             child: Row(

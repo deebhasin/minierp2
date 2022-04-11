@@ -59,7 +59,7 @@ class KDropDownFieldCheckReduncencyValidator extends FieldValidator<String?> {
     print(
         "Check Redundency in KValidator: ${value} Status: ${checkRedundency!(value, index)}");
 
-    return checkRedundency!(value, index) ? true : false;
+    return value == ""? false : checkRedundency!(value, index) ? true : false;
   }
 
   @override

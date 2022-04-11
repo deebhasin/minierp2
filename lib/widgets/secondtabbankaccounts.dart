@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-
 class SecondTabBankAccounts extends StatelessWidget {
   const SecondTabBankAccounts({Key? key}) : super(key: key);
 
@@ -13,7 +12,6 @@ class SecondTabBankAccounts extends StatelessWidget {
     const int expenses = 16577;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -26,7 +24,7 @@ class SecondTabBankAccounts extends StatelessWidget {
                 const Text("Last month"),
                 InkWell(
                   child: const Icon(Icons.keyboard_arrow_down),
-                  onTap: (){},
+                  onTap: () {},
                 ),
               ],
             ),
@@ -95,9 +93,9 @@ class SecondTabBankAccounts extends StatelessWidget {
             Text(
               '-\u{20B9}${currencyFormat.format(expenses)}',
               style: const TextStyle(
-                // fontWeight: FontWeight.bold,
-                // fontSize: 15,
-              ),
+                  // fontWeight: FontWeight.bold,
+                  // fontSize: 15,
+                  ),
             ),
             const Text(
               "Expenses",

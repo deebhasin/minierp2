@@ -2,7 +2,7 @@ import 'package:erpapp/model/challan.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../kwidgets/k_horizontal_data_table.dart';
+import '../widgets/challan_horizontal_data_table.dart';
 import 'challancreate.dart';
 import '../kwidgets/kcreatebutton.dart';
 import '../providers/challan_provider.dart';
@@ -35,8 +35,6 @@ class _ViewChallanState extends State<ViewChallan> {
             return CircularProgressIndicator();
           } else {
             if (snapshot.hasError) {
-//                  if (snapshot.error is ConnectivityError) {
-//                    return NoConnectionScreen();
 //                  }
               return Center(child: Text("An error occured.\n$snapshot"));
               // return noData(context);
@@ -94,130 +92,29 @@ class _ViewChallanState extends State<ViewChallan> {
   }
 
   Widget _displayChallan(BuildContext context) {
-    return Column(
-      children: [
-        KCreateButton(
-          callFunction: challanCreate,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text(
-              "Challan",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                letterSpacing: 2,
-                textBaseline: TextBaseline.alphabetic,
-              ),
+    return Container(
+      child: Column(
+        children: [
+          KCreateButton(
+            callFunction: challanCreate,
+          ),
+          Text(
+            "Challan",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              letterSpacing: 2,
+              textBaseline: TextBaseline.alphabetic,
             ),
-          ],
-        ),
-        const Divider(),
-        KHorizontalDataTable(
-          leftHandSideColumnWidth: 140,
-          rightHandSideColumnWidth: 800,
-          challanList: _challanList,
-        ),
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.center,
-        //   children: [
-        //     KTableCellHeader(
-        //       header: "#",
-        //       context: context,
-        //       cellWidth: containerWidth * .03,
-        //     ),
-        //     KTableCellHeader(
-        //       header: "Challan #",
-        //       context: context,
-        //       cellWidth: containerWidth * 0.08,
-        //     ),
-        //     KTableCellHeader(
-        //       header: "Challan Date",
-        //       context: context,
-        //       cellWidth: containerWidth * 0.08,
-        //     ),
-        //     KTableCellHeader(
-        //       header: "Customer Name",
-        //       context: context,
-        //       cellWidth: containerWidth * 0.14,
-        //     ),
-        //     KTableCellHeader(
-        //       header: "Amount",
-        //       context: context,
-        //       cellWidth: containerWidth * 0.1,
-        //     ),
-        //     KTableCellHeader(
-        //       header: "Tax",
-        //       context: context,
-        //       cellWidth: containerWidth * 0.1,
-        //     ),
-        //     KTableCellHeader(
-        //       header: "Grand Total",
-        //       context: context,
-        //       cellWidth: containerWidth * 0.1,
-        //     ),
-        //     KTableCellHeader(
-        //       header: "Invoice #",
-        //       context: context,
-        //       cellWidth: containerWidth * 0.12,
-        //     ),
-        //     KTableCellHeader(
-        //       header: "",
-        //       context: context,
-        //       cellWidth: containerWidth * .05,
-        //       isLastPos: true,
-        //     ),
-        //   ],
-        // ),
-        // for (var i = 0; i < challanList.length; i++)
-        //   Row(
-        //     mainAxisAlignment: MainAxisAlignment.center,
-        //     children: [
-        //       KTableCellHeader(
-        //         header: challanList[i].id.toString(),
-        //         context: context,
-        //         cellWidth: containerWidth * .03,
-        //       ),
-        //       KTableCellHeader(
-        //         header: challanList[i].challanNo,
-        //         context: context,
-        //         cellWidth: containerWidth * 0.08,
-        //       ),
-        //       KTableCellHeader(
-        //         header: DateFormat("d-M-y").format(challanList[i].challanDate!),
-        //         context: context,
-        //         cellWidth: containerWidth * 0.08,
-        //       ),
-        //       KTableCellHeader(
-        //         header: challanList[i].customerName,
-        //         context: context,
-        //         cellWidth: containerWidth * 0.14,
-        //       ),
-        //       KTableCellHeader(
-        //         header: currencyFormat.format(challanList[i].total),
-        //         context: context,
-        //         cellWidth: containerWidth * 0.1,
-        //       ),
-        //       KTableCellHeader(
-        //         header: currencyFormat.format(challanList[i].taxAmount),
-        //         context: context,
-        //         cellWidth: containerWidth * 0.1,
-        //       ),
-        //       KTableCellHeader(
-        //         header: currencyFormat.format(challanList[i].challanAmount),
-        //         context: context,
-        //         cellWidth: containerWidth * 0.1,
-        //       ),
-        //       KTableCellHeader(
-        //         header: challanList[i].invoiceNo,
-        //         context: context,
-        //         cellWidth: containerWidth * 0.12,
-        //       ),
-        //       _displayIcons(i),
-        //     ],
-        //   ),
-      ],
+          ),
+          const Divider(),
+          ChallanHorizontalDataTable(
+            leftHandSideColumnWidth: 100,
+            rightHandSideColumnWidth: 800,
+            challanList: _challanList,
+          ),
+        ],
+      ),
     );
   }
 
@@ -231,5 +128,4 @@ class _ViewChallanState extends State<ViewChallan> {
           );
         });
   }
-
 }

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../providers/challan_provider.dart';
 
 class KConfirmationPopup extends StatelessWidget {
-  final int challanId;
+  final int id;
+  final Function deleteProvider;
   const KConfirmationPopup({
     Key? key,
-    required this.challanId,
+    required this.id,
+    required this.deleteProvider,
   }) : super(key: key);
 
   @override
@@ -56,7 +55,8 @@ class KConfirmationPopup extends StatelessWidget {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(primary: Colors.red,),
                     onPressed: () {
-                      Provider.of<ChallanProvider>(context, listen: false).deleteChallan(challanId);
+                      print("Delete Button Pressed");
+                      deleteProvider(id);
                       Navigator.of(context).pop();
                     },
                     child: Text("OK"),

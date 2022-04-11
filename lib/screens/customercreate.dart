@@ -1,6 +1,3 @@
-import 'package:erpapp/kwidgets/dtextfield.dart';
-import 'package:erpapp/kwidgets/ksubmitresetbuttons.dart';
-import 'package:erpapp/widgets/alertdialognav.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +5,9 @@ import 'package:provider/provider.dart';
 import '../kwidgets/kvariables.dart';
 import '../model/customer.dart';
 import '../providers/customer_provider.dart';
+import '../kwidgets/dtextfield.dart';
+import '../kwidgets/ksubmitresetbuttons.dart';
+import '../widgets/alertdialognav.dart';
 
 class CustomerCreate extends StatefulWidget {
   late final Customer customer;
@@ -28,6 +28,7 @@ class _CustomerCreateState extends State<CustomerCreate> {
   late final customerIdController;
   late final companyController;
   late final contactPersonController;
+  late final contactPhoneController;
   late final addressController;
   late final pinController;
   late final cityController;
@@ -58,6 +59,7 @@ class _CustomerCreateState extends State<CustomerCreate> {
     customerIdController = TextEditingController();
     companyController = TextEditingController();
     contactPersonController = TextEditingController();
+    contactPhoneController = TextEditingController();
     addressController = TextEditingController();
     pinController = TextEditingController();
     cityController = TextEditingController();
@@ -173,6 +175,10 @@ class _CustomerCreateState extends State<CustomerCreate> {
                                 controller: contactPersonController,
                               ),
                               DTextField(
+                                label: "Contact Phone",
+                                controller: contactPhoneController,
+                              ),
+                              DTextField(
                                 label: "Credit Period",
                                 controller: creditPeriodController,
                                 validator: creditPeriodValidator,
@@ -198,9 +204,6 @@ class _CustomerCreateState extends State<CustomerCreate> {
                       ),
                     ],
                   ),
-                  // SizedBox(
-                  //   height: 20,
-                  // ),
                   KSubmitResetButtons(
                     resetForm: _resetForm,
                     submitForm: _submitForm,
@@ -215,17 +218,14 @@ class _CustomerCreateState extends State<CustomerCreate> {
   }
 
   void _resetForm() {
-    // setState(() {
     _initializeForm();
-    // });
   }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       widget.customer.company_name = companyController.text;
       widget.customer.contact_person = contactPersonController.text;
-      widget.customer.contact_phone = contactPersonController
-          .text; //Have to add Phone and Active Status fields on the page
+      widget.customer.contact_phone = contactPhoneController.text;
       widget.customer.address = addressController.text;
       widget.customer.pin =
           int.parse(pinController.text == "" ? "0" : pinController.text);

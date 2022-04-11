@@ -1,4 +1,3 @@
-import 'package:erpapp/model/challan.dart';
 import 'package:flutter/material.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:intl/intl.dart';
@@ -6,13 +5,14 @@ import 'package:provider/provider.dart';
 
 import '../providers/challan_provider.dart';
 import '../screens/challancreate.dart';
-import 'k_confirmation_popup.dart';
+import '../kwidgets/k_confirmation_popup.dart';
+import '../model/challan.dart';
 
-class KHorizontalDataTable extends StatefulWidget {
+class ChallanHorizontalDataTable extends StatefulWidget {
   List<Challan> challanList;
   final double leftHandSideColumnWidth;
   final double rightHandSideColumnWidth;
-  KHorizontalDataTable({
+  ChallanHorizontalDataTable({
     Key? key,
     required this.leftHandSideColumnWidth,
     required this.rightHandSideColumnWidth,
@@ -20,10 +20,12 @@ class KHorizontalDataTable extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<KHorizontalDataTable> createState() => _KHorizontalDataTableState();
+  State<ChallanHorizontalDataTable> createState() =>
+      _ChallanHorizontalDataTableState();
 }
 
-class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
+class _ChallanHorizontalDataTableState
+    extends State<ChallanHorizontalDataTable> {
   HDTRefreshController _hdtRefreshController = HDTRefreshController();
 
   final currencyFormat = NumberFormat("#,##0.00", "en_US");
@@ -32,6 +34,8 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
   bool _isChallanDateAscending = false;
   bool _isCustomerNameAscending = false;
   bool _isInvoiceNoAscending = false;
+
+  List<ScrollController> _scrollControllerList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +94,6 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
     return [
       Row(
         children: [
-          _getTitleItemWidget('#', 40),
           TextButton(
             style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
@@ -157,7 +160,6 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
           setState(() {});
         },
       ),
-      // _getTitleItemWidget('', 100),
     ];
   }
 
@@ -175,19 +177,10 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
   Widget _generateFirstColumnRow(BuildContext context, int index) {
     return Row(
       children: [
-        Container(
-          child: Text((index + 1).toString()),
-          width: 40,
-          height: 30,
-          padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.center,
-        ),
-        Container(
-          child: Text(widget.challanList[index].challanNo),
-          width: 100,
-          height: 30,
-          padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.center,
+        _columnItem(
+          widget.challanList[index].challanNo,
+          100,
+          index,
         ),
       ],
     );
@@ -196,56 +189,36 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
   Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
     return Row(
       children: [
-        Container(
-          // color: Colors.grey,
-          child: Text(DateFormat("dd-MM-yyyy")
-              .format(widget.challanList[index].challanDate!)),
-          width: 100,
-          height: 30,
-          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.center,
+        _columnItem(
+          DateFormat("dd-MM-yyyy")
+              .format(widget.challanList[index].challanDate!),
+          100,
+          index,
         ),
-        Container(
-          // color: Colors.grey,
-          child: Text(widget.challanList[index].customerName),
-          width: 150,
-          height: 30,
-          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.center,
+        _columnItem(
+          widget.challanList[index].customerName,
+          150,
+          index,
         ),
-        Container(
-          // color: Colors.grey,
-          child: Text(currencyFormat.format(widget.challanList[index].total)),
-          width: 150,
-          height: 30,
-          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.center,
+        _columnItem(
+          currencyFormat.format(widget.challanList[index].total),
+          150,
+          index,
         ),
-        Container(
-          // color: Colors.grey,
-          child:
-              Text(currencyFormat.format(widget.challanList[index].taxAmount)),
-          width: 100,
-          height: 30,
-          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.center,
+        _columnItem(
+          currencyFormat.format(widget.challanList[index].taxAmount),
+          100,
+          index,
         ),
-        Container(
-          // color: Colors.grey,
-          child: Text(
-              currencyFormat.format(widget.challanList[index].challanAmount)),
-          width: 100,
-          height: 30,
-          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.center,
+        _columnItem(
+          currencyFormat.format(widget.challanList[index].challanAmount),
+          100,
+          index,
         ),
-        Container(
-          // color: Colors.grey,
-          child: Text(widget.challanList[index].invoiceNo),
-          width: 120,
-          height: 30,
-          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.center,
+        _columnItem(
+          widget.challanList[index].invoiceNo,
+          120,
+          index,
         ),
         Container(
           width: 80,
@@ -299,6 +272,27 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
     );
   }
 
+  Widget _columnItem(String item, double width, int index) {
+    if (widget.challanList[index].customerName.length >= 60)
+      _scrollControllerList.add(ScrollController());
+    return Container(
+      child: SingleChildScrollView(
+        controller: widget.challanList[index].customerName.length >= 60
+            ? _scrollControllerList[_scrollControllerList.length - 1]
+            : null,
+        child: Text(item),
+      ),
+      width: width,
+      height: widget.challanList[index].customerName.length <= 30
+          ? 30
+          : widget.challanList[index].customerName.length <= 40
+              ? 60
+              : 90,
+      // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+      alignment: Alignment.center,
+    );
+  }
+
   void _sortChallanNo() {
     widget.challanList.sort((a, b) {
       return _isChallanNoAscending
@@ -340,11 +334,16 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return KConfirmationPopup(challanId: id,);
+          return KConfirmationPopup(
+            id: id,
+            deleteProvider: deleteChallan,
+          );
         });
-    // Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
   }
 
+  void deleteChallan(int id) {
+    Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
+  }
 
   Widget editAction(int id) {
     Challan challan;
@@ -356,9 +355,6 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
             return CircularProgressIndicator();
           } else {
             if (snapshot.hasError) {
-              //                  if (snapshot.error is ConnectivityError) {
-              //                    return NoConnectionScreen();
-              //                  }
               return Center(child: Text("An error occured.\n$snapshot"));
               // return noData(context);
             } else if (snapshot.hasData) {
@@ -372,5 +368,13 @@ class _KHorizontalDataTableState extends State<KHorizontalDataTable> {
         },
       );
     });
+  }
+
+  @override
+  void dispose() {
+    for (int i = 0; i < _scrollControllerList.length; i++) {
+      _scrollControllerList[i].dispose();
+    }
+    super.dispose();
   }
 }

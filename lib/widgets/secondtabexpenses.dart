@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
-
 class SecondTabExpenses extends StatefulWidget {
-
   const SecondTabExpenses({Key? key}) : super(key: key);
 
   @override
@@ -14,20 +12,18 @@ class SecondTabExpenses extends StatefulWidget {
 class _SecondTabExpensesState extends State<SecondTabExpenses> {
   late List<charts.Series<Task, String>> _seriesPieData;
 
-  _generateData(){
+  _generateData() {
     var pieData = [
       Task('Work', 99.9, Colors.black12),
       Task('No Work', 0.1, Colors.white),
     ];
-    _seriesPieData.add(
-      charts.Series(
-        data:  pieData,
-        domainFn: (Task task, _) => task.task,
-        measureFn: (Task task, _) => task.taskValue,
-        colorFn: (Task task, _) => charts.ColorUtil.fromDartColor(task.taskColor),
-        id: "Daily Task",
-      )
-    );
+    _seriesPieData.add(charts.Series(
+      data: pieData,
+      domainFn: (Task task, _) => task.task,
+      measureFn: (Task task, _) => task.taskValue,
+      colorFn: (Task task, _) => charts.ColorUtil.fromDartColor(task.taskColor),
+      id: "Daily Task",
+    ));
   }
 
   @override
@@ -47,7 +43,6 @@ class _SecondTabExpensesState extends State<SecondTabExpenses> {
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -60,7 +55,7 @@ class _SecondTabExpensesState extends State<SecondTabExpenses> {
                     const Text("Last 30 days"),
                     InkWell(
                       child: const Icon(Icons.keyboard_arrow_down),
-                      onTap: (){},
+                      onTap: () {},
                     ),
                   ],
                 ),
@@ -98,13 +93,13 @@ class _SecondTabExpensesState extends State<SecondTabExpenses> {
                       backgroundColor: Colors.green,
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0,0 ,0, 0),
+                      padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
                       child: Text(
                         '\u{20B9}${currencyFormat.format(expenses)}',
                         style: const TextStyle(
-                          // fontWeight: FontWeight.bold,
-                          // fontSize: 15,
-                        ),
+                            // fontWeight: FontWeight.bold,
+                            // fontSize: 15,
+                            ),
                       ),
                     ),
                   ],
@@ -121,11 +116,13 @@ class _SecondTabExpensesState extends State<SecondTabExpenses> {
             height: 150,
             decoration: const BoxDecoration(color: Colors.transparent),
             child: Center(
-              child: charts.PieChart<String>(       //<String> IS USED ELSE IT GIVES ERROR
+              child: charts.PieChart<String>(
+                //<String> IS USED ELSE IT GIVES ERROR
                 _seriesPieData,
                 animate: true,
                 animationDuration: const Duration(milliseconds: 300),
-                defaultRenderer: charts.ArcRendererConfig<String>(  //THSI DOESNT SEEM TO BE WORKING HENCE WILL USE CIRCLE AVATAR
+                defaultRenderer: charts.ArcRendererConfig<String>(
+                  //THSI DOESNT SEEM TO BE WORKING HENCE WILL USE CIRCLE AVATAR
                   arcWidth: 150,
                 ),
               ),
@@ -154,13 +151,9 @@ class _SecondTabExpensesState extends State<SecondTabExpenses> {
 
 // created from Link https://www.youtube.com/watch?v=GwDMwnELTP4  Pie Cnart and Bar Chart explained well
 // Using the Charts package from pub.dev
-class Task{
+class Task {
   String task;
   double taskValue;
   Color taskColor;
-  Task(
-      this.task,
-      this.taskValue,
-      this.taskColor
-      );
+  Task(this.task, this.taskValue, this.taskColor);
 }
