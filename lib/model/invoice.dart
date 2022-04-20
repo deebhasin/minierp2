@@ -1,5 +1,7 @@
 import 'package:intl/intl.dart';
 
+import 'challan.dart';
+
 class Invoice{
   int id;
   String invoiceNo;
@@ -11,6 +13,7 @@ class Invoice{
   double invoiceTotal;
   String pdfFileLocation;
   int active;
+  List<Challan> challanList = [];
 
   Invoice({
    this.id = 0,

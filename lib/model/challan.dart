@@ -23,11 +23,9 @@ class Challan {
     this.taxAmount = 0,
     this.challanAmount = 0,
     this.invoiceNo = "",
-    // this.challanProductList,
     this.isActive = true,
 }){
     this.challanDate = DateTime.now();
-    // challanProductList = [];
   }
 
   Challan.fromMap(Map<String, dynamic> res)

@@ -37,7 +37,7 @@ class KTextField extends StatelessWidget {
     height = multiLine == 1 ? height : (height + multiLine * 17);
 
     return Container(
-      height: height + 10,
+      // height: height + 10,
       width: width,
       // decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
       child: Column(
@@ -64,7 +64,7 @@ class KTextField extends StatelessWidget {
               ],
             ),
             SizedBox(
-              height: 15,
+              height: 5,
               width: 1,
             ),
             TextFormField(

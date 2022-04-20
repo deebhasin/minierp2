@@ -89,22 +89,20 @@ class _ProductHorizontalDataTableState
 
   List<Widget> _getTitleWidget() {
     return [
-      Row(
-        children: [
-          TextButton(
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-            ),
-            child: _getTitleItemWidget(
-              'Product Name ' + (_isCustomerNameAscending ? '↓' : '↑'),
-              200,
-            ),
-            onPressed: () {
-              _sortProductName();
-              setState(() {});
-            },
-          ),
-        ],
+      Row(),
+      TextButton(
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.zero,
+        ),
+        child: _getTitleItemWidget(
+          'Product Name ' + (_isCustomerNameAscending ? '↓' : '↑'),
+          250,
+          alignment: Alignment.centerLeft,
+        ),
+        onPressed: () {
+          _sortProductName();
+          setState(() {});
+        },
       ),
       TextButton(
         style: TextButton.styleFrom(
@@ -113,6 +111,7 @@ class _ProductHorizontalDataTableState
         child: _getTitleItemWidget(
           'Unit ' + (_isContactPersonAscending ? '↓' : '↑'),
           150,
+          alignment: Alignment.centerLeft,
         ),
         onPressed: () {
           _sortUnit();
@@ -122,26 +121,41 @@ class _ProductHorizontalDataTableState
       _getTitleItemWidget(
         'Price Per Unit',
         150,
+        alignment: Alignment.centerRight,
       ),
       _getTitleItemWidget(
         'HSN Code',
         150,
+        alignment: Alignment.centerLeft,
       ),
       _getTitleItemWidget(
         'GST %',
         150,
+        alignment: Alignment.centerRight,
       ),
     ];
   }
 
-  Widget _getTitleItemWidget(String label, double width) {
+  Widget _getTitleItemWidget(
+    String label,
+    double width, {
+    Alignment alignment = Alignment.center,
+  }) {
     return Container(
-      // color: Colors.grey,
-      child: Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
+      ),
       width: width,
       height: 50,
-      // padding: EdgeInsets.fromLTRB(0, 2, 0, 2),
-      alignment: Alignment.center,
+      padding: EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 0,
+      ),
+      alignment: alignment,
     );
   }
 
@@ -150,11 +164,11 @@ class _ProductHorizontalDataTableState
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5.0),
       child: Row(
         children: [
-          _columnItem(
-            widget.productList[index].name,
-            200,
-            index,
-          ),
+          // _columnItem(
+          //   widget.productList[index].name,
+          //   200,
+          //   index,
+          // ),
         ],
       ),
     );
@@ -166,24 +180,34 @@ class _ProductHorizontalDataTableState
       child: Row(
         children: [
           _columnItem(
+            widget.productList[index].name,
+            250,
+            index,
+            alignment: Alignment.centerLeft,
+          ),
+          _columnItem(
             widget.productList[index].unit,
             150,
             index,
+            alignment: Alignment.centerLeft,
           ),
           _columnItem(
             widget.productList[index].pricePerUnit.toString(),
             150,
             index,
+            alignment: Alignment.centerRight,
           ),
           _columnItem(
             widget.productList[index].HSN,
             150,
             index,
+            alignment: Alignment.centerLeft,
           ),
           _columnItem(
             widget.productList[index].GST,
             150,
             index,
+            alignment: Alignment.centerRight,
           ),
           Container(
             width: 80,
@@ -231,14 +255,20 @@ class _ProductHorizontalDataTableState
     );
   }
 
-  Widget _columnItem(String label, double width, int index) {
+  Widget _columnItem(String item, double width, int index,
+      {Alignment alignment = Alignment.center}) {
     return Container(
-      // color: Colors.grey,
-      child: Text(label),
+      padding: EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 0,
+      ),
+      child: Text(
+        item,
+        style: TextStyle(fontSize: 16),
+      ),
       width: width,
       height: 30,
-      // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-      alignment: Alignment.center,
+      alignment: alignment,
     );
   }
 

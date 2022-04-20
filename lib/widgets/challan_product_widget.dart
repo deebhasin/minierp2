@@ -3,6 +3,7 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../kwidgets/k_confirmation_popup.dart';
 import '../kwidgets/kdropdown.dart';
 import '../kwidgets/ktextfield.dart';
 import '../kwidgets/kvalidator.dart';
@@ -110,7 +111,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
       children: [
         widget.isInvoice!
             ? KTextField(
-                label: "Product",
+                label: "",
                 controller: productNameController,
                 width: 250,
                 isDisabled: widget.isInvoice!,
@@ -119,22 +120,20 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
                 children: [
                   KDropdown(
                     dropDownList: _productList.map((e) => e.name).toList(),
-                    label: "Product",
+                    label: "",
                     initialValue: _dropdownInitialValue,
                     width: 250,
                     onChangeDropDown: onProductChange,
                     validator: productNameValidator,
-                    isMandatory: true,
                     isShowSearchBox: false,
                   ),
                   const SizedBox(
-                    height: 50,
+                    height: 35,
                   ),
                 ],
               ),
         KTextField(
-          label: "Price Per Unit",
-          isMandatory: true,
+          label: "",
           width: 130,
           controller: pricePerUnitController,
           validator: productName != "" ? pricePerUnitValidator : null,
@@ -142,8 +141,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
           isDisabled: widget.isInvoice!,
         ),
         KTextField(
-          label: "Unit",
-          isMandatory: true,
+          label: "",
           width: 70,
           controller: unitController,
           validator: productName != "" ? unitValidator : null,
@@ -151,8 +149,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
           valueUpdated: _unitValueChanged,
         ),
         KTextField(
-          label: "Quantity",
-          isMandatory: true,
+          label: "",
           width: 80,
           controller: quantityController,
           validator: productName != "" ? quantityValidator : null,
@@ -160,13 +157,13 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
           valueUpdated: _quantityValueChanged,
         ),
         KTextField(
-          label: "Total",
+          label: "",
           width: 80,
           controller: productTotalBeforeTaxController,
           isDisabled: true,
         ),
         KTextField(
-          label: "GST %",
+          label: "",
           width: 70,
           controller: productGstPercentController,
           validator: productName != "" ? gstPercentValidator : null,
@@ -174,13 +171,13 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
           valueUpdated: _gstPercentValueChanged,
         ),
         KTextField(
-          label: "GST",
+          label: "",
           width: 100,
           controller: productTaxAmountController,
           isDisabled: true,
         ),
         KTextField(
-          label: "Total Amount",
+          label: "",
           width: 110,
           controller: productTotalAmountController,
           isDisabled: true,
@@ -272,6 +269,18 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
   }
 
   void _deleteAction() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return KConfirmationPopup(
+            id: 0,
+            deleteProvider: _deleteChallanProduct,
+          );
+        });
+  }
+
+  void _deleteChallanProduct(int id) {
     print("Line Item in Challan Product ${widget.challanProductListPos}");
     widget.deleteChallanProductFromList(widget.challanProductListPos);
   }

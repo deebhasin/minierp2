@@ -114,10 +114,11 @@ class _ProductsViewState extends State<ProductsView> {
             ),
           ],
         ),
-        const Divider(),
+        const SizedBox(height: 10,),
+        // const Divider(),
         ProductHorizontalDataTable(
-            leftHandSideColumnWidth: 200,
-            rightHandSideColumnWidth: 700,
+            leftHandSideColumnWidth: 0,
+            rightHandSideColumnWidth: containerWidth * 1.025,
             productList: productList)
       ],
     );

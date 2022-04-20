@@ -74,6 +74,7 @@ class _CustomerCreateState extends State<CustomerCreate> {
     customerIdController.text = widget.customer.id.toString();
     companyController.text = widget.customer.company_name;
     contactPersonController.text = widget.customer.contact_person;
+    contactPhoneController.text = widget.customer.contact_phone;
     addressController.text = widget.customer.address;
     pinController.text =
         widget.customer.pin == 0 ? "" : widget.customer.pin.toString();

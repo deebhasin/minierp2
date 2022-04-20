@@ -7,7 +7,6 @@ import '../model/customer.dart';
 import '../screens/customercreate.dart';
 import '../providers/customer_provider.dart';
 
-
 class CustomerHorizontalDataTable extends StatefulWidget {
   List<Customer> customerList;
   final double leftHandSideColumnWidth;
@@ -90,22 +89,20 @@ class _CustomerHorizontalDataTableState
 
   List<Widget> _getTitleWidget() {
     return [
-      Row(
-        children: [
-          TextButton(
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-            ),
-            child: _getTitleItemWidget(
-              'Company Name ' + (_isCustomerNameAscending ? '↓' : '↑'),
-              200,
-            ),
-            onPressed: () {
-              _sortCustomerName();
-              setState(() {});
-            },
-          ),
-        ],
+      Row(),
+      TextButton(
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.zero,
+        ),
+        child: _getTitleItemWidget(
+          'Company Name ' + (_isCustomerNameAscending ? '↓' : '↑'),
+          250,
+          alignment: Alignment.centerLeft,
+        ),
+        onPressed: () {
+          _sortCustomerName();
+          setState(() {});
+        },
       ),
       TextButton(
         style: TextButton.styleFrom(
@@ -113,7 +110,8 @@ class _CustomerHorizontalDataTableState
         ),
         child: _getTitleItemWidget(
           'Contact Person ' + (_isContactPersonAscending ? '↓' : '↑'),
-          150,
+          170,
+          alignment: Alignment.centerLeft,
         ),
         onPressed: () {
           _sortContactPerson();
@@ -126,11 +124,12 @@ class _CustomerHorizontalDataTableState
       ),
       _getTitleItemWidget(
         'Address',
-        150,
+        200,
+        alignment: Alignment.centerLeft,
       ),
       _getTitleItemWidget(
         'Pin',
-        150,
+        75,
       ),
       TextButton(
         style: TextButton.styleFrom(
@@ -139,6 +138,7 @@ class _CustomerHorizontalDataTableState
         child: _getTitleItemWidget(
           'State ' + (_isStateAscending ? '↓' : '↑'),
           150,
+          alignment: Alignment.centerLeft,
         ),
         onPressed: () {
           _sortState();
@@ -147,7 +147,8 @@ class _CustomerHorizontalDataTableState
       ),
       _getTitleItemWidget(
         'GST Number',
-        150,
+        120,
+        alignment: Alignment.centerLeft,
       ),
       _getTitleItemWidget(
         'Credit Period\n(Days)',
@@ -156,14 +157,14 @@ class _CustomerHorizontalDataTableState
     ];
   }
 
-  Widget _getTitleItemWidget(String label, double width) {
+  Widget _getTitleItemWidget(String label, double width, {Alignment alignment = Alignment.center,}) {
     return Container(
-      // color: Colors.grey,
-      child: Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
+      child: Text(label,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
       width: width,
-      height: 50,
-      // padding: EdgeInsets.fromLTRB(0, 2, 0, 2),
-      alignment: Alignment.center,
+      height: 70,
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+      alignment: alignment,
     );
   }
 
@@ -172,11 +173,11 @@ class _CustomerHorizontalDataTableState
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5.0),
       child: Row(
         children: [
-          _columnItem(
-            widget.customerList[index].company_name,
-            200,
-            index,
-          ),
+          // _columnItem(
+          //   widget.customerList[index].company_name,
+          //   200,
+          //   index,
+          // ),
         ],
       ),
     );
@@ -188,9 +189,16 @@ class _CustomerHorizontalDataTableState
       child: Row(
         children: [
           _columnItem(
-            widget.customerList[index].contact_person,
-            150,
+            widget.customerList[index].company_name,
+            250,
             index,
+            alignment: Alignment.centerLeft,
+          ),
+          _columnItem(
+            widget.customerList[index].contact_person,
+            170,
+            index,
+            alignment: Alignment.centerLeft,
           ),
           _columnItem(
             widget.customerList[index].contact_phone,
@@ -199,23 +207,26 @@ class _CustomerHorizontalDataTableState
           ),
           _columnItem(
             widget.customerList[index].address,
-            150,
+            200,
             index,
+            alignment: Alignment.centerLeft,
           ),
           _columnItem(
             widget.customerList[index].pin.toString(),
-            150,
+            75,
             index,
           ),
           _columnItem(
             widget.customerList[index].state,
             150,
             index,
+            alignment: Alignment.centerLeft,
           ),
           _columnItem(
             widget.customerList[index].gst,
-            150,
+            120,
             index,
+            alignment: Alignment.centerLeft,
           ),
           _columnItem(
             widget.customerList[index].creditPeriod.toString(),
@@ -268,28 +279,25 @@ class _CustomerHorizontalDataTableState
     );
   }
 
-  Widget _columnItem(String item, double width, int index) {
+  Widget _columnItem(String item, double width, int index,
+      {Alignment alignment = Alignment.center}) {
     String _columnName = widget.customerList[index].company_name.length >=
             widget.customerList[index].address.length
         ? widget.customerList[index].company_name
         : widget.customerList[index].address;
-    if (_columnName.length >= 60) _scrollControllerList.add(ScrollController());
     return Container(
-      // color: Colors.grey,
-      child: SingleChildScrollView(
-        controller: _columnName.length >= 60
-            ? _scrollControllerList[_scrollControllerList.length - 1]
-            : null,
-        child: Text(item),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0,),
+      child: Text(
+        item,
+        style: TextStyle(fontSize: 16),
       ),
       width: width,
       height: _columnName.length <= 30
           ? 30
-          : _columnName.length <= 40
+          : _columnName.length <= 150
               ? 60
-              : 90,
-      // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-      alignment: Alignment.center,
+              : 150,
+      alignment: alignment,
     );
   }
 
@@ -365,13 +373,5 @@ class _CustomerHorizontalDataTableState
         },
       );
     });
-  }
-
-  @override
-  void dispose() {
-    for (int i = 0; i < _scrollControllerList.length; i++) {
-      _scrollControllerList[i].dispose();
-    }
-    super.dispose();
   }
 }

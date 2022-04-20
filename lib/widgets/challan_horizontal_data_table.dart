@@ -3,6 +3,7 @@ import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../kwidgets/k_invoice_checkbox.dart';
 import '../providers/challan_provider.dart';
 import '../screens/challancreate.dart';
 import '../kwidgets/k_confirmation_popup.dart';
@@ -10,13 +11,17 @@ import '../model/challan.dart';
 
 class ChallanHorizontalDataTable extends StatefulWidget {
   List<Challan> challanList;
+  bool isCheckbox;
   final double leftHandSideColumnWidth;
   final double rightHandSideColumnWidth;
+  final Function? checkboxChanged;
   ChallanHorizontalDataTable({
     Key? key,
     required this.leftHandSideColumnWidth,
     required this.rightHandSideColumnWidth,
     required this.challanList,
+    this.isCheckbox = false,
+    this.checkboxChanged,
   }) : super(key: key);
 
   @override
@@ -28,7 +33,8 @@ class _ChallanHorizontalDataTableState
     extends State<ChallanHorizontalDataTable> {
   HDTRefreshController _hdtRefreshController = HDTRefreshController();
 
-  final currencyFormat = NumberFormat("#,##0.00", "en_US");
+  // final currencyFormat = NumberFormat("#,##0.00", "en_US");
+  final currencyFormat = NumberFormat("#,##0.", "en_US");
 
   bool _isChallanNoAscending = false;
   bool _isChallanDateAscending = false;
@@ -37,11 +43,24 @@ class _ChallanHorizontalDataTableState
 
   List<ScrollController> _scrollControllerList = [];
 
+  List<int> _challanSelectedList = [];
+  List<bool> _isCheckedList = [];
+
+  @override
+  void initState() {
+    for(int i = 0; i <widget.challanList.length; i++){
+      _isCheckedList.add(false);
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.green,
-      width: MediaQuery.of(context).size.width * 0.6,
+      width: widget.isCheckbox
+          ? MediaQuery.of(context).size.width * 0.64
+          : MediaQuery.of(context).size.width * 0.9,
       child: HorizontalDataTable(
         leftHandSideColumnWidth: widget.leftHandSideColumnWidth,
         rightHandSideColumnWidth: widget.rightHandSideColumnWidth,
@@ -86,28 +105,32 @@ class _ChallanHorizontalDataTableState
         },
         htdRefreshController: _hdtRefreshController,
       ),
-      height: MediaQuery.of(context).size.height - 200,
+      height:
+          widget.isCheckbox ? 185 : MediaQuery.of(context).size.height - 200,
     );
   }
 
   List<Widget> _getTitleWidget() {
     return [
-      Row(
-        children: [
-          TextButton(
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-            ),
-            child: _getTitleItemWidget(
-              'Challan # ' + (_isChallanNoAscending ? '↓' : '↑'),
-              100,
-            ),
-            onPressed: () {
-              _sortChallanNo();
-              setState(() {});
-            },
-          ),
-        ],
+      Row(),
+      if (widget.isCheckbox)
+        _getTitleItemWidget(
+          'Select',
+          80,
+        ),
+      TextButton(
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.zero,
+        ),
+        child: _getTitleItemWidget(
+          'Challan # ' + (_isChallanNoAscending ? '↓' : '↑'),
+          150,
+          alignment: Alignment.centerLeft,
+        ),
+        onPressed: () {
+          _sortChallanNo();
+          setState(() {});
+        },
       ),
       TextButton(
         style: TextButton.styleFrom(
@@ -115,37 +138,42 @@ class _ChallanHorizontalDataTableState
         ),
         child: _getTitleItemWidget(
           'Challan Date ' + (_isChallanDateAscending ? '↓' : '↑'),
-          100,
+          150,
         ),
         onPressed: () {
           _sortChallanDate();
           setState(() {});
         },
       ),
-      TextButton(
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
+      if (!widget.isCheckbox)
+        TextButton(
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+          ),
+          child: _getTitleItemWidget(
+            'Customer Name ' + (_isCustomerNameAscending ? '↓' : '↑'),
+            300,
+            alignment: Alignment.centerLeft,
+          ),
+          onPressed: () {
+            _sortCustomerName();
+            setState(() {});
+          },
         ),
-        child: _getTitleItemWidget(
-          'Customer Name ' + (_isCustomerNameAscending ? '↓' : '↑'),
-          150,
-        ),
-        onPressed: () {
-          _sortCustomerName();
-          setState(() {});
-        },
-      ),
       _getTitleItemWidget(
-        'Amount Before Tax',
+        'Amount Before Tax\n(\u{20B9})',
         150,
+        alignment: Alignment.centerRight,
       ),
       _getTitleItemWidget(
-        'Tax',
-        100,
+        'Tax\n(\u{20B9})',
+        140,
+        alignment: Alignment.centerRight,
       ),
       _getTitleItemWidget(
-        'Grand Total',
-        100,
+        'Total\n(\u{20B9})',
+        150,
+        alignment: Alignment.centerRight,
       ),
       TextButton(
         style: TextButton.styleFrom(
@@ -153,7 +181,8 @@ class _ChallanHorizontalDataTableState
         ),
         child: _getTitleItemWidget(
           'Invoice # ' + (_isInvoiceNoAscending ? '↓' : '↑'),
-          120,
+          150,
+          alignment: Alignment.centerLeft,
         ),
         onPressed: () {
           _sortInvoiceNo();
@@ -163,25 +192,32 @@ class _ChallanHorizontalDataTableState
     ];
   }
 
-  Widget _getTitleItemWidget(String label, double width) {
+  Widget _getTitleItemWidget(
+    String label,
+    double width, {
+    Alignment alignment = Alignment.center,
+  }) {
     return Container(
-      // color: Colors.grey,
-      child: Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
+      child: Text(
+        label,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+      ),
       width: width,
-      height: 30,
-      // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-      alignment: Alignment.center,
+      height: 70,
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+      alignment: alignment,
     );
   }
 
   Widget _generateFirstColumnRow(BuildContext context, int index) {
     return Row(
       children: [
-        _columnItem(
-          widget.challanList[index].challanNo,
-          100,
-          index,
-        ),
+        // _columnItem(
+        //   widget.challanList[index].challanNo,
+        //   100,
+        //   index,
+        // ),
       ],
     );
   }
@@ -189,107 +225,131 @@ class _ChallanHorizontalDataTableState
   Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
     return Row(
       children: [
+        if (widget.isCheckbox)
+          Container(
+            width: 80,
+            child: KInvoiceCheckbox(
+              checkStatus: _isCheckedList[index],
+              challan: widget.challanList[index],
+              index: index,
+              onChangeStatus: onCheckboxChanged,
+            ),
+          ),
+        _columnItem(
+          widget.challanList[index].challanNo,
+          150,
+          index,
+          alignment: Alignment.centerLeft,
+        ),
         _columnItem(
           DateFormat("dd-MM-yyyy")
               .format(widget.challanList[index].challanDate!),
-          100,
-          index,
-        ),
-        _columnItem(
-          widget.challanList[index].customerName,
           150,
           index,
         ),
+        if (!widget.isCheckbox)
+          _columnItem(
+            widget.challanList[index].customerName,
+            300,
+            index,
+            alignment: Alignment.centerLeft,
+          ),
         _columnItem(
           currencyFormat.format(widget.challanList[index].total),
           150,
           index,
+          alignment: Alignment.centerRight,
         ),
         _columnItem(
           currencyFormat.format(widget.challanList[index].taxAmount),
-          100,
+          140,
           index,
+          alignment: Alignment.centerRight,
         ),
         _columnItem(
           currencyFormat.format(widget.challanList[index].challanAmount),
-          100,
+          150,
           index,
+          alignment: Alignment.centerRight,
         ),
         _columnItem(
           widget.challanList[index].invoiceNo,
-          120,
+          150,
           index,
+          alignment: Alignment.centerLeft,
         ),
-        Container(
-          width: 80,
-          height: 30,
-          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.center,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              InkWell(
-                onTap: () {
-                  showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        if (editAction(widget.challanList[index].id) != null) {
-                          return editAction(widget.challanList[index].id);
-                        } else {
-                          return Container();
-                        }
-                      });
-                },
-                child: Icon(
-                  widget.challanList[index].invoiceNo != ""
-                      ? Icons.remove_red_eye_outlined
-                      : Icons.edit,
-                  size: 16,
-                  color: widget.challanList[index].invoiceNo != ""
-                      ? Colors.blue
-                      : Colors.green,
+        if (!widget.isCheckbox)
+          Container(
+            width: 80,
+            height: 30,
+            // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                InkWell(
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          if (editAction(widget.challanList[index].id) !=
+                              null) {
+                            return editAction(widget.challanList[index].id);
+                          } else {
+                            return Container();
+                          }
+                        });
+                  },
+                  child: Icon(
+                    widget.challanList[index].invoiceNo != ""
+                        ? Icons.remove_red_eye_outlined
+                        : Icons.edit,
+                    size: 16,
+                    color: widget.challanList[index].invoiceNo != ""
+                        ? Colors.blue
+                        : Colors.green,
+                  ),
                 ),
-              ),
-              widget.challanList[index].invoiceNo != ""
-                  ? Icon(
-                      Icons.no_cell_outlined,
-                      size: 16,
-                      color: Colors.blueGrey,
-                    )
-                  : InkWell(
-                      onTap: () => deleteAction(widget.challanList[index].id),
-                      child: Icon(
-                        Icons.delete,
+                widget.challanList[index].invoiceNo != ""
+                    ? Icon(
+                        Icons.no_cell_outlined,
                         size: 16,
-                        color: Colors.red,
+                        color: Colors.blueGrey,
+                      )
+                    : InkWell(
+                        onTap: () => deleteAction(widget.challanList[index].id),
+                        child: Icon(
+                          Icons.delete,
+                          size: 16,
+                          color: Colors.red,
+                        ),
                       ),
-                    ),
-            ],
+              ],
+            ),
           ),
-        ),
       ],
     );
   }
 
-  Widget _columnItem(String item, double width, int index) {
-    if (widget.challanList[index].customerName.length >= 60)
-      _scrollControllerList.add(ScrollController());
+  Widget _columnItem(String item, double width, int index,
+      {Alignment alignment = Alignment.center}) {
     return Container(
-      child: SingleChildScrollView(
-        controller: widget.challanList[index].customerName.length >= 60
-            ? _scrollControllerList[_scrollControllerList.length - 1]
-            : null,
-        child: Text(item),
+      child: Text(
+        item,
+        style: TextStyle(fontSize: 16),
       ),
       width: width,
-      height: widget.challanList[index].customerName.length <= 30
+      height: widget.challanList[index].customerName.length <= 20
           ? 30
-          : widget.challanList[index].customerName.length <= 40
+          : widget.challanList[index].customerName.length <= 80
               ? 60
-              : 90,
-      // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-      alignment: Alignment.center,
+              : 150,
+      padding: EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 0,
+      ),
+      alignment: alignment,
     );
   }
 
@@ -368,6 +428,11 @@ class _ChallanHorizontalDataTableState
         },
       );
     });
+  }
+
+  void onCheckboxChanged(bool _isChecked, Challan _challan, int i){
+    _isCheckedList[i] = _isChecked;
+    widget.checkboxChanged!();
   }
 
   @override

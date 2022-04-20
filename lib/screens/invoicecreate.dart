@@ -1,4 +1,7 @@
+import 'package:erpapp/providers/checkbox_provider.dart';
 import 'package:erpapp/providers/invoice_provider.dart';
+import 'package:erpapp/widgets/challan_horizontal_data_table.dart';
+import 'package:erpapp/widgets/display_invoice_total.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
@@ -6,7 +9,6 @@ import 'package:provider/provider.dart';
 
 import '../kwidgets/kvariables.dart';
 import '../kwidgets/kdropdown.dart';
-import '../kwidgets/ktablecellheader.dart';
 import '../kwidgets/KDateTextForm.dart';
 import '../kwidgets/ktextfield.dart';
 import '../model/challan.dart';
@@ -15,7 +17,6 @@ import '../model/invoice.dart';
 import '../model/product.dart';
 import '../providers/challan_provider.dart';
 import '../providers/customer_provider.dart';
-import '../providers/product_provider.dart';
 import '../widgets/alertdialognav.dart';
 import 'challancreate.dart';
 
@@ -46,7 +47,6 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   late final RequiredValidator gstValidator;
   late final RequiredValidator billingAddressValidator;
 
-
   String _gstNumber = "";
   String _billingAddress = "";
   DateTime? _dueDate;
@@ -54,12 +54,9 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   List<Customer> _customerList = [];
   List<Challan> _challanList = [];
   List<Product> _productList = [];
-  List<bool> checkboxList = [];
   List<int> challanSelected = [];
 
   String _companyName = "";
-  DateTime _fromDate = DateFormat("yyyy-MM-dd").parse("2000-01-01");
-  DateTime _toDate = DateTime.now();
 
   String dropdownValue = "-----";
   final currencyFormat = NumberFormat("#,##0.00", "en_US");
@@ -73,24 +70,40 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   @override
   void initState() {
     _getAllLists();
+    // _gstNumber = _customerList
+    //     .firstWhere(
+    //         (element) => element.company_name == widget.invoice.customerName)
+    //     .gst;
+    // _dueDate = widget.invoice.id == 0? null : DateTime.now().add(Duration(
+    //     days: _customerList
+    //         .firstWhere((element) =>
+    //             element.company_name == widget.invoice.customerName)
+    //         .creditPeriod));
+
     invoiceNumberController =
         TextEditingController(text: widget.invoice.invoiceNo);
-    invoiceDateController =
-        TextEditingController(text:DateFormat("d-M-y").format(widget.invoice.invoiceDate!));
-    gstNumberController =
-        TextEditingController(text: _gstNumber);
-    dueDateController =
-        TextEditingController(text: _dueDate == null? "" : DateFormat("d-M-y").format(_dueDate!));
+    invoiceDateController = TextEditingController(
+        text: DateFormat("dd-MM-yyyy").format(widget.invoice.invoiceDate!));
+    gstNumberController = TextEditingController(text: _gstNumber);
+    dueDateController = TextEditingController(
+        text:
+            _dueDate == null ? "" : DateFormat("dd-MM-yyyy").format(_dueDate!));
     billingAddressController =
-        TextEditingController(text: _billingAddress);
-    _dateFromController = TextEditingController(text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
-    _dateToController = TextEditingController(text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
+        TextEditingController(text: widget.invoice.customerAddress);
+    _dateFromController = TextEditingController(
+        text:
+            "01-${DateFormat("MM").format(DateTime.now())}-${DateFormat("yyyy").format(DateTime.now())}");
+    _dateToController = TextEditingController(
+        text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
 
-    invoiceNumberValidator = RequiredValidator(errorText: 'Invoice number is required');
-    invoiceDateValidator = RequiredValidator(errorText: 'Invoice Date   is required');
+    invoiceNumberValidator =
+        RequiredValidator(errorText: 'Invoice number is required');
+    invoiceDateValidator =
+        RequiredValidator(errorText: 'Invoice Date   is required');
     gstValidator = RequiredValidator(errorText: 'GST number is required');
-    billingAddressValidator = RequiredValidator(errorText: 'Billing number is required');
-
+    billingAddressValidator =
+        RequiredValidator(errorText: 'Billing number is required');
+    Provider.of<CheckboxProvider>(context, listen: false).initialiseTotalList();
     super.initState();
   }
 
@@ -129,9 +142,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        widget.invoice.id != 0
-                            ? "Edit Invoice"
-                            : "New Invoice",
+                        widget.invoice.id != 0 ? "Edit Invoice" : "New Invoice",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
@@ -148,8 +159,11 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                             .toList(),
                         label: "Customer Name",
                         width: 300,
-                        initialValue: "-----",
+                        initialValue: widget.invoice.id == 0
+                            ? "-----"
+                            : widget.invoice.customerName,
                         onChangeDropDown: _onCompanyChange,
+                        isShowSearchBox: false,
                       ),
                       Column(
                         children: [
@@ -159,12 +173,13 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                             width: 200,
                             validator: invoiceNumberValidator,
                           ),
-                          KTextField(
-                            label: "Invoice Date",
-                            controller: invoiceDateController,
-                            width: 200,
-                            validator: invoiceDateValidator,
-                          )
+                          KDateTextForm(
+                            label: "Invoice Date:",
+                            dateInputController: invoiceDateController,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
                         ],
                       ),
                     ],
@@ -235,13 +250,8 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                 "Amount",
                                 style: TextStyle(fontSize: 11),
                               ),
-                              Text(
-                                "\u{20B9}${currencyFormat.format(invoiceTotal)}",
-                                style: const TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              DisplayInvoiceTotal(
+                                  totalType: "invoiceTotal", fontSize: 30),
                             ],
                           ),
                         ),
@@ -261,68 +271,6 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      KTableCellHeader(
-                        header: "Select",
-                        context: context,
-                        cellWidth: containerWidth * .05,
-                      ),
-                      KTableCellHeader(
-                        header: "#",
-                        context: context,
-                        cellWidth: containerWidth * .03,
-                      ),
-                      KTableCellHeader(
-                        header: "Challan #",
-                        context: context,
-                        cellWidth: containerWidth * 0.08,
-                      ),
-                      KTableCellHeader(
-                        header: "Challan Date",
-                        context: context,
-                        cellWidth: containerWidth * 0.08,
-                      ),
-                      // KTableCellHeader(header: "Customer Name", context: context, cellWidth: containerWidth * 0.14,),
-                      KTableCellHeader(
-                        header: "Product Name",
-                        context: context,
-                        cellWidth: containerWidth * 0.14,
-                      ),
-                      KTableCellHeader(
-                        header: "Price Per Unit",
-                        context: context,
-                        cellWidth: containerWidth * 0.1,
-                      ),
-                      KTableCellHeader(
-                        header: "Unit",
-                        context: context,
-                        cellWidth: containerWidth * 0.08,
-                      ),
-                      KTableCellHeader(
-                        header: "Quantity",
-                        context: context,
-                        cellWidth: containerWidth * 0.06,
-                      ),
-                      KTableCellHeader(
-                        header: "Amount",
-                        context: context,
-                        cellWidth: containerWidth * .1,
-                      ),
-                      KTableCellHeader(
-                        header: "Tax",
-                        context: context,
-                        cellWidth: containerWidth * 0.07,
-                      ),
-                      KTableCellHeader(
-                        header: "",
-                        context: context,
-                        cellWidth: containerWidth * .05,
-                        isLastPos: true,
-                      ),
-                    ],
-                  ),
                   _getChallanList(_companyName),
                   const SizedBox(
                     height: 20,
@@ -334,7 +282,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          width: containerWidth * 0.95/1.3,
+                          width: containerWidth * 0.95 / 1.3,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
@@ -392,30 +340,17 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text(
-                                  "\u{20B9}${currencyFormat.format(subtotal)}",
-                                  style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold),
-                                ),
+                                // DisplayInvoiceTotal(value: subtotal),
+
+                                DisplayInvoiceTotal(totalType: "subtotal"),
                                 const SizedBox(
                                   height: 20,
                                 ),
-                                Text(
-                                  "\u{20B9}${currencyFormat.format(taxTotal)}",
-                                  style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold),
-                                ),
+                                DisplayInvoiceTotal(totalType: "taxTotal"),
                                 const SizedBox(
                                   height: 20,
                                 ),
-                                Text(
-                                  "\u{20B9}${currencyFormat.format(invoiceTotal)}",
-                                  style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold),
-                                ),
+                                DisplayInvoiceTotal(totalType: "invoiceTotal"),
                               ],
                             ),
                             const SizedBox(
@@ -435,30 +370,30 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     );
   }
 
-  void _getAllLists() async {
-    _customerList = await Provider.of<CustomerProvider>(context, listen: false)
-        .getCustomerList();
-    _challanList = await Provider.of<ChallanProvider>(context, listen: false)
-        .getChallanList();
-    _productList = await Provider.of<ProductProvider>(context, listen: false)
-        .getProductList();
-    setState(() {});
+  void _getAllLists() {
+    _customerList =
+        Provider.of<CustomerProvider>(context, listen: false).customerList;
   }
 
   void _onCompanyChange(String companyName) {
     setState(() {
-      this._companyName = companyName;
-      if(companyName != ""){
-        Customer _customerData = _customerList.where((element) => element.company_name == companyName).toList()[0];
+      if (companyName == "") {
+        companyName = widget.invoice.customerName;
+      } else {
+        _companyName = companyName;
+        print("-ONcompanyChange Company NAme: $companyName");
+        Customer _customerData = _customerList
+            .where((element) => element.company_name == companyName)
+            .toList()[0];
         _billingAddress = _customerData.address;
         _gstNumber = _customerData.gst;
-        _dueDate = (widget.invoice.invoiceDate!.add(Duration(days: _customerData.creditPeriod))) ;
+        _dueDate = (widget.invoice.invoiceDate!
+            .add(Duration(days: _customerData.creditPeriod)));
 
         billingAddressController.text = _billingAddress;
         gstNumberController.text = _gstNumber;
         dueDateController.text = DateFormat("d-M-y").format(_dueDate!);
       }
-      checkboxList.clear();
       challanSelected.clear();
       subtotal = 0;
       taxTotal = 0;
@@ -501,25 +436,8 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
   }
 
-  void fromDateSelected(DateTime _pickedDate) {
-    setState(() {
-      _fromDate = _pickedDate;
-    });
-    print("From Date: $_fromDate");
-  }
-
-  void toDateSelected(DateTime _pickedDate) {
-    setState(() {
-      _toDate = _pickedDate;
-    });
-    print("To Date: $_toDate");
-  }
-
   Widget _getChallanList(String _companyName) {
     List<Challan> challanList;
-
-    print("Date From in _getChallanList: $_fromDate");
-    print("Date To in _getChallanList: $_toDate");
 
     return _companyName == ""
         ? Text("Please Select Company")
@@ -529,8 +447,9 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                 customerName: _companyName,
                 active: 1,
                 invoiceNo: "Not Assigned",
-                fromDate: _fromDate,
-                toDate: _toDate,
+                fromDate:
+                    DateFormat("dd-MM-yyyy").parse(_dateFromController.text),
+                toDate: DateFormat("dd-MM-yyyy").parse(_dateToController.text),
               ),
               builder: (context, AsyncSnapshot<List<Challan>> snapshot) {
                 print("Inside fetchGST Function");
@@ -544,9 +463,9 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                     // return noData(context);
                   } else if (snapshot.hasData) {
                     challanList = snapshot.data!;
-                    challanList.forEach((row) => print(row.customerName));
-                    return _gSTList(challanList, _companyName, context);
-                    // return _displayChallans(challanList, context);
+                    // challanList.forEach((row) => print(row.customerName));
+                    // return _displayChallans(_challanList, context);
+                    return _displayChallans(challanList, context);
                     // return Container();
                   } else
                     return Container();
@@ -556,176 +475,58 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
           });
   }
 
-  Widget _gSTList(
-      List<Challan> _challanList, String CompanyName, BuildContext context) {
-    List<String> _gstList = [];
-    return Consumer<ChallanProvider>(builder: (ctx, provider, child) {
-      return FutureBuilder(
-        future: provider.getChallanListwithGSTbyCompanyName(CompanyName),
-        builder: (context, AsyncSnapshot<List<String>> snapshot) {
-          print("Inside fetchGST Function");
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
-          } else {
-            if (snapshot.hasError) {
-              //                  if (snapshot.error is ConnectivityError) {
-              //                    return NoConnectionScreen();
-              //                  }
-              return Center(child: Text("An error occured.\n$snapshot"));
-              // return noData(context);
-            } else if (snapshot.hasData) {
-              _gstList = snapshot.data!;
-              // _gstList.forEach((row) => print(row));
-              return _displayChallans(_challanList, _gstList, context);
-            } else
-              return Container();
-          }
-        },
-      );
-    });
-  }
-
-  Widget _displayChallans(
-      List<Challan> _challanList, List<String> _gstList, BuildContext context) {
-    print("CheckboxKist LEngth: ${checkboxList.length}");
-
-    if (checkboxList.isEmpty) {
-      for (int i = 0; i < _challanList.length; i++) {
-        checkboxList.add(false);
-        challanSelected.add(-1);
-      }
-    }
-
-    return Container(
-      width: containerWidth,
-      height: 100,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            for (var i = 0; i < _challanList.length; i++)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Checkbox(
-                    // key: _challanList[i].id.toString(),
-                    value: checkboxList[i],
-                    onChanged: (bool? value) => checkboxChanged(
-                        value!, _challanList[i], i, _gstList[i]),
-                  ),
-                  KTableCellHeader(
-                    header: (i + 1).toString(),
-                    context: context,
-                    cellWidth: containerWidth * .03,
-                  ),
-                  KTableCellHeader(
-                    header: _challanList[i].challanNo,
-                    context: context,
-                    cellWidth: containerWidth * 0.08,
-                  ),
-                  KTableCellHeader(
-                    header: DateFormat("d-M-y")
-                        .format(_challanList[i].challanDate!),
-                    context: context,
-                    cellWidth: containerWidth * 0.08,
-                  ),
-                  // KTableCellHeader(header: challanList[i].customerName, context: context, cellWidth: containerWidth * 0.14,),
-                  // KTableCellHeader(
-                  //   header: _challanList[i].productName,
-                  //   context: context,
-                  //   cellWidth: containerWidth * 0.14,
-                  // ),
-                  // KTableCellHeader(
-                  //   header: _challanList[i].pricePerUnit.toString(),
-                  //   context: context,
-                  //   cellWidth: containerWidth * 0.1,
-                  // ),
-                  // KTableCellHeader(
-                  //   header: _challanList[i].productUnit,
-                  //   context: context,
-                  //   cellWidth: containerWidth * 0.08,
-                  // ),
-                  // KTableCellHeader(
-                  //   header: _challanList[i].quantity.toString(),
-                  //   context: context,
-                  //   cellWidth: containerWidth * 0.06,
-                  // ),
-                  // KTableCellHeader(
-                  //   header: _challanList[i].totalAmount.toString(),
-                  //   context: context,
-                  //   cellWidth: containerWidth * .1,
-                  // ),
-                  KTableCellHeader(
-                    header: _gstList[i],
-                    context: context,
-                    cellWidth: containerWidth * 0.07,
-                  ),
-                  KTableCellHeader(
-                    header: "",
-                    context: context,
-                    cellWidth: containerWidth * .05,
-                    id: _challanList[i].id,
-                    deleteAction: deleteAction,
-                    editAction: editAction,
-                    isLastPos: true,
-                  ),
-                ],
-              ),
-          ],
-        ),
-      ),
+  Widget _displayChallans(List<Challan> _challanList, BuildContext context) {
+    return ChallanHorizontalDataTable(
+      leftHandSideColumnWidth: 0,
+      rightHandSideColumnWidth: containerWidth * 0.73,
+      challanList: _challanList,
+      checkboxChanged: checkboxChanged,
+      isCheckbox: true,
     );
   }
 
-  void checkboxChanged(bool _isChecked, Challan _challan, int i, String _gst) {
-    setState(() {
-      checkboxList[i] = _isChecked;
-      // if (_isChecked) {
-      //   challanSelected[i] = _challan.id;
-      //   subtotal += _challan.totalAmount;
-      //   taxTotal += _challan.totalAmount * double.parse(_gst) / 100;
-      //   invoiceTotal += _challan.totalAmount +
-      //       (_challan.totalAmount * double.parse(_gst) / 100);
-      // } else {
-      //   challanSelected[i] = -1;
-      //   subtotal -= _challan.totalAmount;
-      //   taxTotal -= _challan.totalAmount * double.parse(_gst) / 100;
-      //   invoiceTotal -= (_challan.totalAmount +
-      //       (_challan.totalAmount * double.parse(_gst) / 100));
-      // }
-      print("Checkbox Status: $_isChecked od id: $_challan.id");
-      print("Selected Challans: ${challanSelected}");
-    });
+  void checkboxChanged() {
+    List<double> totalList =
+        Provider.of<CheckboxProvider>(context, listen: false).totalList;
+    subtotal = totalList[0];
+    taxTotal = totalList[1];
+    invoiceTotal = totalList[2];
+    print("checkboxChanged in Invoice Create ${subtotal}");
   }
 
   void _resetForm() {
     invoiceNumberController.text = "";
-    invoiceDateController.text = DateFormat("d-M-y").format(widget.invoice.invoiceDate!);
+    invoiceDateController.text =
+        DateFormat("dd-MM-yyyy").format(widget.invoice.invoiceDate!);
     billingAddressController.text = "";
     gstNumberController.text = "";
     dueDateController.text = "";
     _onCompanyChange("");
+    challanSelected.clear();
   }
 
   void _submitForm() {
     print("Submit Form");
     widget.invoice.invoiceNo = invoiceNumberController.text;
-    widget.invoice.invoiceDate = DateFormat("yyyy-MM-dd").parse(invoiceDateController.text);
+    widget.invoice.invoiceDate =
+        DateFormat("yyyy-MM-dd").parse(invoiceDateController.text);
     widget.invoice.customerName = _companyName;
     widget.invoice.customerAddress = billingAddressController.text;
     widget.invoice.invoiceAmount = subtotal;
     widget.invoice.invoiceTax = taxTotal;
     widget.invoice.invoiceTotal = invoiceTotal;
-    Provider.of<InvoiceProvider>(context, listen: false).saveInvoice(widget.invoice);
-    Provider.of<ChallanProvider>(context, listen: false).updateInvoiceNumberInChallan(challanSelected, widget.invoice.invoiceNo);
+    Provider.of<InvoiceProvider>(context, listen: false)
+        .saveInvoice(widget.invoice);
     Navigator.of(context).pop();
   }
 
   @override
-  void dispose(){
+  void dispose() {
     invoiceNumberController.dispose();
     invoiceDateController.dispose();
     billingAddressController.dispose();
     gstNumberController.dispose();
     dueDateController.dispose();
+    super.dispose();
   }
 }

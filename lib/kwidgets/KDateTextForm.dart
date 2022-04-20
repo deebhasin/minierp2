@@ -3,17 +3,12 @@ import 'package:intl/intl.dart';
 
 class KDateTextForm extends StatelessWidget {
   final String label;
-  late DateTime? rangeFrom;
-  late DateTime? rangeTo;
-  late DateTime? initialDate;
   final TextEditingController dateInputController;
+
 
   KDateTextForm({
     Key? key,
     required this.label,
-    this.rangeFrom,
-    this.rangeTo,
-    this.initialDate,
     required this.dateInputController,
   }) : super(key: key);
 
@@ -21,8 +16,6 @@ class KDateTextForm extends StatelessWidget {
   Widget build(BuildContext context) {
     // late final _dateInputController = TextEditingController(
     //     text: DateFormat("dd-MM-yyyy").format(DateTime.now()));
-    rangeFrom != null ? rangeFrom : DateTime(2000);
-    rangeTo != null ? rangeTo : DateTime.now();
 
     return Container(
       width: 150,

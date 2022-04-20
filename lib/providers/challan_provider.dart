@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 import '../model/challan_product.dart';
 import '../utils/localDB_repo.dart';
@@ -256,6 +255,8 @@ class ChallanProvider with ChangeNotifier {
     }
     return id;
   }
+
+
 
   Future<void> _updateChallan(Challan challan) async {
     print("In Challan Provider Update Challan Start");

@@ -176,19 +176,35 @@ class _ChallanCreateState extends State<ChallanCreate> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (_isInvoice)
+                      KTextField(
+                        label: "Invoice #",
+                        width: 150,
+                        controller: challanInvoiceNoController,
+                        isDisabled: _isInvoice,
+                        valueUpdated: (String) {},
+                      ),
                     KTextField(
-                      label: "Challan #",
+                      label: "Challan # ",
                       width: 150,
-                      isMandatory: true,
+                      isMandatory: _isInvoice ? false : true,
                       controller: challanNumberController,
                       validator: challanNumberValidator,
                       isDisabled: _isInvoice,
                       valueUpdated: (String) {},
                     ),
-                    KDateTextForm(
-                      label: "Challan Date",
-                      dateInputController: _dateInputController,
-                    ),
+                    _isInvoice
+                        ? KTextField(
+                            label: "Challan Date",
+                            width: 150,
+                            controller: challanDateController,
+                            validator: challanNumberValidator,
+                            isDisabled: _isInvoice,
+                          )
+                        : KDateTextForm(
+                            label: "Challan Date",
+                            dateInputController: _dateInputController,
+                          ),
                   ],
                 ),
               ],
@@ -196,6 +212,25 @@ class _ChallanCreateState extends State<ChallanCreate> {
             const SizedBox(
               height: 30,
             ),
+            Container(
+              width: containerWidth *0.95,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _textFieldHeader("Product", 250,),
+                  _textFieldHeader("Price Per Unit", 130,),
+                  _textFieldHeader("Unit", 70,),
+                  _textFieldHeader("Quantity", 80,),
+                  _textFieldHeader("Total", 80,),
+                  _textFieldHeader("GST %", 70,),
+                  _textFieldHeader("GST", 100,),
+                  _textFieldHeader("Total Amount", 110,),
+                  _textFieldHeader("", 2,),
+                ],
+              ),
+            ),
+            const Divider(thickness: 3,),
             Expanded(
               child: SingleChildScrollView(
                 child: _getChallanProductWidgets(),
@@ -312,6 +347,19 @@ class _ChallanCreateState extends State<ChallanCreate> {
               height: 30,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _textFieldHeader(String _label, double _width) {
+    return Container(
+      width: _width,
+      alignment: Alignment.center,
+      child: Text(
+        _label,
+        style: TextStyle(
+          fontSize: 16,
         ),
       ),
     );

@@ -7,6 +7,7 @@ import '../providers/org_provider.dart';
 import '../providers/product_provider.dart';
 import '../providers/challan_provider.dart';
 import '../providers/invoice_provider.dart';
+import '../providers/checkbox_provider.dart';
 
 
 class AppProvider {
@@ -19,6 +20,7 @@ class AppProvider {
 			ChangeNotifierProvider<ProductProvider>(create: (_) => ProductProvider()),
 			ChangeNotifierProvider<ChallanProvider>(create: (_) => ChallanProvider()),
 			ChangeNotifierProvider<InvoiceProvider>(create: (_) => InvoiceProvider()),
+			ChangeNotifierProvider<CheckboxProvider>(create: (_) => CheckboxProvider()),
 	];
 	}
 }

@@ -1,5 +1,3 @@
-import 'package:erpapp/screens/invoicecreate.dart';
-import 'package:erpapp/test/testList.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +6,7 @@ import '../kwidgets/kcreatebutton.dart';
 import '../kwidgets/ktablecellheader.dart';
 import '../model/invoice.dart';
 import '../providers/invoice_provider.dart';
+import '../screens/invoicecreate.dart';
 
 
 class InvoiceView extends StatefulWidget {
@@ -29,8 +28,6 @@ class _InvoiceViewState extends State<InvoiceView> {
   }
   @override
   Widget build(BuildContext context) {
-    // InvoiceProvider invoiceProvider = InvoiceProvider();
-    // invoiceProvider.invoiceTest(invoiceProvider);
 
     return Consumer<InvoiceProvider>(builder: (ctx, provider, child) {
       return FutureBuilder(
@@ -40,9 +37,6 @@ class _InvoiceViewState extends State<InvoiceView> {
             return CircularProgressIndicator();
           } else {
             if (snapshot.hasError) {
-//                  if (snapshot.error is ConnectivityError) {
-//                    return NoConnectionScreen();
-//                  }
               return Center(child: Text("An error occured.\n$snapshot"));
               // return noData(context);
             } else if (snapshot.hasData) {
@@ -187,15 +181,10 @@ class _InvoiceViewState extends State<InvoiceView> {
             return CircularProgressIndicator();
           } else {
             if (snapshot.hasError) {
-              //                  if (snapshot.error is ConnectivityError) {
-              //                    return NoConnectionScreen();
-              //                  }
               return Center(child: Text("An error occured.\n$snapshot"));
               // return noData(context);
             } else if (snapshot.hasData) {
               invoice = snapshot.data!;
-              // customer.forEach((row) => print(row));
-              // return displayCustomer(context);
               return InvoiceCreate(invoice: invoice,);
             } else
               return Container();
