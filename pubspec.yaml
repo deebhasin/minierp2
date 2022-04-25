@@ -82,3 +82,9 @@ flutter:
     - asset/images/back_arrow.png
     - asset/images/clock_16.png
     - asset/images/clock_32.png
+
+
+  fonts:
+    - family: open-sans
+      fonts:
+        - asset: asset/fonts/OpenSans-Regular.ttf

@@ -1,3 +1,4 @@
+import 'package:erpapp/widgets/pdf_create.dart';
 import 'package:flutter/material.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:intl/intl.dart';
@@ -38,6 +39,8 @@ class _InvoiceHorizontalDataTableState
 
   String sortType = "";
   bool sortAscDesc = true;
+
+  PDFCreate pdfCreate = PDFCreate();
 
   List<bool> _isCheckedList = [];
 
@@ -198,7 +201,8 @@ class _InvoiceHorizontalDataTableState
   }
 
   Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
-    print("Disco Challan LIst Length of Invoice ${widget.invoiceList[3].totalBeforeTax}: ${widget.invoiceList[3].challanList.length}");
+    print(
+        "Disco Challan LIst Length of Invoice ${widget.invoiceList[3].totalBeforeTax}: ${widget.invoiceList[3].challanList.length}");
     return Row(
       children: [
         _columnItem(
@@ -246,7 +250,9 @@ class _InvoiceHorizontalDataTableState
         Container(
           width: 50,
           child: InkWell(
-            onTap: () {},
+            onTap: () async {
+              await pdfCreate.createPdf(widget.invoiceList[index]);
+            },
             child: Icon(
               Icons.picture_as_pdf,
               size: 16,
