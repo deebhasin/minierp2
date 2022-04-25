@@ -8,9 +8,6 @@ class Invoice{
   late DateTime? invoiceDate;
   String customerName;
   String customerAddress;
-  double invoiceAmount;
-  double invoiceTax;
-  double invoiceTotal;
   String pdfFileLocation;
   int active;
   List<Challan> challanList = [];
@@ -21,9 +18,6 @@ class Invoice{
    this.invoiceDate,
     this.customerName = "",
     this.customerAddress = "",
-    this.invoiceAmount = 0,
-    this.invoiceTax = 0,
-    this.invoiceTotal = 0,
     this.pdfFileLocation = "",
     this.active = 1,
 }){
@@ -36,9 +30,6 @@ class Invoice{
         invoiceDate = DateFormat("yyyy-MM-dd").parse(res["invoice_date"]),
         customerName = res["customer_name"],
         customerAddress = res["customer_address"],
-        invoiceAmount = res["invoice_amount"],
-        invoiceTax = res["invoice_tax"],
-        invoiceTotal = res["invoice_total"],
         pdfFileLocation = res["pdf_file_path"],
         active = res["active"];
 
@@ -49,14 +40,49 @@ class Invoice{
       "invoice_date": DateFormat("yyyy-MM-dd").format(invoiceDate!),
       "customer_name": customerName,
       "customer_address": customerAddress,
-      "invoice_amount": invoiceAmount,
-      "invoice_tax": invoiceTax,
-      "invoice_total": invoiceTotal,
+      "invoice_amount": totalBeforeTax,
+      "invoice_tax": taxAmount,
+      "invoice_total": invoiceAmount,
       "pdf_file_path": pdfFileLocation,
       "active": active,
     };
   }
 
+  void addChallan(Challan challan){
+    removeChallan(challan);
+    challanList.add(challan);
+  }
+
+  void removeChallan(Challan challan){
+    challanList.removeWhere((element) => element.id == challan.id);
+  }
+
+  double get totalBeforeTax{
+    double val = 0;
+    print("InvoiceDart ChallanList Length: ${challanList.length}");
+    challanList.forEach((challan) {
+      val += challan.total;
+    });
+    // print("Invoice Dart TotalBeforeTax Challan List Length: ${challanList.length} Total: ${challanList[0].total}");
+    print("Total Before Tax Value = $val");
+    return val;
+  }
+
+  double get taxAmount{
+    double val = 0;
+    challanList.forEach((challan) {
+      val += challan.taxAmount;
+    });
+    return val;
+  }
+
+  double get invoiceAmount{
+    double val = 0;
+    challanList.forEach((challan) {
+      val += challan.challanAmount;
+    });
+    return val;
+  }
 
 
 }

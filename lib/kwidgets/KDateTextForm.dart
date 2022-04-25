@@ -4,12 +4,13 @@ import 'package:intl/intl.dart';
 class KDateTextForm extends StatelessWidget {
   final String label;
   final TextEditingController dateInputController;
-
+  final Function? onDateChange;
 
   KDateTextForm({
     Key? key,
     required this.label,
     required this.dateInputController,
+    this.onDateChange,
   }) : super(key: key);
 
   @override
@@ -26,12 +27,12 @@ class KDateTextForm extends StatelessWidget {
           icon: Icon(Icons.calendar_today), //icon of text field
           labelText: label, //label text of field
         ),
-        onTap: () => selectDate(context),
+        onTap: () => selectDate(context, onDateChange?? (){}),
       ),
     );
   }
 
-  void selectDate(BuildContext context) async {
+  void selectDate(BuildContext context, Function onDateChange) async {
     DateTime? _pickedDate = await showDatePicker(
       context: context,
       initialDate: DateFormat('dd-MM-yyyy').parse(dateInputController.text),
@@ -49,7 +50,7 @@ class KDateTextForm extends StatelessWidget {
 
       dateInputController.text =
           _formattedDate; //set output date to TextField value.
-
+      onDateChange();
     } else {
       print("Date is not selected");
     }

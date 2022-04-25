@@ -7,9 +7,6 @@ class Challan {
   String challanNo;
   DateTime? challanDate;
   String customerName;
-  double total;
-  double taxAmount;
-  double challanAmount;
   String invoiceNo;
   List<ChallanProduct> challanProductList = [];
   bool isActive;
@@ -17,14 +14,11 @@ class Challan {
   Challan({
     this.id = 0,
     this.challanNo = "",
-    this.challanDate ,
+    this.challanDate,
     this.customerName = "",
-    this.total = 0,
-    this.taxAmount = 0,
-    this.challanAmount = 0,
     this.invoiceNo = "",
     this.isActive = true,
-}){
+  }) {
     this.challanDate = DateTime.now();
   }
 
@@ -33,12 +27,9 @@ class Challan {
         challanNo = res["challan_no"],
         challanDate = DateFormat("yyyy-MM-dd").parse(res["challan_date"]),
         customerName = res["customer_name"],
-        total = res["total"],
-        taxAmount = res["tax_amount"],
-        challanAmount = res["challan_amount"],
-        invoiceNo = res["invoice_number"],
         challanProductList = [],
-        isActive = res["active"] == 1? true : false;
+        invoiceNo = res["invoice_number"],
+        isActive = res["active"] == 1 ? true : false;
 
   Map<String, Object?> toMap() {
     return {
@@ -50,7 +41,31 @@ class Challan {
       'tax_amount': taxAmount,
       'challan_amount': challanAmount,
       'invoice_number': invoiceNo,
-      'active': isActive == true? 1 : 0,
+      'active': isActive == true ? 1 : 0,
     };
+  }
+
+  double get total {
+    double val = 0;
+    challanProductList.forEach((challanProduct) {
+      val += challanProduct.totalBeforeTax;
+    });
+    return val;
+  }
+
+  double get taxAmount {
+    double val = 0;
+    challanProductList.forEach((challanProduct) {
+      val += challanProduct.taxAmount;
+    });
+    return val;
+  }
+
+  double get challanAmount {
+    double val = 0;
+    challanProductList.forEach((challanProduct) {
+      val += challanProduct.totalAmount;
+    });
+    return val;
   }
 }

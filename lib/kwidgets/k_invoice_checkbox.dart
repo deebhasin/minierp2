@@ -1,4 +1,3 @@
-import 'package:erpapp/providers/checkbox_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -31,8 +30,6 @@ class _KInvoiceCheckboxState extends State<KInvoiceCheckbox> {
             widget.onChangeStatus(value!, widget.challan, widget.index);
             widget.checkStatus = !widget.checkStatus;
           });
-          await Provider.of<CheckboxProvider>(context, listen: false)
-              .updateCheckbox(value!, widget.challan);
         });
   }
 }

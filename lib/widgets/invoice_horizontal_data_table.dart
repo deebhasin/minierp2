@@ -3,36 +3,36 @@ import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/challan_provider.dart';
-import '../screens/challancreate.dart';
+import '../model/invoice.dart';
+import '../providers/invoice_provider.dart';
 import '../kwidgets/k_confirmation_popup.dart';
-import '../model/challan.dart';
+import '../screens/invoicecreate.dart';
 
-class ChallanHorizontalDataTable extends StatefulWidget {
-  List<Challan> challanList;
+class InvoiceHorizontalDataTable extends StatefulWidget {
+  List<Invoice> invoiceList;
   final double leftHandSideColumnWidth;
   final double rightHandSideColumnWidth;
-  ChallanHorizontalDataTable({
+  InvoiceHorizontalDataTable({
     Key? key,
     required this.leftHandSideColumnWidth,
     required this.rightHandSideColumnWidth,
-    required this.challanList,
+    required this.invoiceList,
   }) : super(key: key);
 
   @override
-  State<ChallanHorizontalDataTable> createState() =>
-      _ChallanHorizontalDataTableState();
+  State<InvoiceHorizontalDataTable> createState() =>
+      _InvoiceHorizontalDataTableState();
 }
 
-class _ChallanHorizontalDataTableState
-    extends State<ChallanHorizontalDataTable> {
+class _InvoiceHorizontalDataTableState
+    extends State<InvoiceHorizontalDataTable> {
   HDTRefreshController _hdtRefreshController = HDTRefreshController();
 
   // final currencyFormat = NumberFormat("#,##0.00", "en_US");
   final currencyFormat = NumberFormat("#,##0", "en_US");
 
   bool _isChallanNoAscending = false;
-  bool _isChallanDateAscending = false;
+  bool _isInvoiceDateAscending = false;
   bool _isCustomerNameAscending = false;
   bool _isInvoiceNoAscending = false;
 
@@ -43,9 +43,6 @@ class _ChallanHorizontalDataTableState
 
   @override
   void initState() {
-    for (int i = 0; i < widget.challanList.length; i++) {
-      _isCheckedList.add(false);
-    }
     WidgetsBinding.instance!.addPostFrameCallback((_) => _sortStatus());
     super.initState();
   }
@@ -62,7 +59,7 @@ class _ChallanHorizontalDataTableState
         headerWidgets: _getTitleWidget(),
         leftSideItemBuilder: _generateFirstColumnRow,
         rightSideItemBuilder: _generateRightHandSideColumnRow,
-        itemCount: widget.challanList.length,
+        itemCount: widget.invoiceList.length,
         rowSeparatorWidget: const Divider(
           color: Colors.black54,
           height: 1.0,
@@ -73,7 +70,7 @@ class _ChallanHorizontalDataTableState
         verticalScrollbarStyle: const ScrollbarStyle(
           thumbColor: Colors.transparent,
           isAlwaysShown: true,
-          thickness: 1.0,
+          thickness: 2.0,
           radius: Radius.circular(5.0),
         ),
         horizontalScrollbarStyle: const ScrollbarStyle(
@@ -111,12 +108,12 @@ class _ChallanHorizontalDataTableState
           padding: EdgeInsets.zero,
         ),
         child: _getTitleItemWidget(
-          'Challan # ' + (_isChallanNoAscending ? '↓' : '↑'),
+          'Invoice # ' + (_isInvoiceNoAscending ? '↓' : '↑'),
           150,
           alignment: Alignment.centerLeft,
         ),
         onPressed: () {
-          _sortChallanNo();
+          _sortInvoiceNo();
           setState(() {});
         },
       ),
@@ -125,11 +122,11 @@ class _ChallanHorizontalDataTableState
           padding: EdgeInsets.zero,
         ),
         child: _getTitleItemWidget(
-          'Challan Date ' + (_isChallanDateAscending ? '↓' : '↑'),
+          'Invoice Date ' + (_isInvoiceDateAscending ? '↓' : '↑'),
           150,
         ),
         onPressed: () {
-          _sortChallanDate();
+          _sortInvoiceDate();
           setState(() {});
         },
       ),
@@ -139,13 +136,18 @@ class _ChallanHorizontalDataTableState
         ),
         child: _getTitleItemWidget(
           'Customer Name ' + (_isCustomerNameAscending ? '↓' : '↑'),
-          300,
+          200,
           alignment: Alignment.centerLeft,
         ),
         onPressed: () {
           _sortCustomerName();
           setState(() {});
         },
+      ),
+      _getTitleItemWidget(
+        'Customer Address',
+        200,
+        alignment: Alignment.centerLeft,
       ),
       _getTitleItemWidget(
         'Amount Before Tax\n(\u{20B9})',
@@ -162,19 +164,13 @@ class _ChallanHorizontalDataTableState
         150,
         alignment: Alignment.centerRight,
       ),
-      TextButton(
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-        ),
-        child: _getTitleItemWidget(
-          'Invoice # ' + (_isInvoiceNoAscending ? '↓' : '↑'),
-          150,
-          alignment: Alignment.centerLeft,
-        ),
-        onPressed: () {
-          _sortInvoiceNo();
-          setState(() {});
-        },
+      _getTitleItemWidget(
+        '',
+        50,
+      ),
+      _getTitleItemWidget(
+        '',
+        70,
       ),
     ];
   }
@@ -198,61 +194,65 @@ class _ChallanHorizontalDataTableState
   }
 
   Widget _generateFirstColumnRow(BuildContext context, int index) {
-    return Row(
-      children: [
-        // _columnItem(
-        //   widget.challanList[index].challanNo,
-        //   100,
-        //   index,
-        // ),
-      ],
-    );
+    return Row();
   }
 
   Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
+    print("Disco Challan LIst Length of Invoice ${widget.invoiceList[3].totalBeforeTax}: ${widget.invoiceList[3].challanList.length}");
     return Row(
       children: [
         _columnItem(
-          widget.challanList[index].challanNo,
+          widget.invoiceList[index].invoiceNo,
           150,
           index,
           alignment: Alignment.centerLeft,
         ),
         _columnItem(
           DateFormat("dd-MM-yyyy")
-              .format(widget.challanList[index].challanDate!),
+              .format(widget.invoiceList[index].invoiceDate!),
           150,
           index,
         ),
         _columnItem(
-          widget.challanList[index].customerName,
-          300,
+          widget.invoiceList[index].customerName,
+          200,
           index,
           alignment: Alignment.centerLeft,
         ),
         _columnItem(
-          currencyFormat.format(widget.challanList[index].total),
+          widget.invoiceList[index].customerAddress,
+          200,
+          index,
+          alignment: Alignment.centerLeft,
+        ),
+        _columnItem(
+          currencyFormat.format(widget.invoiceList[index].totalBeforeTax),
           150,
           index,
           alignment: Alignment.centerRight,
         ),
         _columnItem(
-          currencyFormat.format(widget.challanList[index].taxAmount),
+          currencyFormat.format(widget.invoiceList[index].taxAmount),
           140,
           index,
           alignment: Alignment.centerRight,
         ),
         _columnItem(
-          currencyFormat.format(widget.challanList[index].challanAmount),
+          currencyFormat.format(widget.invoiceList[index].invoiceAmount),
           150,
           index,
           alignment: Alignment.centerRight,
         ),
-        _columnItem(
-          widget.challanList[index].invoiceNo,
-          150,
-          index,
-          alignment: Alignment.centerLeft,
+        Container(
+          width: 50,
+          child: InkWell(
+            onTap: () {},
+            child: Icon(
+              Icons.picture_as_pdf,
+              size: 16,
+              color: Colors.red,
+            ),
+          ),
         ),
         Container(
           width: 70,
@@ -268,31 +268,27 @@ class _ChallanHorizontalDataTableState
                       context: context,
                       barrierDismissible: false,
                       builder: (BuildContext context) {
-                        if (editAction(widget.challanList[index].id) != null) {
-                          return editAction(widget.challanList[index].id);
-                        } else {
-                          return Container();
-                        }
+                        return editAction(widget.invoiceList[index]);
                       });
                 },
                 child: Icon(
-                  widget.challanList[index].invoiceNo != ""
+                  widget.invoiceList[index].invoiceNo == ""
                       ? Icons.remove_red_eye_outlined
                       : Icons.edit,
                   size: 16,
-                  color: widget.challanList[index].invoiceNo != ""
+                  color: widget.invoiceList[index].invoiceNo == ""
                       ? Colors.blue
                       : Colors.green,
                 ),
               ),
-              widget.challanList[index].invoiceNo != ""
+              widget.invoiceList[index].invoiceNo == ""
                   ? Icon(
                       Icons.no_cell_outlined,
                       size: 16,
                       color: Colors.blueGrey,
                     )
                   : InkWell(
-                      onTap: () => deleteAction(widget.challanList[index].id),
+                      onTap: () => deleteAction(widget.invoiceList[index].id),
                       child: Icon(
                         Icons.delete,
                         size: 16,
@@ -306,29 +302,6 @@ class _ChallanHorizontalDataTableState
     );
   }
 
-  void _sortStatus() async {
-    sortType =
-        await Provider.of<ChallanProvider>(context, listen: false).getSortType;
-    sortAscDesc = await Provider.of<ChallanProvider>(context, listen: false)
-        .getIsAscending;
-    print("SOrt Type in _sortSttus: $sortType");
-
-    if (sortType == "_sortChallanNo") {
-      _isChallanNoAscending = sortAscDesc;
-      _sortChallanNo();
-    } else if (sortType == "_sortChallanDate") {
-      _isChallanDateAscending = sortAscDesc;
-      _sortChallanDate();
-    } else if (sortType == "_sortCustomerName") {
-      _isCustomerNameAscending = sortAscDesc;
-      _sortCustomerName();
-    } else if (sortType == "_sortInvoiceNo") {
-      _isInvoiceNoAscending = sortAscDesc;
-      _sortInvoiceNo();
-    }
-    setState(() {});
-  }
-
   Widget _columnItem(String item, double width, int index,
       {Alignment alignment = Alignment.center}) {
     return Container(
@@ -337,9 +310,9 @@ class _ChallanHorizontalDataTableState
         style: TextStyle(fontSize: 16),
       ),
       width: width,
-      height: widget.challanList[index].customerName.length <= 20
+      height: widget.invoiceList[index].customerAddress.length <= 20
           ? 30
-          : widget.challanList[index].customerName.length <= 80
+          : widget.invoiceList[index].customerAddress.length <= 40
               ? 60
               : 150,
       padding: EdgeInsets.symmetric(
@@ -350,64 +323,69 @@ class _ChallanHorizontalDataTableState
     );
   }
 
-  void _sortChallanNo() {
-    Provider.of<ChallanProvider>(context, listen: false).setSortType =
-        "_sortChallanNo";
-    Provider.of<ChallanProvider>(context, listen: false).setIsAscending =
-        _isChallanNoAscending;
-    widget.challanList.sort((a, b) {
-      return _isChallanNoAscending
-          ? a.challanNo.compareTo(b.challanNo)
-          : b.challanNo.compareTo(a.challanNo);
-    });
-    _isChallanNoAscending = !_isChallanNoAscending;
+  void _sortStatus() async {
+    sortType =
+        await Provider.of<InvoiceProvider>(context, listen: false).getSortType;
+    sortAscDesc = await Provider.of<InvoiceProvider>(context, listen: false)
+        .getIsAscending;
+    print("SOrt Type in _sortSttus: $sortType");
 
-    sortType = "_sortChallanNo";
-    sortAscDesc = _isChallanDateAscending;
-
-    print("Sort Type Set to: $sortType");
-  }
-
-  void _sortChallanDate() {
-    Provider.of<ChallanProvider>(context, listen: false).setSortType =
-        "_sortChallanDate";
-    Provider.of<ChallanProvider>(context, listen: false).setIsAscending =
-        _isChallanDateAscending;
-
-    widget.challanList.sort((a, b) {
-      return _isChallanDateAscending
-          ? a.challanDate!.compareTo(b.challanDate!)
-          : b.challanDate!.compareTo(a.challanDate!);
-    });
-    _isChallanDateAscending = !_isChallanDateAscending;
-  }
-
-  void _sortCustomerName() {
-    Provider.of<ChallanProvider>(context, listen: false).setSortType =
-        "_sortCustomerName";
-    Provider.of<ChallanProvider>(context, listen: false).setIsAscending =
-        _isCustomerNameAscending;
-
-    widget.challanList.sort((a, b) {
-      return _isCustomerNameAscending
-          ? a.customerName.compareTo(b.customerName)
-          : b.customerName.compareTo(a.customerName);
-    });
-    _isCustomerNameAscending = !_isCustomerNameAscending;
+    if (sortType == "_sortChallanNo") {
+      _isChallanNoAscending = sortAscDesc;
+      _sortInvoiceNo();
+    } else if (sortType == "_sortChallanDate") {
+      _isInvoiceDateAscending = sortAscDesc;
+      _sortInvoiceDate();
+    } else if (sortType == "_sortCustomerName") {
+      _isCustomerNameAscending = sortAscDesc;
+      _sortCustomerName();
+    } else if (sortType == "_sortInvoiceNo") {
+      _isInvoiceNoAscending = sortAscDesc;
+      _sortInvoiceNo();
+    }
+    setState(() {});
   }
 
   void _sortInvoiceNo() {
-    Provider.of<ChallanProvider>(context, listen: false).setSortType =
+    Provider.of<InvoiceProvider>(context, listen: false).setSortType =
         "_sortInvoiceNo";
-    Provider.of<ChallanProvider>(context, listen: false).setIsAscending =
+    Provider.of<InvoiceProvider>(context, listen: false).setIsAscending =
         _isInvoiceNoAscending;
 
-    widget.challanList.sort((a, b) {
+    widget.invoiceList.sort((a, b) {
       return _isInvoiceNoAscending
           ? a.invoiceNo.compareTo(b.invoiceNo)
           : b.invoiceNo.compareTo(a.invoiceNo);
     });
     _isInvoiceNoAscending = !_isInvoiceNoAscending;
+  }
+
+  void _sortInvoiceDate() {
+    Provider.of<InvoiceProvider>(context, listen: false).setSortType =
+        "_sortChallanDate";
+    Provider.of<InvoiceProvider>(context, listen: false).setIsAscending =
+        _isInvoiceDateAscending;
+
+    widget.invoiceList.sort((a, b) {
+      return _isInvoiceDateAscending
+          ? a.invoiceDate!.compareTo(b.invoiceDate!)
+          : b.invoiceDate!.compareTo(a.invoiceDate!);
+    });
+    _isInvoiceDateAscending = !_isInvoiceDateAscending;
+  }
+
+  void _sortCustomerName() {
+    Provider.of<InvoiceProvider>(context, listen: false).setSortType =
+        "_sortCustomerName";
+    Provider.of<InvoiceProvider>(context, listen: false).setIsAscending =
+        _isCustomerNameAscending;
+
+    widget.invoiceList.sort((a, b) {
+      return _isCustomerNameAscending
+          ? a.customerName.compareTo(b.customerName)
+          : b.customerName.compareTo(a.customerName);
+    });
+    _isCustomerNameAscending = !_isCustomerNameAscending;
   }
 
   void deleteAction(int id) {
@@ -417,38 +395,19 @@ class _ChallanHorizontalDataTableState
         builder: (BuildContext context) {
           return KConfirmationPopup(
             id: id,
-            deleteProvider: deleteChallan,
+            deleteProvider: deleteInvoice,
           );
         });
   }
 
-  void deleteChallan(int id) {
-    Provider.of<ChallanProvider>(context, listen: false).deleteChallan(id);
+  void deleteInvoice(int id) {
+    Provider.of<InvoiceProvider>(context, listen: false).deleteInvoice(id);
   }
 
-  Widget editAction(int id) {
-    Challan challan;
-    return Consumer<ChallanProvider>(builder: (ctx, provider, child) {
-      return FutureBuilder(
-        future: provider.getChallanById(id),
-        builder: (context, AsyncSnapshot<Challan> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
-          } else {
-            if (snapshot.hasError) {
-              return Center(child: Text("An error occured.\n$snapshot"));
-              // return noData(context);
-            } else if (snapshot.hasData) {
-              challan = snapshot.data!;
-              return ChallanCreate(
-                challan: challan,
-              );
-            } else
-              return Container();
-          }
-        },
-      );
-    });
+  Widget editAction(Invoice invoice) {
+    return InvoiceCreate(
+      invoice: invoice,
+    );
   }
 
   @override

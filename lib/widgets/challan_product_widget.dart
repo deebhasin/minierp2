@@ -105,94 +105,96 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
           index: widget.challanProductListPos,
           checkRedundency: widget.checkRedundentLineItem!),
     ]);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        widget.isInvoice!
-            ? KTextField(
-                label: "",
-                controller: productNameController,
-                width: 250,
-                isDisabled: widget.isInvoice!,
-              )
-            : Column(
-                children: [
-                  KDropdown(
-                    dropDownList: _productList.map((e) => e.name).toList(),
-                    label: "",
-                    initialValue: _dropdownInitialValue,
-                    width: 250,
-                    onChangeDropDown: onProductChange,
-                    validator: productNameValidator,
-                    isShowSearchBox: false,
-                  ),
-                  const SizedBox(
-                    height: 35,
-                  ),
-                ],
-              ),
-        KTextField(
-          label: "",
-          width: 130,
-          controller: pricePerUnitController,
-          validator: productName != "" ? pricePerUnitValidator : null,
-          valueUpdated: _pricePerUnitValueChanged,
-          isDisabled: widget.isInvoice!,
-        ),
-        KTextField(
-          label: "",
-          width: 70,
-          controller: unitController,
-          validator: productName != "" ? unitValidator : null,
-          isDisabled: widget.isInvoice!,
-          valueUpdated: _unitValueChanged,
-        ),
-        KTextField(
-          label: "",
-          width: 80,
-          controller: quantityController,
-          validator: productName != "" ? quantityValidator : null,
-          isDisabled: widget.isInvoice!,
-          valueUpdated: _quantityValueChanged,
-        ),
-        KTextField(
-          label: "",
-          width: 80,
-          controller: productTotalBeforeTaxController,
-          isDisabled: true,
-        ),
-        KTextField(
-          label: "",
-          width: 70,
-          controller: productGstPercentController,
-          validator: productName != "" ? gstPercentValidator : null,
-          isDisabled: widget.isInvoice!,
-          valueUpdated: _gstPercentValueChanged,
-        ),
-        KTextField(
-          label: "",
-          width: 100,
-          controller: productTaxAmountController,
-          isDisabled: true,
-        ),
-        KTextField(
-          label: "",
-          width: 110,
-          controller: productTotalAmountController,
-          isDisabled: true,
-        ),
-        widget.isInvoice!
-            ? Container()
-            : InkWell(
-                onTap: () => _deleteAction(),
-                child: Icon(
-                  Icons.delete,
-                  size: 16,
-                  color: Colors.red,
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          widget.isInvoice!
+              ? KTextField(
+                  label: "",
+                  controller: productNameController,
+                  width: 250,
+                  isDisabled: widget.isInvoice!,
+                )
+              : Column(
+                  children: [
+                    KDropdown(
+                      dropDownList: _productList.map((e) => e.name).toList(),
+                      label: "",
+                      initialValue: _dropdownInitialValue,
+                      width: 250,
+                      onChangeDropDown: onProductChange,
+                      validator: productNameValidator,
+                      isShowSearchBox: false,
+                    ),
+                    const SizedBox(
+                      height: 35,
+                    ),
+                  ],
                 ),
-              ),
-      ],
+          KTextField(
+            label: "",
+            width: 130,
+            controller: pricePerUnitController,
+            validator: productName != "" ? pricePerUnitValidator : null,
+            valueUpdated: _pricePerUnitValueChanged,
+            isDisabled: widget.isInvoice!,
+          ),
+          KTextField(
+            label: "",
+            width: 70,
+            controller: unitController,
+            validator: productName != "" ? unitValidator : null,
+            isDisabled: widget.isInvoice!,
+            valueUpdated: _unitValueChanged,
+          ),
+          KTextField(
+            label: "",
+            width: 80,
+            controller: quantityController,
+            validator: productName != "" ? quantityValidator : null,
+            isDisabled: widget.isInvoice!,
+            valueUpdated: _quantityValueChanged,
+          ),
+          KTextField(
+            label: "",
+            width: 80,
+            controller: productTotalBeforeTaxController,
+            isDisabled: true,
+          ),
+          KTextField(
+            label: "",
+            width: 70,
+            controller: productGstPercentController,
+            validator: productName != "" ? gstPercentValidator : null,
+            isDisabled: widget.isInvoice!,
+            valueUpdated: _gstPercentValueChanged,
+          ),
+          KTextField(
+            label: "",
+            width: 100,
+            controller: productTaxAmountController,
+            isDisabled: true,
+          ),
+          KTextField(
+            label: "",
+            width: 110,
+            controller: productTotalAmountController,
+            isDisabled: true,
+          ),
+          widget.isInvoice!
+              ? Container()
+              : InkWell(
+                  onTap: () => _deleteAction(),
+                  child: Icon(
+                    Icons.delete,
+                    size: 16,
+                    color: Colors.red,
+                  ),
+                ),
+        ],
+      ),
     );
   }
 

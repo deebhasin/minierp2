@@ -111,7 +111,7 @@ class _ViewChallanState extends State<ViewChallan> {
           // const Divider(),
           ChallanHorizontalDataTable(
             leftHandSideColumnWidth: 0,
-            rightHandSideColumnWidth: containerWidth * 1.02,
+            rightHandSideColumnWidth: containerWidth * 1.01,
             challanList: _challanList,
           ),
         ],

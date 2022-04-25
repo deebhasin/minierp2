@@ -1,12 +1,10 @@
-import 'package:erpapp/providers/checkbox_provider.dart';
-import 'package:erpapp/providers/invoice_provider.dart';
-import 'package:erpapp/widgets/challan_horizontal_data_table.dart';
-import 'package:erpapp/widgets/display_invoice_total.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../kwidgets/k_popup_alert.dart';
 import '../kwidgets/kvariables.dart';
 import '../kwidgets/kdropdown.dart';
 import '../kwidgets/KDateTextForm.dart';
@@ -14,10 +12,11 @@ import '../kwidgets/ktextfield.dart';
 import '../model/challan.dart';
 import '../model/customer.dart';
 import '../model/invoice.dart';
-import '../model/product.dart';
 import '../providers/challan_provider.dart';
 import '../providers/customer_provider.dart';
 import '../widgets/alertdialognav.dart';
+import '../providers/invoice_provider.dart';
+import '../widgets/challan_checkbox_horizontal_data_table.dart';
 import 'challancreate.dart';
 
 class InvoiceCreate extends StatefulWidget {
@@ -53,15 +52,17 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
 
   List<Customer> _customerList = [];
   List<Challan> _challanList = [];
-  List<Product> _productList = [];
-  List<int> challanSelected = [];
+
+
+  List<String> _errorMsgList = [];
+  bool _hasErrors = false;
 
   String _companyName = "";
 
   String dropdownValue = "-----";
   final currencyFormat = NumberFormat("#,##0.00", "en_US");
   double challanAmount = 0;
-  bool isChecked = false;
+  List<bool> _isCheckedList = [];
 
   double subtotal = 0;
   double taxTotal = 0;
@@ -70,15 +71,23 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   @override
   void initState() {
     _getAllLists();
-    // _gstNumber = _customerList
-    //     .firstWhere(
-    //         (element) => element.company_name == widget.invoice.customerName)
-    //     .gst;
-    // _dueDate = widget.invoice.id == 0? null : DateTime.now().add(Duration(
-    //     days: _customerList
-    //         .firstWhere((element) =>
-    //             element.company_name == widget.invoice.customerName)
-    //         .creditPeriod));
+
+    if (widget.invoice.id != 0) {
+      print("InvoiceCreate ChallanList Length: ${widget.invoice.challanList.length}");
+      _companyName = widget.invoice.customerName;
+      _gstNumber = _customerList
+          .where(
+              (element) => element.company_name == widget.invoice.customerName)
+          .toList()[0]
+          .gst;
+      _dueDate = widget.invoice.invoiceDate!.add(Duration(
+          days: _customerList
+              .where((element) =>
+                  element.company_name == widget.invoice.customerName)
+              .toList()[0]
+              .creditPeriod));
+     _updateTotals();
+    }
 
     invoiceNumberController =
         TextEditingController(text: widget.invoice.invoiceNo);
@@ -103,7 +112,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     gstValidator = RequiredValidator(errorText: 'GST number is required');
     billingAddressValidator =
         RequiredValidator(errorText: 'Billing number is required');
-    Provider.of<CheckboxProvider>(context, listen: false).initialiseTotalList();
+
     super.initState();
   }
 
@@ -228,6 +237,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                               KDateTextForm(
                                 label: "From:",
                                 dateInputController: _dateFromController,
+                                onDateChange: _dateSelected,
                               ),
                               SizedBox(
                                 width: 50,
@@ -235,6 +245,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                               KDateTextForm(
                                 label: "To:",
                                 dateInputController: _dateToController,
+                                onDateChange: _dateSelected,
                               ),
                             ],
                           ),
@@ -250,8 +261,13 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                 "Amount",
                                 style: TextStyle(fontSize: 11),
                               ),
-                              DisplayInvoiceTotal(
-                                  totalType: "invoiceTotal", fontSize: 30),
+                              Text(
+                                "\u{20B9}${currencyFormat.format(widget.invoice.invoiceAmount)}",
+                                style: TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -315,7 +331,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 SizedBox(
-                                  height: 20,
+                                  height: 10,
                                 ),
                                 Text(
                                   "Tax Total",
@@ -324,7 +340,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 SizedBox(
-                                  height: 20,
+                                  height: 10,
                                 ),
                                 Text(
                                   "Invoice Total",
@@ -342,15 +358,36 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                               children: [
                                 // DisplayInvoiceTotal(value: subtotal),
 
-                                DisplayInvoiceTotal(totalType: "subtotal"),
-                                const SizedBox(
-                                  height: 20,
+                                // DisplayInvoiceTotal(totalType: "subtotal"),
+                                Text(
+                                  "\u{20B9}${currencyFormat.format(widget.invoice.totalBeforeTax)}",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                DisplayInvoiceTotal(totalType: "taxTotal"),
                                 const SizedBox(
-                                  height: 20,
+                                  height: 10,
                                 ),
-                                DisplayInvoiceTotal(totalType: "invoiceTotal"),
+                                Text(
+                                  "\u{20B9}${currencyFormat.format(widget.invoice.taxAmount)}",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                // DisplayInvoiceTotal(totalType: "taxTotal"),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  "\u{20B9}${currencyFormat.format(widget.invoice.invoiceAmount)}",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                // DisplayInvoiceTotal(totalType: "invoiceTotal"),
                               ],
                             ),
                             const SizedBox(
@@ -377,24 +414,20 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
 
   void _onCompanyChange(String companyName) {
     setState(() {
-      if (companyName == "") {
-        companyName = widget.invoice.customerName;
-      } else {
-        _companyName = companyName;
-        print("-ONcompanyChange Company NAme: $companyName");
-        Customer _customerData = _customerList
-            .where((element) => element.company_name == companyName)
-            .toList()[0];
-        _billingAddress = _customerData.address;
-        _gstNumber = _customerData.gst;
-        _dueDate = (widget.invoice.invoiceDate!
-            .add(Duration(days: _customerData.creditPeriod)));
+      _companyName = companyName;
+      print("-ONcompanyChange Company NAme: $companyName");
+      Customer _customerData = _customerList
+          .where((element) => element.company_name == companyName)
+          .toList()[0];
+      _billingAddress = _customerData.address;
+      _gstNumber = _customerData.gst;
+      _dueDate = (widget.invoice.invoiceDate!
+          .add(Duration(days: _customerData.creditPeriod)));
 
-        billingAddressController.text = _billingAddress;
-        gstNumberController.text = _gstNumber;
-        dueDateController.text = DateFormat("d-M-y").format(_dueDate!);
-      }
-      challanSelected.clear();
+      billingAddressController.text = _billingAddress;
+      gstNumberController.text = _gstNumber;
+      dueDateController.text = DateFormat("d-M-y").format(_dueDate!);
+
       subtotal = 0;
       taxTotal = 0;
       invoiceTotal = 0;
@@ -443,14 +476,25 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
         ? Text("Please Select Company")
         : Consumer<ChallanProvider>(builder: (ctx, provider, child) {
             return FutureBuilder(
-              future: provider.getChallanListByParameters(
-                customerName: _companyName,
-                active: 1,
-                invoiceNo: "Not Assigned",
-                fromDate:
-                    DateFormat("dd-MM-yyyy").parse(_dateFromController.text),
-                toDate: DateFormat("dd-MM-yyyy").parse(_dateToController.text),
-              ),
+              future: widget.invoice.id == 0
+                  ? provider.getChallanListByParameters(
+                      customerName: _companyName,
+                      active: 1,
+                      invoiceNo: "Not Assigned",
+                      fromDate: DateFormat("dd-MM-yyyy")
+                          .parse(_dateFromController.text),
+                      toDate: DateFormat("dd-MM-yyyy")
+                          .parse(_dateToController.text),
+                    )
+                  : provider.getChallanListByParameters(
+                      customerName: _companyName,
+                      active: 1,
+                      invoiceNo: widget.invoice.invoiceNo + "*or",
+                      fromDate: DateFormat("dd-MM-yyyy")
+                          .parse(_dateFromController.text),
+                      toDate: DateFormat("dd-MM-yyyy")
+                          .parse(_dateToController.text),
+                    ),
               builder: (context, AsyncSnapshot<List<Challan>> snapshot) {
                 print("Inside fetchGST Function");
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -463,9 +507,23 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                     // return noData(context);
                   } else if (snapshot.hasData) {
                     challanList = snapshot.data!;
-                    // challanList.forEach((row) => print(row.customerName));
-                    // return _displayChallans(_challanList, context);
-                    return _displayChallans(challanList, context);
+
+                    _isCheckedList.clear();
+                    challanList.forEach((challan) {
+                      print("Disco Khisco Challan List Length: ${widget.invoice.challanList.length}");
+                      print("DIsco ${challan.id}: ${widget.invoice.challanList.any((invoiceChallan) =>
+                      challan.id == invoiceChallan.id)}");
+                      if (widget.invoice.challanList.any((invoiceChallan) =>
+                          challan.id == invoiceChallan.id)) {
+                        _isCheckedList.add(true);
+                      } else {
+                        _isCheckedList.add(false);
+                      }
+                    });
+                    print(
+                        "_isCheckedList Length in Invoice Create: ${_isCheckedList.length}");
+                    return _displayChallans(
+                        challanList, context, _isCheckedList);
                     // return Container();
                   } else
                     return Container();
@@ -475,23 +533,36 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
           });
   }
 
-  Widget _displayChallans(List<Challan> _challanList, BuildContext context) {
-    return ChallanHorizontalDataTable(
+  Widget _displayChallans(
+      List<Challan> challanList, BuildContext context, List<bool> isCheckList) {
+
+    return challanList.isEmpty? Text("Challans Dont Exist for the selected period.") : ChallanCheckboxHorizontalDataTable(
       leftHandSideColumnWidth: 0,
-      rightHandSideColumnWidth: containerWidth * 0.73,
-      challanList: _challanList,
+      rightHandSideColumnWidth: containerWidth * 0.65,
+      challanList: challanList,
+      isCheckedList: _isCheckedList,
       checkboxChanged: checkboxChanged,
-      isCheckbox: true,
     );
   }
 
-  void checkboxChanged() {
-    List<double> totalList =
-        Provider.of<CheckboxProvider>(context, listen: false).totalList;
-    subtotal = totalList[0];
-    taxTotal = totalList[1];
-    invoiceTotal = totalList[2];
-    print("checkboxChanged in Invoice Create ${subtotal}");
+  void checkboxChanged(bool isChecked, Challan challan) {
+    challan.invoiceNo = invoiceNumberController.text;
+    setState(() {
+      isChecked
+          ? widget.invoice.addChallan(challan)
+          : widget.invoice.removeChallan(challan);
+    });
+    _updateTotals();
+  }
+
+  void _updateTotals(){
+    subtotal = widget.invoice.totalBeforeTax;
+    taxTotal = widget.invoice.taxAmount;
+    invoiceTotal = widget.invoice.invoiceAmount;
+  }
+
+  void _dateSelected(){
+    _onCompanyChange(_companyName);
   }
 
   void _resetForm() {
@@ -502,22 +573,66 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     gstNumberController.text = "";
     dueDateController.text = "";
     _onCompanyChange("");
-    challanSelected.clear();
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     print("Submit Form");
-    widget.invoice.invoiceNo = invoiceNumberController.text;
-    widget.invoice.invoiceDate =
-        DateFormat("yyyy-MM-dd").parse(invoiceDateController.text);
-    widget.invoice.customerName = _companyName;
-    widget.invoice.customerAddress = billingAddressController.text;
-    widget.invoice.invoiceAmount = subtotal;
-    widget.invoice.invoiceTax = taxTotal;
-    widget.invoice.invoiceTotal = invoiceTotal;
-    Provider.of<InvoiceProvider>(context, listen: false)
-        .saveInvoice(widget.invoice);
-    Navigator.of(context).pop();
+    _hasErrors = false;
+    _errorMsgList.clear();
+    _checkInvoiceNumberError();
+    _checkLineItemError();
+
+    if (_hasErrors) _popupAlert(_errorMsgList);
+
+    if (_formKey.currentState!.validate() && !_hasErrors) {
+      widget.invoice.invoiceNo = invoiceNumberController.text;
+      widget.invoice.invoiceDate =
+          DateFormat("dd-MM-yyyy").parse(invoiceDateController.text);
+      widget.invoice.customerName = _companyName;
+      widget.invoice.customerAddress = billingAddressController.text;
+      await Provider.of<InvoiceProvider>(context, listen: false)
+          .saveInvoice(widget.invoice);
+      await Provider.of<ChallanProvider>(context, listen: false)
+          .updateInvoiceNumberInChallan(
+              widget.invoice.challanList, widget.invoice.invoiceNo);
+      print("Invoice Date: ${invoiceDateController.text}");
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> _checkInvoiceNumberError() async {
+    bool _isInvoiceNo = false;
+    _isInvoiceNo = await Provider.of<InvoiceProvider>(context, listen: false)
+        .checkInvoiceNumber(invoiceNumberController.text);
+    if (widget.invoice.id == 0) {
+      _hasErrors = _isInvoiceNo;
+      _errorMsgList.add("The Invoice Number Exists");
+    } else {
+      if (invoiceNumberController.text != widget.invoice.invoiceNo) {
+        _hasErrors = _isInvoiceNo;
+        _errorMsgList.add("The Invoice Number Cannot be changed");
+        print("Error in _checkInvoiceNumberError: $_hasErrors");
+      }
+    }
+  }
+
+  void _checkLineItemError(){
+    bool isChecked = _isCheckedList.any((element) => element == true);
+    if(!isChecked){
+      _hasErrors = true;
+      _errorMsgList.add("Select atleast one Challan");
+    }
+  }
+
+  void _popupAlert(List<String> _errorMsgList) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return KPopupAlert(
+            errorMsgList: _errorMsgList,
+          );
+        });
   }
 
   @override

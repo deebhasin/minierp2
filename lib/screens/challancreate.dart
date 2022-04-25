@@ -213,24 +213,53 @@ class _ChallanCreateState extends State<ChallanCreate> {
               height: 30,
             ),
             Container(
-              width: containerWidth *0.95,
+              width: containerWidth * 0.95,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _textFieldHeader("Product", 250,),
-                  _textFieldHeader("Price Per Unit", 130,),
-                  _textFieldHeader("Unit", 70,),
-                  _textFieldHeader("Quantity", 80,),
-                  _textFieldHeader("Total", 80,),
-                  _textFieldHeader("GST %", 70,),
-                  _textFieldHeader("GST", 100,),
-                  _textFieldHeader("Total Amount", 110,),
-                  _textFieldHeader("", 2,),
+                  _textFieldHeader(
+                    "Product",
+                    250,
+                  ),
+                  _textFieldHeader(
+                    "Price Per Unit",
+                    130,
+                  ),
+                  _textFieldHeader(
+                    "Unit",
+                    70,
+                  ),
+                  _textFieldHeader(
+                    "Quantity",
+                    80,
+                  ),
+                  _textFieldHeader(
+                    "Total",
+                    80,
+                  ),
+                  _textFieldHeader(
+                    "GST %",
+                    70,
+                  ),
+                  _textFieldHeader(
+                    "GST",
+                    100,
+                  ),
+                  _textFieldHeader(
+                    "Total Amount",
+                    110,
+                  ),
+                  _textFieldHeader(
+                    "",
+                    2,
+                  ),
                 ],
               ),
             ),
-            const Divider(thickness: 3,),
+            const Divider(
+              thickness: 3,
+            ),
             Expanded(
               child: SingleChildScrollView(
                 child: _getChallanProductWidgets(),
@@ -360,6 +389,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
         _label,
         style: TextStyle(
           fontSize: 16,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -409,19 +439,11 @@ class _ChallanCreateState extends State<ChallanCreate> {
   }
 
   void _updateTotals() {
-    _totalBeforeTax = 0;
-    _taxAmount = 0;
-    _challanAmount = 0;
-    print("Update Totalts Begin");
-    for (ChallanProduct _element in _challanProductList) {
-      _totalBeforeTax += _element.totalBeforeTax;
-      _taxAmount += _element.taxAmount;
-      _challanAmount += _element.totalAmount;
-    }
-    print("Total Before Tax: $_totalBeforeTax");
-    print("Tax Amount: $_taxAmount");
-    print("Challan Total: $_challanAmount");
-    setState(() {});
+    setState(() {
+      _totalBeforeTax = widget.challan.total;
+      _taxAmount = widget.challan.taxAmount;
+      _challanAmount = widget.challan.challanAmount;
+    });
   }
 
   Future<void> _submitForm() async {
@@ -441,14 +463,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
           DateFormat('dd-MM-yyyy').parse(_dateInputController.text);
 
       print("Customer Name: ${widget.challan.customerName}");
-      widget.challan.total = 0;
-      widget.challan.taxAmount = 0;
-      widget.challan.challanAmount = 0;
       widget.challan.challanProductList = List.from(_challanProductList);
-
-      widget.challan.total += _totalBeforeTax;
-      widget.challan.taxAmount += _taxAmount;
-      widget.challan.challanAmount += _challanAmount;
 
       Provider.of<ChallanProvider>(context, listen: false)
           .challanSave(widget.challan);
@@ -521,17 +536,10 @@ class _ChallanCreateState extends State<ChallanCreate> {
     } else {
       if (challanNumberController.text != widget.challan.challanNo) {
         _hasErrors = _isChallanNo;
+        _challanNumberErrorMessage = _hasErrors ? "Challan Number exists" : "";
         print("Error in Edit: $_hasErrors");
       }
     }
-
-    _challanNumberErrorMessage = _hasErrors ? "Challan Number exists" : "";
-    if (_hasErrors) _errorMsgList.add(_challanNumberErrorMessage);
-    print("Check Error Challan Id: ${widget.challan.id}");
-    print(":Has Errors: $_hasErrors");
-    print("ISChallanNumber: $_isChallanNo");
-    print("_challanNumberErrorMessage: $_challanNumberErrorMessage");
-    // });
   }
 
   void _checkLineItemError() {

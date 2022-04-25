@@ -16,7 +16,7 @@ class KPopupAlert extends StatelessWidget {
       ),
       content: Container(
         width: 700,
-        height: 350,
+        height: 200,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -31,6 +31,10 @@ class KPopupAlert extends StatelessWidget {
                       title: Text(
                         errorMsgList[index],
                         textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     );
                   },
@@ -40,11 +44,14 @@ class KPopupAlert extends StatelessWidget {
             const SizedBox(
               height: 30,
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("Ok"),
+            Container(
+              width: 100,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("Ok"),
+              ),
             ),
           ],
         ),

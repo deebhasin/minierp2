@@ -37,6 +37,8 @@ class KTextField extends StatelessWidget {
     height = multiLine == 1 ? height : (height + multiLine * 17);
 
     return Container(
+      margin: EdgeInsets.zero,
+      padding: EdgeInsets.zero,
       // height: height + 10,
       width: width,
       // decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
@@ -63,7 +65,7 @@ class KTextField extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(
+            if(label != "") SizedBox(
               height: 5,
               width: 1,
             ),
@@ -84,8 +86,6 @@ class KTextField extends StatelessWidget {
               decoration: InputDecoration(
                 border: UnderlineInputBorder(),
                 isDense: true,
-                // contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 3),
-                contentPadding: EdgeInsets.fromLTRB(10, 10, 0, 0),
                 fillColor: isDisabled
                     ? Color.fromRGBO(0, 0, 0, 0.05)
                     : Colors.transparent,

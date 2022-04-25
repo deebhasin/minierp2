@@ -8,24 +8,28 @@ import '../screens/challancreate.dart';
 import '../kwidgets/k_confirmation_popup.dart';
 import '../model/challan.dart';
 
-class ChallanHorizontalDataTable extends StatefulWidget {
+class ChallanCheckboxHorizontalDataTable extends StatefulWidget {
   List<Challan> challanList;
   final double leftHandSideColumnWidth;
   final double rightHandSideColumnWidth;
-  ChallanHorizontalDataTable({
+  final List<bool> isCheckedList;
+  final Function checkboxChanged;
+  ChallanCheckboxHorizontalDataTable({
     Key? key,
     required this.leftHandSideColumnWidth,
     required this.rightHandSideColumnWidth,
     required this.challanList,
+    required this.isCheckedList,
+    required this.checkboxChanged,
   }) : super(key: key);
 
   @override
-  State<ChallanHorizontalDataTable> createState() =>
-      _ChallanHorizontalDataTableState();
+  State<ChallanCheckboxHorizontalDataTable> createState() =>
+      _ChallanCheckboxHorizontalDataTableState();
 }
 
-class _ChallanHorizontalDataTableState
-    extends State<ChallanHorizontalDataTable> {
+class _ChallanCheckboxHorizontalDataTableState
+    extends State<ChallanCheckboxHorizontalDataTable> {
   HDTRefreshController _hdtRefreshController = HDTRefreshController();
 
   // final currencyFormat = NumberFormat("#,##0.00", "en_US");
@@ -36,17 +40,13 @@ class _ChallanHorizontalDataTableState
   bool _isCustomerNameAscending = false;
   bool _isInvoiceNoAscending = false;
 
-  String sortType = "";
-  bool sortAscDesc = true;
+  List<ScrollController> _scrollControllerList = [];
 
-  List<bool> _isCheckedList = [];
+  List<int> _challanSelectedList = [];
 
   @override
   void initState() {
-    for (int i = 0; i < widget.challanList.length; i++) {
-      _isCheckedList.add(false);
-    }
-    WidgetsBinding.instance!.addPostFrameCallback((_) => _sortStatus());
+    WidgetsBinding.instance!.addPostFrameCallback((_) => setState(() {}));
     super.initState();
   }
 
@@ -54,7 +54,7 @@ class _ChallanHorizontalDataTableState
   Widget build(BuildContext context) {
     return Container(
       color: Colors.green,
-      width: MediaQuery.of(context).size.width * 0.835,
+      width: MediaQuery.of(context).size.width * 0.55,
       child: HorizontalDataTable(
         leftHandSideColumnWidth: widget.leftHandSideColumnWidth,
         rightHandSideColumnWidth: widget.rightHandSideColumnWidth,
@@ -73,11 +73,11 @@ class _ChallanHorizontalDataTableState
         verticalScrollbarStyle: const ScrollbarStyle(
           thumbColor: Colors.transparent,
           isAlwaysShown: true,
-          thickness: 1.0,
+          thickness: 4.0,
           radius: Radius.circular(5.0),
         ),
         horizontalScrollbarStyle: const ScrollbarStyle(
-          thumbColor: Colors.red,
+          thumbColor: Colors.transparent,
           isAlwaysShown: true,
           thickness: 4.0,
           radius: Radius.circular(5.0),
@@ -94,18 +94,22 @@ class _ChallanHorizontalDataTableState
         loadIndicator: const ClassicFooter(),
         onLoad: () async {
           //Do sth
-          await Future.delayed(const Duration(milliseconds: 100));
+          await Future.delayed(const Duration(milliseconds: 500));
           _hdtRefreshController.loadComplete();
         },
         htdRefreshController: _hdtRefreshController,
       ),
-      height: MediaQuery.of(context).size.height - 200,
+      height: 185,
     );
   }
 
   List<Widget> _getTitleWidget() {
     return [
       Row(),
+      _getTitleItemWidget(
+        'Select',
+        80,
+      ),
       TextButton(
         style: TextButton.styleFrom(
           padding: EdgeInsets.zero,
@@ -133,20 +137,6 @@ class _ChallanHorizontalDataTableState
           setState(() {});
         },
       ),
-      TextButton(
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-        ),
-        child: _getTitleItemWidget(
-          'Customer Name ' + (_isCustomerNameAscending ? '↓' : '↑'),
-          300,
-          alignment: Alignment.centerLeft,
-        ),
-        onPressed: () {
-          _sortCustomerName();
-          setState(() {});
-        },
-      ),
       _getTitleItemWidget(
         'Amount Before Tax\n(\u{20B9})',
         150,
@@ -161,20 +151,6 @@ class _ChallanHorizontalDataTableState
         'Total\n(\u{20B9})',
         150,
         alignment: Alignment.centerRight,
-      ),
-      TextButton(
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-        ),
-        child: _getTitleItemWidget(
-          'Invoice # ' + (_isInvoiceNoAscending ? '↓' : '↑'),
-          150,
-          alignment: Alignment.centerLeft,
-        ),
-        onPressed: () {
-          _sortInvoiceNo();
-          setState(() {});
-        },
       ),
     ];
   }
@@ -212,6 +188,13 @@ class _ChallanHorizontalDataTableState
   Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
     return Row(
       children: [
+        Container(
+          width: 80,
+          child: Checkbox(
+              value: widget.isCheckedList[index],
+              onChanged: (bool? value) =>
+                  widget.checkboxChanged(value, widget.challanList[index])),
+        ),
         _columnItem(
           widget.challanList[index].challanNo,
           150,
@@ -223,12 +206,6 @@ class _ChallanHorizontalDataTableState
               .format(widget.challanList[index].challanDate!),
           150,
           index,
-        ),
-        _columnItem(
-          widget.challanList[index].customerName,
-          300,
-          index,
-          alignment: Alignment.centerLeft,
         ),
         _columnItem(
           currencyFormat.format(widget.challanList[index].total),
@@ -248,85 +225,8 @@ class _ChallanHorizontalDataTableState
           index,
           alignment: Alignment.centerRight,
         ),
-        _columnItem(
-          widget.challanList[index].invoiceNo,
-          150,
-          index,
-          alignment: Alignment.centerLeft,
-        ),
-        Container(
-          width: 70,
-          height: 30,
-          // padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-          alignment: Alignment.center,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              InkWell(
-                onTap: () {
-                  showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        if (editAction(widget.challanList[index].id) != null) {
-                          return editAction(widget.challanList[index].id);
-                        } else {
-                          return Container();
-                        }
-                      });
-                },
-                child: Icon(
-                  widget.challanList[index].invoiceNo != ""
-                      ? Icons.remove_red_eye_outlined
-                      : Icons.edit,
-                  size: 16,
-                  color: widget.challanList[index].invoiceNo != ""
-                      ? Colors.blue
-                      : Colors.green,
-                ),
-              ),
-              widget.challanList[index].invoiceNo != ""
-                  ? Icon(
-                      Icons.no_cell_outlined,
-                      size: 16,
-                      color: Colors.blueGrey,
-                    )
-                  : InkWell(
-                      onTap: () => deleteAction(widget.challanList[index].id),
-                      child: Icon(
-                        Icons.delete,
-                        size: 16,
-                        color: Colors.red,
-                      ),
-                    ),
-            ],
-          ),
-        ),
       ],
     );
-  }
-
-  void _sortStatus() async {
-    sortType =
-        await Provider.of<ChallanProvider>(context, listen: false).getSortType;
-    sortAscDesc = await Provider.of<ChallanProvider>(context, listen: false)
-        .getIsAscending;
-    print("SOrt Type in _sortSttus: $sortType");
-
-    if (sortType == "_sortChallanNo") {
-      _isChallanNoAscending = sortAscDesc;
-      _sortChallanNo();
-    } else if (sortType == "_sortChallanDate") {
-      _isChallanDateAscending = sortAscDesc;
-      _sortChallanDate();
-    } else if (sortType == "_sortCustomerName") {
-      _isCustomerNameAscending = sortAscDesc;
-      _sortCustomerName();
-    } else if (sortType == "_sortInvoiceNo") {
-      _isInvoiceNoAscending = sortAscDesc;
-      _sortInvoiceNo();
-    }
-    setState(() {});
   }
 
   Widget _columnItem(String item, double width, int index,
@@ -351,29 +251,15 @@ class _ChallanHorizontalDataTableState
   }
 
   void _sortChallanNo() {
-    Provider.of<ChallanProvider>(context, listen: false).setSortType =
-        "_sortChallanNo";
-    Provider.of<ChallanProvider>(context, listen: false).setIsAscending =
-        _isChallanNoAscending;
     widget.challanList.sort((a, b) {
       return _isChallanNoAscending
           ? a.challanNo.compareTo(b.challanNo)
           : b.challanNo.compareTo(a.challanNo);
     });
     _isChallanNoAscending = !_isChallanNoAscending;
-
-    sortType = "_sortChallanNo";
-    sortAscDesc = _isChallanDateAscending;
-
-    print("Sort Type Set to: $sortType");
   }
 
   void _sortChallanDate() {
-    Provider.of<ChallanProvider>(context, listen: false).setSortType =
-        "_sortChallanDate";
-    Provider.of<ChallanProvider>(context, listen: false).setIsAscending =
-        _isChallanDateAscending;
-
     widget.challanList.sort((a, b) {
       return _isChallanDateAscending
           ? a.challanDate!.compareTo(b.challanDate!)
@@ -383,11 +269,6 @@ class _ChallanHorizontalDataTableState
   }
 
   void _sortCustomerName() {
-    Provider.of<ChallanProvider>(context, listen: false).setSortType =
-        "_sortCustomerName";
-    Provider.of<ChallanProvider>(context, listen: false).setIsAscending =
-        _isCustomerNameAscending;
-
     widget.challanList.sort((a, b) {
       return _isCustomerNameAscending
           ? a.customerName.compareTo(b.customerName)
@@ -397,11 +278,6 @@ class _ChallanHorizontalDataTableState
   }
 
   void _sortInvoiceNo() {
-    Provider.of<ChallanProvider>(context, listen: false).setSortType =
-        "_sortInvoiceNo";
-    Provider.of<ChallanProvider>(context, listen: false).setIsAscending =
-        _isInvoiceNoAscending;
-
     widget.challanList.sort((a, b) {
       return _isInvoiceNoAscending
           ? a.invoiceNo.compareTo(b.invoiceNo)
@@ -453,6 +329,9 @@ class _ChallanHorizontalDataTableState
 
   @override
   void dispose() {
+    for (int i = 0; i < _scrollControllerList.length; i++) {
+      _scrollControllerList[i].dispose();
+    }
     super.dispose();
   }
 }
