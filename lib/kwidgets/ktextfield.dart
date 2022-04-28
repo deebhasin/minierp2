@@ -76,7 +76,7 @@ class KTextField extends StatelessWidget {
                 LengthLimitingTextInputFormatter(maxLength),
               ],
               // onEditingComplete: () => valueUpdatedTest,
-              onChanged: (value) => valueUpdated!(value),
+              onChanged: (value) => valueUpdated == null? (){} : valueUpdated!(value),
               maxLines: multiLine,
               readOnly: isDisabled,
               controller: controller,

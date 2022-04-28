@@ -40,7 +40,7 @@ class Customer{
         pin = res["PIN"],
         city = res["city"],
         state = res["state"],
-        stateCode = res["state_cd"],
+        stateCode = res["state_code"],
         gst = res["GST"],
         creditPeriod = res["credit_period"],
         isActive = res["active"];
@@ -56,7 +56,7 @@ class Customer{
         'PIN': pin,
         'city': city,
         'state': state,
-        'state_cd': stateCode,
+        'state_code': stateCode,
         'GST': gst,
         'credit_period': creditPeriod,
         'active': isActive,

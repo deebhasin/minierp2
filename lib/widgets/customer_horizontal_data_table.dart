@@ -96,7 +96,7 @@ class _CustomerHorizontalDataTableState
         ),
         child: _getTitleItemWidget(
           'Company Name ' + (_isCustomerNameAscending ? '↓' : '↑'),
-          250,
+          220,
           alignment: Alignment.centerLeft,
         ),
         onPressed: () {
@@ -147,7 +147,7 @@ class _CustomerHorizontalDataTableState
       ),
       _getTitleItemWidget(
         'GST Number',
-        120,
+        150,
         alignment: Alignment.centerLeft,
       ),
       _getTitleItemWidget(
@@ -190,7 +190,7 @@ class _CustomerHorizontalDataTableState
         children: [
           _columnItem(
             widget.customerList[index].company_name,
-            250,
+            220,
             index,
             alignment: Alignment.centerLeft,
           ),
@@ -224,7 +224,7 @@ class _CustomerHorizontalDataTableState
           ),
           _columnItem(
             widget.customerList[index].gst,
-            120,
+            150,
             index,
             alignment: Alignment.centerLeft,
           ),
@@ -292,9 +292,9 @@ class _CustomerHorizontalDataTableState
         style: TextStyle(fontSize: 16),
       ),
       width: width,
-      height: _columnName.length <= 30
+      height: _columnName.length <= 15
           ? 30
-          : _columnName.length <= 150
+          : _columnName.length <= 40
               ? 60
               : 150,
       alignment: alignment,

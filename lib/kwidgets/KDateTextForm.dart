@@ -5,12 +5,14 @@ class KDateTextForm extends StatelessWidget {
   final String label;
   final TextEditingController dateInputController;
   final Function? onDateChange;
+  DateTime? lastDate;
 
   KDateTextForm({
     Key? key,
     required this.label,
     required this.dateInputController,
     this.onDateChange,
+    this.lastDate,
   }) : super(key: key);
 
   @override
@@ -38,7 +40,7 @@ class KDateTextForm extends StatelessWidget {
       initialDate: DateFormat('dd-MM-yyyy').parse(dateInputController.text),
       firstDate: DateTime(
           2000), //DateTime.now() - not to allow to choose before today.
-      lastDate: DateTime.now(),
+      lastDate: lastDate == null? DateTime.now() : lastDate!,
     );
 
     if (_pickedDate != null) {

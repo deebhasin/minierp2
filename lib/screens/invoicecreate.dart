@@ -1,3 +1,5 @@
+import 'package:erpapp/providers/org_provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -12,6 +14,7 @@ import '../kwidgets/ktextfield.dart';
 import '../model/challan.dart';
 import '../model/customer.dart';
 import '../model/invoice.dart';
+import '../model/organization.dart';
 import '../providers/challan_provider.dart';
 import '../providers/customer_provider.dart';
 import '../widgets/alertdialognav.dart';
@@ -33,18 +36,25 @@ class InvoiceCreate extends StatefulWidget {
 class _InvoiceCreateState extends State<InvoiceCreate> {
   late double containerWidth;
   final _formKey = GlobalKey<FormState>();
-  late final invoiceNumberController;
-  late final invoiceDateController;
-  late final gstNumberController;
-  late final dueDateController;
-  late final billingAddressController;
+  late final _invoiceNumberController;
+  late final _invoiceDateController;
+  late final _gstNumberController;
+  late final _dueDateController;
+  late final _billingAddressController;
   late final _dateFromController;
   late final _dateToController;
+  late final _transportModeController;
+  late final _vehicleNumberController;
+  late final _taxPayableOnReverseChargeController;
+  late final _termsAndConditionsController;
 
-  late final RequiredValidator invoiceNumberValidator;
-  late final RequiredValidator invoiceDateValidator;
-  late final RequiredValidator gstValidator;
-  late final RequiredValidator billingAddressValidator;
+  late final RequiredValidator _invoiceNumberValidator;
+  late final RequiredValidator _invoiceDateValidator;
+  late final RequiredValidator _gstValidator;
+  late final RequiredValidator _billingAddressValidator;
+  late final RequiredValidator _transportModeValidator;
+  late final RequiredValidator _vehicleNumberValidator;
+  late final RequiredValidator _taxPayableOnReverseChargeCoValidator;
 
   String _gstNumber = "";
   String _billingAddress = "";
@@ -52,7 +62,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
 
   List<Customer> _customerList = [];
   List<Challan> _challanList = [];
-
+  Organization organization = Organization();
 
   List<String> _errorMsgList = [];
   bool _hasErrors = false;
@@ -73,7 +83,8 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     _getAllLists();
 
     if (widget.invoice.id != 0) {
-      print("InvoiceCreate ChallanList Length: ${widget.invoice.challanList.length}");
+      print(
+          "InvoiceCreate ChallanList Length: ${widget.invoice.challanList.length}");
       _companyName = widget.invoice.customerName;
       _gstNumber = _customerList
           .where(
@@ -86,32 +97,51 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                   element.company_name == widget.invoice.customerName)
               .toList()[0]
               .creditPeriod));
-     _updateTotals();
+      _updateTotals();
     }
 
-    invoiceNumberController =
+    _invoiceNumberController =
         TextEditingController(text: widget.invoice.invoiceNo);
-    invoiceDateController = TextEditingController(
+    _invoiceDateController = TextEditingController(
         text: DateFormat("dd-MM-yyyy").format(widget.invoice.invoiceDate!));
-    gstNumberController = TextEditingController(text: _gstNumber);
-    dueDateController = TextEditingController(
+    _gstNumberController = TextEditingController(text: _gstNumber);
+    _dueDateController = TextEditingController(
         text:
             _dueDate == null ? "" : DateFormat("dd-MM-yyyy").format(_dueDate!));
-    billingAddressController =
+    _billingAddressController =
         TextEditingController(text: widget.invoice.customerAddress);
+    _transportModeController =
+        TextEditingController(text: widget.invoice.transportMode);
+    _vehicleNumberController =
+        TextEditingController(text: widget.invoice.vehicleNumber);
+    _taxPayableOnReverseChargeController = TextEditingController(
+        text: widget.invoice.id == 0
+            ? "Yes"
+            : widget.invoice.taxPayableOnReverseCharges);
+    _termsAndConditionsController = TextEditingController(
+        text: widget.invoice.id == 0
+            ? organization.termsAndConditions
+            : widget.invoice.termsAndConditions);
+
     _dateFromController = TextEditingController(
         text:
             "01-${DateFormat("MM").format(DateTime.now())}-${DateFormat("yyyy").format(DateTime.now())}");
     _dateToController = TextEditingController(
         text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
 
-    invoiceNumberValidator =
+    _invoiceNumberValidator =
         RequiredValidator(errorText: 'Invoice number is required');
-    invoiceDateValidator =
-        RequiredValidator(errorText: 'Invoice Date   is required');
-    gstValidator = RequiredValidator(errorText: 'GST number is required');
-    billingAddressValidator =
+    _invoiceDateValidator =
+        RequiredValidator(errorText: 'Invoice Date is required');
+    _gstValidator = RequiredValidator(errorText: 'GST number is required');
+    _billingAddressValidator =
         RequiredValidator(errorText: 'Billing number is required');
+    _transportModeValidator =
+        RequiredValidator(errorText: 'Transport Mode is required');
+    _vehicleNumberValidator =
+        RequiredValidator(errorText: 'Vehicle Number is required');
+    _taxPayableOnReverseChargeCoValidator =
+        RequiredValidator(errorText: 'Required');
 
     super.initState();
   }
@@ -143,262 +173,310 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
               width: containerWidth,
               child: AlertDialogNav(),
             ),
-            Container(
-              width: containerWidth * 0.95,
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+            Expanded(
+              child: SingleChildScrollView(
+                child: Container(
+                  width: containerWidth * 0.95,
+                  child: Column(
                     children: [
-                      Text(
-                        widget.invoice.id != 0 ? "Edit Invoice" : "New Invoice",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // const SizedBox(width: 50,),
-                      KDropdown(
-                        dropDownList: _customerList
-                            .map((item) => item.company_name.toString())
-                            .toList(),
-                        label: "Customer Name",
-                        width: 300,
-                        initialValue: widget.invoice.id == 0
-                            ? "-----"
-                            : widget.invoice.customerName,
-                        onChangeDropDown: _onCompanyChange,
-                        isShowSearchBox: false,
-                      ),
-                      Column(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          KTextField(
-                            label: "Invoice #",
-                            controller: invoiceNumberController,
-                            width: 200,
-                            validator: invoiceNumberValidator,
-                          ),
-                          KDateTextForm(
-                            label: "Invoice Date:",
-                            dateInputController: invoiceDateController,
-                          ),
-                          const SizedBox(
-                            height: 10,
+                          Text(
+                            widget.invoice.id != 0
+                                ? "Edit Invoice"
+                                : "New Invoice",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      KTextField(
-                        label: "Billing Address",
-                        controller: billingAddressController,
-                        width: 310,
-                        multiLine: 5,
-                        validator: billingAddressValidator,
-                      ),
-                      Column(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          KTextField(
-                            label: "GST #",
-                            controller: gstNumberController,
-                            width: 200,
-                            validator: gstValidator,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              KDropdown(
+                                dropDownList: _customerList
+                                    .map((item) => item.company_name.toString())
+                                    .toList(),
+                                label: "Customer Name",
+                                width: 300,
+                                initialValue: widget.invoice.id == 0
+                                    ? "-----"
+                                    : widget.invoice.customerName,
+                                onChangeDropDown: _onCompanyChange,
+                                isShowSearchBox: false,
+                                isMandatory: true,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              KTextField(
+                                label: "Billing Address ",
+                                controller: _billingAddressController,
+                                width: 310,
+                                multiLine: 5,
+                                validator: _billingAddressValidator,
+                                isMandatory: true,
+                              ),
+                            ],
                           ),
-                          KTextField(
-                            label: "Due Date",
-                            controller: dueDateController,
-                            width: 200,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              KTextField(
+                                label: "Invoice #",
+                                controller: _invoiceNumberController,
+                                width: 200,
+                                validator: _invoiceNumberValidator,
+                                isMandatory: true,
+                              ),
+                              KDateTextForm(
+                                label: "Invoice Date:",
+                                dateInputController: _invoiceDateController,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              KDateTextForm(
+                                label: "Due Date:",
+                                dateInputController: _dueDateController,
+                                lastDate:
+                                    DateTime.now().add(Duration(days: 365)),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              KTextField(
+                                label: "GST #",
+                                controller: _gstNumberController,
+                                width: 200,
+                                validator: _gstValidator,
+                                isMandatory: true,
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              KTextField(
+                                label: "Transport Mode",
+                                controller: _transportModeController,
+                                width: 200,
+                                validator: _transportModeValidator,
+                                isMandatory: true,
+                              ),
+                              KTextField(
+                                label: "Vehicle Number",
+                                controller: _vehicleNumberController,
+                                width: 200,
+                                validator: _vehicleNumberValidator,
+                                isMandatory: true,
+                              ),
+                              KTextField(
+                                label: "Tax payable on reverse charge",
+                                controller:
+                                    _taxPayableOnReverseChargeController,
+                                width: 240,
+                                validator:
+                                    _taxPayableOnReverseChargeCoValidator,
+                                isMandatory: true,
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  Container(
-                    // color: Colors.green,
-                    padding: EdgeInsets.only(right: 10),
-                    width: containerWidth * 0.95,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Container(
-                          // color: Colors.cyan,
-                          width: containerWidth * 0.95 / 2.2,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              KDateTextForm(
-                                label: "From:",
-                                dateInputController: _dateFromController,
-                                onDateChange: _dateSelected,
-                              ),
-                              SizedBox(
-                                width: 50,
-                              ),
-                              KDateTextForm(
-                                label: "To:",
-                                dateInputController: _dateToController,
-                                onDateChange: _dateSelected,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          width: containerWidth * 0.95 / 2.2,
-                          // color: Colors.red,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              const Text(
-                                "Amount",
-                                style: TextStyle(fontSize: 11),
-                              ),
-                              Text(
-                                "\u{20B9}${currencyFormat.format(widget.invoice.invoiceAmount)}",
-                                style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Challan",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  _getChallanList(_companyName),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  SizedBox(
-                    width: containerWidth * 0.95,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: containerWidth * 0.95 / 1.3,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Container(
-                                width: 80,
-                                child: ElevatedButton(
-                                  onPressed: _resetForm,
-                                  child: Text("Reset"),
-                                ),
-                              ),
-                              Container(
-                                width: 80,
-                                child: ElevatedButton(
-                                  onPressed: _submitForm,
-                                  child: Text("Submit"),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Row(
+                      Container(
+                        // color: Colors.green,
+                        padding: EdgeInsets.only(right: 10),
+                        width: containerWidth * 0.95,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: const [
-                                Text(
-                                  "Subtotal",
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  "Tax Total",
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  "Invoice Total",
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              width: 50,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                // DisplayInvoiceTotal(value: subtotal),
-
-                                // DisplayInvoiceTotal(totalType: "subtotal"),
-                                Text(
-                                  "\u{20B9}${currencyFormat.format(widget.invoice.totalBeforeTax)}",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                            Container(
+                              // color: Colors.cyan,
+                              width: containerWidth * 0.95 / 2.2,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  KDateTextForm(
+                                    label: "From:",
+                                    dateInputController: _dateFromController,
+                                    onDateChange: _dateSelected,
                                   ),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  "\u{20B9}${currencyFormat.format(widget.invoice.taxAmount)}",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                                  SizedBox(
+                                    width: 50,
                                   ),
-                                ),
-                                // DisplayInvoiceTotal(totalType: "taxTotal"),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  "\u{20B9}${currencyFormat.format(widget.invoice.invoiceAmount)}",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                                  KDateTextForm(
+                                    label: "To:",
+                                    dateInputController: _dateToController,
+                                    onDateChange: _dateSelected,
                                   ),
-                                ),
-                                // DisplayInvoiceTotal(totalType: "invoiceTotal"),
-                              ],
+                                ],
+                              ),
                             ),
-                            const SizedBox(
-                              width: 10,
+                            Text(
+                              "Challan",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20),
+                            ),
+                            Container(
+                              width: containerWidth * 0.95 / 2.2,
+                              // color: Colors.red,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  const Text(
+                                    "Amount",
+                                    style: TextStyle(fontSize: 11),
+                                  ),
+                                  Text(
+                                    "\u{20B9}${currencyFormat.format(widget.invoice.invoiceAmount)}",
+                                    style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Text(
+                          //   "Challan",
+                          //   style: TextStyle(
+                          //       fontWeight: FontWeight.bold, fontSize: 20),
+                          // )
+                        ],
+                      ),
+                      _getChallanList(_companyName),
+                      SizedBox(
+                        height: 140,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Column(
+                              children: [
+                                Expanded(
+                                  child: KTextField(
+                                    label: "Terms and Conditions",
+                                    controller: _termsAndConditionsController,
+                                    width: 310,
+                                    multiLine: 3,
+                                    validator: _billingAddressValidator,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Container(
+                                  width: 200,
+                                  child: ElevatedButton(
+                                    onPressed: _submitForm,
+                                    child: Text("Submit"),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: const [
+                                        Text(
+                                          "Subtotal",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          "Tax Total",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          "Invoice Total",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      width: 50,
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          "\u{20B9}${currencyFormat.format(widget.invoice.totalBeforeTax)}",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          "\u{20B9}${currencyFormat.format(widget.invoice.taxAmount)}",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        // DisplayInvoiceTotal(totalType: "taxTotal"),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          "\u{20B9}${currencyFormat.format(widget.invoice.invoiceAmount)}",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        // DisplayInvoiceTotal(totalType: "invoiceTotal"),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ],
@@ -410,6 +488,8 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   void _getAllLists() {
     _customerList =
         Provider.of<CustomerProvider>(context, listen: false).customerList;
+    organization = Provider.of<OrgProvider>(context, listen: false).getOrg;
+    print("Organization Terms: ${organization.termsAndConditions}");
   }
 
   void _onCompanyChange(String companyName) {
@@ -424,9 +504,9 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
       _dueDate = (widget.invoice.invoiceDate!
           .add(Duration(days: _customerData.creditPeriod)));
 
-      billingAddressController.text = _billingAddress;
-      gstNumberController.text = _gstNumber;
-      dueDateController.text = DateFormat("d-M-y").format(_dueDate!);
+      _billingAddressController.text = _billingAddress;
+      _gstNumberController.text = _gstNumber;
+      _dueDateController.text = DateFormat("d-M-y").format(_dueDate!);
 
       subtotal = 0;
       taxTotal = 0;
@@ -473,7 +553,16 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     List<Challan> challanList;
 
     return _companyName == ""
-        ? Text("Please Select Company")
+        ? Container(
+            height: 185,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text("Please Select Company"),
+              ],
+            ),
+          )
         : Consumer<ChallanProvider>(builder: (ctx, provider, child) {
             return FutureBuilder(
               future: widget.invoice.id == 0
@@ -510,9 +599,10 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
 
                     _isCheckedList.clear();
                     challanList.forEach((challan) {
-                      print("Disco Khisco Challan List Length: ${widget.invoice.challanList.length}");
-                      print("DIsco ${challan.id}: ${widget.invoice.challanList.any((invoiceChallan) =>
-                      challan.id == invoiceChallan.id)}");
+                      print(
+                          "Disco Khisco Challan List Length: ${widget.invoice.challanList.length}");
+                      print(
+                          "DIsco ${challan.id}: ${widget.invoice.challanList.any((invoiceChallan) => challan.id == invoiceChallan.id)}");
                       if (widget.invoice.challanList.any((invoiceChallan) =>
                           challan.id == invoiceChallan.id)) {
                         _isCheckedList.add(true);
@@ -535,18 +625,19 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
 
   Widget _displayChallans(
       List<Challan> challanList, BuildContext context, List<bool> isCheckList) {
-
-    return challanList.isEmpty? Text("Challans Dont Exist for the selected period.") : ChallanCheckboxHorizontalDataTable(
-      leftHandSideColumnWidth: 0,
-      rightHandSideColumnWidth: containerWidth * 0.65,
-      challanList: challanList,
-      isCheckedList: _isCheckedList,
-      checkboxChanged: checkboxChanged,
-    );
+    return challanList.isEmpty
+        ? Text("Challans Dont Exist for the selected period.")
+        : ChallanCheckboxHorizontalDataTable(
+            leftHandSideColumnWidth: 0,
+            rightHandSideColumnWidth: containerWidth * 0.65,
+            challanList: challanList,
+            isCheckedList: _isCheckedList,
+            checkboxChanged: checkboxChanged,
+          );
   }
 
   void checkboxChanged(bool isChecked, Challan challan) {
-    challan.invoiceNo = invoiceNumberController.text;
+    challan.invoiceNo = _invoiceNumberController.text;
     setState(() {
       isChecked
           ? widget.invoice.addChallan(challan)
@@ -555,23 +646,23 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     _updateTotals();
   }
 
-  void _updateTotals(){
+  void _updateTotals() {
     subtotal = widget.invoice.totalBeforeTax;
     taxTotal = widget.invoice.taxAmount;
     invoiceTotal = widget.invoice.invoiceAmount;
   }
 
-  void _dateSelected(){
+  void _dateSelected() {
     _onCompanyChange(_companyName);
   }
 
   void _resetForm() {
-    invoiceNumberController.text = "";
-    invoiceDateController.text =
+    _invoiceNumberController.text = "";
+    _invoiceDateController.text =
         DateFormat("dd-MM-yyyy").format(widget.invoice.invoiceDate!);
-    billingAddressController.text = "";
-    gstNumberController.text = "";
-    dueDateController.text = "";
+    _billingAddressController.text = "";
+    _gstNumberController.text = "";
+    _dueDateController.text = "";
     _onCompanyChange("");
   }
 
@@ -585,17 +676,25 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     if (_hasErrors) _popupAlert(_errorMsgList);
 
     if (_formKey.currentState!.validate() && !_hasErrors) {
-      widget.invoice.invoiceNo = invoiceNumberController.text;
+      widget.invoice.invoiceNo = _invoiceNumberController.text;
       widget.invoice.invoiceDate =
-          DateFormat("dd-MM-yyyy").parse(invoiceDateController.text);
+          DateFormat("dd-MM-yyyy").parse(_invoiceDateController.text);
+      widget.invoice.dueDate =
+          DateFormat("dd-MM-yyyy").parse(_dueDateController.text);
       widget.invoice.customerName = _companyName;
-      widget.invoice.customerAddress = billingAddressController.text;
+      widget.invoice.customerAddress = _billingAddressController.text;
+      widget.invoice.gst = _gstNumberController.text;
+      widget.invoice.transportMode = _transportModeController.text;
+      widget.invoice.vehicleNumber = _vehicleNumberController.text;
+      widget.invoice.taxPayableOnReverseCharges = _taxPayableOnReverseChargeController.text;
+      widget.invoice.termsAndConditions = _termsAndConditionsController.text;
+
       await Provider.of<InvoiceProvider>(context, listen: false)
           .saveInvoice(widget.invoice);
       await Provider.of<ChallanProvider>(context, listen: false)
           .updateInvoiceNumberInChallan(
               widget.invoice.challanList, widget.invoice.invoiceNo);
-      print("Invoice Date: ${invoiceDateController.text}");
+      print("Invoice Date: ${_invoiceDateController.text}");
       Navigator.of(context).pop();
     }
   }
@@ -603,12 +702,12 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   Future<void> _checkInvoiceNumberError() async {
     bool _isInvoiceNo = false;
     _isInvoiceNo = await Provider.of<InvoiceProvider>(context, listen: false)
-        .checkInvoiceNumber(invoiceNumberController.text);
+        .checkInvoiceNumber(_invoiceNumberController.text);
     if (widget.invoice.id == 0) {
       _hasErrors = _isInvoiceNo;
       _errorMsgList.add("The Invoice Number Exists");
     } else {
-      if (invoiceNumberController.text != widget.invoice.invoiceNo) {
+      if (_invoiceNumberController.text != widget.invoice.invoiceNo) {
         _hasErrors = _isInvoiceNo;
         _errorMsgList.add("The Invoice Number Cannot be changed");
         print("Error in _checkInvoiceNumberError: $_hasErrors");
@@ -616,9 +715,9 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     }
   }
 
-  void _checkLineItemError(){
+  void _checkLineItemError() {
     bool isChecked = _isCheckedList.any((element) => element == true);
-    if(!isChecked){
+    if (!isChecked) {
       _hasErrors = true;
       _errorMsgList.add("Select atleast one Challan");
     }
@@ -637,11 +736,11 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
 
   @override
   void dispose() {
-    invoiceNumberController.dispose();
-    invoiceDateController.dispose();
-    billingAddressController.dispose();
-    gstNumberController.dispose();
-    dueDateController.dispose();
+    _invoiceNumberController.dispose();
+    _invoiceDateController.dispose();
+    _billingAddressController.dispose();
+    _gstNumberController.dispose();
+    _dueDateController.dispose();
     super.dispose();
   }
 }

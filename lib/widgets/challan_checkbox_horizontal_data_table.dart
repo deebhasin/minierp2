@@ -139,7 +139,7 @@ class _ChallanCheckboxHorizontalDataTableState
       ),
       _getTitleItemWidget(
         'Amount Before Tax\n(\u{20B9})',
-        150,
+        170,
         alignment: Alignment.centerRight,
       ),
       _getTitleItemWidget(
@@ -209,7 +209,7 @@ class _ChallanCheckboxHorizontalDataTableState
         ),
         _columnItem(
           currencyFormat.format(widget.challanList[index].total),
-          150,
+          170,
           index,
           alignment: Alignment.centerRight,
         ),

@@ -1,9 +1,13 @@
+import 'package:erpapp/model/organization.dart';
+import 'package:erpapp/providers/customer_provider.dart';
+import 'package:erpapp/providers/org_provider.dart';
 import 'package:erpapp/widgets/pdf_create.dart';
 import 'package:flutter/material.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../model/customer.dart';
 import '../model/invoice.dart';
 import '../providers/invoice_provider.dart';
 import '../kwidgets/k_confirmation_popup.dart';
@@ -43,10 +47,15 @@ class _InvoiceHorizontalDataTableState
   PDFCreate pdfCreate = PDFCreate();
 
   List<bool> _isCheckedList = [];
+  late Organization org;
+  late List<Customer> customerList;
 
   @override
   void initState() {
     WidgetsBinding.instance!.addPostFrameCallback((_) => _sortStatus());
+    org = Provider.of<OrgProvider>(context, listen: false).getOrg;
+    customerList =
+        Provider.of<CustomerProvider>(context, listen: false).customerList;
     super.initState();
   }
 
@@ -201,8 +210,6 @@ class _InvoiceHorizontalDataTableState
   }
 
   Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
-    print(
-        "Disco Challan LIst Length of Invoice ${widget.invoiceList[3].totalBeforeTax}: ${widget.invoiceList[3].challanList.length}");
     return Row(
       children: [
         _columnItem(
@@ -251,7 +258,12 @@ class _InvoiceHorizontalDataTableState
           width: 50,
           child: InkWell(
             onTap: () async {
-              await pdfCreate.createPdf(widget.invoiceList[index]);
+              await pdfCreate.createPdf(
+                  widget.invoiceList[index],
+                  org,
+                  customerList.firstWhere((element) =>
+                      element.company_name ==
+                      widget.invoiceList[index].customerName));
             },
             child: Icon(
               Icons.picture_as_pdf,

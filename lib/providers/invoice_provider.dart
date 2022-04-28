@@ -2,7 +2,6 @@ import 'package:erpapp/model/invoice.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../model/challan.dart';
 import '../utils/localDB_repo.dart';
 import '../providers/challan_provider.dart';
 

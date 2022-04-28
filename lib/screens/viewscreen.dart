@@ -16,9 +16,12 @@ import '../providers/customer_provider.dart';
 import '../providers/product_provider.dart';
 
 import '../widgets/sidebar.dart';
+import 'organization_create.dart';
 
 class ViewScreen extends StatefulWidget {
-  const ViewScreen({Key? key}) : super(key: key);
+  const ViewScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<ViewScreen> createState() => _ViewScreenState();
@@ -33,25 +36,11 @@ class _ViewScreenState extends State<ViewScreen> {
   Widget build(BuildContext context) {
     Provider.of<CustomerProvider>(context, listen: false).cacheCustomer();
     Provider.of<ProductProvider>(context, listen: false).cacheProductList();
+    Provider.of<OrgProvider>(context, listen: false).cacheOrg();
 
-    return Consumer<OrgProvider>(builder: (ctx, provider, child) {
-      return FutureBuilder(
-        future: provider.getOrganization(),
-        builder: (context, AsyncSnapshot<Organization> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(body: const CircularProgressIndicator());
-          } else {
-            if (snapshot.hasError) {
-              return Center(child: Text("An error occured"));
-            } else if (snapshot.hasData) {
-              _org = snapshot.data!;
-              return body();
-            } else
-              return Container();
-          }
-        },
-      );
-    });
+    _org = Provider.of<OrgProvider>(context, listen: false).getOrg;
+
+    return _org.id == 0? OrganizationCreate(org: _org, reFresh: _refreshPage,) : body();
   }
 
   Widget body() {
@@ -164,6 +153,12 @@ class _ViewScreenState extends State<ViewScreen> {
         ),
       ],
     );
+  }
+
+  void _refreshPage(){
+    setState(() {
+      print("Refreshing View Screen");
+    });
   }
 
   _setDesktopFullScreen() {

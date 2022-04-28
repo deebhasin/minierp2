@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../model/organization.dart';
 import '/screens/loadscreen.dart';
 import '/screens/viewscreen.dart';
 
@@ -9,9 +10,12 @@ import '../utils/localDB_repo.dart';
 
 class HomePage extends StatelessWidget {
   late OrgProvider _OrgProvider;
+  Organization organization = Organization();
+
   Future<void> initApp() async {
     bool newDb = await LocalDBRepo().init(forceRebuild: false);
-    if (newDb) await _OrgProvider.insertOrganization();
+    // if (newDb) await _OrgProvider.insertOrganization();
+    // organization = await _OrgProvider.getOrganization();
   }
 
   HomePage({Key? key}) : super(key: key);
@@ -19,6 +23,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _OrgProvider = Provider.of<OrgProvider>(context, listen: false);
+    // _getOrg();
     return Scaffold(
       // appBar: AppBar(),
       body: FutureBuilder<void>(
@@ -26,12 +31,16 @@ class HomePage extends StatelessWidget {
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             // if(snapshot.hasData){
-            return const ViewScreen();
+            return ViewScreen();
             // }
           }
           return LoadScreen();
         },
       ),
     );
+  }
+
+  void _getOrg() async {
+    await _OrgProvider.getOrganization();
   }
 }

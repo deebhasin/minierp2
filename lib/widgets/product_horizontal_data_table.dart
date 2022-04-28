@@ -38,7 +38,7 @@ class _ProductHorizontalDataTableState
   Widget build(BuildContext context) {
     return Container(
       color: Colors.green,
-      width: MediaQuery.of(context).size.width * 0.6,
+      width: MediaQuery.of(context).size.width * 0.62,
       child: HorizontalDataTable(
         leftHandSideColumnWidth: widget.leftHandSideColumnWidth,
         rightHandSideColumnWidth: widget.rightHandSideColumnWidth,

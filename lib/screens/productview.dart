@@ -21,7 +21,7 @@ class _ProductsViewState extends State<ProductsView> {
   late List<Product> productList;
   late double containerWidth;
 
-  final currencyFormat = NumberFormat("#,##0.00", "en_US");
+  final currencyFormat = NumberFormat("#,##0", "en_US");
 
   @override
   void initState() {
@@ -118,7 +118,7 @@ class _ProductsViewState extends State<ProductsView> {
         // const Divider(),
         ProductHorizontalDataTable(
             leftHandSideColumnWidth: 0,
-            rightHandSideColumnWidth: containerWidth * 1.025,
+            rightHandSideColumnWidth: containerWidth * 0.75,
             productList: productList)
       ],
     );
