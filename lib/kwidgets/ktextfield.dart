@@ -82,7 +82,7 @@ class KTextField extends StatelessWidget {
               controller: controller,
               validator: validator ?? DefaultFieldValidator(),
               style: const TextStyle(fontSize: 15),
-              textAlignVertical: TextAlignVertical.bottom,
+              textAlignVertical: TextAlignVertical.center,
               decoration: InputDecoration(
                 border: UnderlineInputBorder(),
                 isDense: true,

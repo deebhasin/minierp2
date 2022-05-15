@@ -33,6 +33,10 @@ class OrgProvider with ChangeNotifier {
     return org;
   }
 
+  Future<void> saveOrganization(Organization organization) async{
+    organization.id ==0? await createOrganization(organization) : await editOganization(organization);
+  }
+
   Future<int> createOrganization(Organization organization) async {
     int id = 0;
     print("In Organization Provider Create Organization Start");
@@ -45,6 +49,19 @@ class OrgProvider with ChangeNotifier {
       handleException("Error while Creating Organization $e", e, s);
     }
     return id;
+  }
+
+  Future<void> editOganization(Organization organization) async {
+    int id = 0;
+    print("In Organization Provider Edit Organization Start");
+    try {
+      id = await LocalDBRepo().db.update("ORGANIZATION", organization.toMap(), where: "id = ?", whereArgs: [organization.id]);
+      print("Editing Organization with Id: $id in Organization Provider}");
+      await cacheOrg();
+      notifyListeners();
+    } on Exception catch (e, s) {
+      handleException("Error while Editing Organization $e", e, s);
+    }
   }
 
   void handleException(String message, Exception exception, StackTrace st) {

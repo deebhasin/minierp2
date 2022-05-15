@@ -1,6 +1,6 @@
-class ChallanProduct{
+class InvoiceProduct {
   int id;
-  int challanId;
+  int invoiceId;
   String productName;
   String hsnCode;
   double gstPercent;
@@ -9,9 +9,9 @@ class ChallanProduct{
   double quantity;
   bool isActive;
 
-  ChallanProduct({
+  InvoiceProduct({
     this.id = 0,
-    this.challanId = 0,
+    this.invoiceId = 0,
     this.productName = "",
     this.hsnCode = "",
     this.gstPercent = 0,
@@ -19,22 +19,22 @@ class ChallanProduct{
     this.productUnit = "",
     this.quantity = 0,
     this.isActive = true,
-});
+  });
 
-  ChallanProduct.fromMap(Map<String, dynamic> res)
-  : id = res["id"],
-  challanId = res["challan_id"],
-  productName = res["product_name"],
-  hsnCode = res["hsn"],
-  gstPercent = res["gst_percent"],
-  pricePerUnit = res["price_per_unit"],
-  productUnit = res["product_unit"],
-  quantity = res["quantity"],
-  isActive = res["active"] == 1? true : false;
+  InvoiceProduct.fromMap(Map<String, dynamic> res)
+      : id = res["id"],
+        invoiceId = res["invoice_id"],
+        productName = res["product_name"],
+        hsnCode = res["hsn"],
+        gstPercent = res["gst_percent"],
+        pricePerUnit = res["price_per_unit"],
+        productUnit = res["product_unit"],
+        quantity = res["quantity"],
+        isActive = res["active"] == 1 ? true : false;
 
   Map<String, Object?> toMap() {
     return {
-      'challan_id': challanId,
+      'invoice_id': invoiceId,
       'product_name': productName,
       'hsn': hsnCode,
       'gst_percent': gstPercent,
@@ -44,31 +44,28 @@ class ChallanProduct{
       "product_total": totalBeforeTax,
       "product_tax": taxAmount,
       "product_amount": totalAmount,
-      'active': isActive == true? 1 : 0,
+      'active': isActive == true ? 1 : 0,
     };
   }
 
-
-  double get totalBeforeTax{
-
+  double get totalBeforeTax {
     return pricePerUnit == 0 || quantity == 0 ? 0 : pricePerUnit * quantity;
   }
 
-  double get taxAmount{
-    return  totalBeforeTax * gstPercent/100;
+  double get taxAmount {
+    return totalBeforeTax * gstPercent / 100;
   }
 
-  double get totalAmount{
+  double get totalAmount {
     return totalBeforeTax + taxAmount;
   }
 
   @override
   bool operator ==(Object other) =>
-      other is ChallanProduct &&
-          other.runtimeType == runtimeType &&
-          other.productName == productName;
+      other is InvoiceProduct &&
+      other.runtimeType == runtimeType &&
+      other.productName == productName;
 
   @override
   int get hashCode => productName.hashCode;
-
 }

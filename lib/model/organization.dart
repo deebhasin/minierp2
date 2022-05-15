@@ -7,6 +7,7 @@ class Organization {
   int pin;
   String city;
   String state;
+  String stateCode;
   String phone;
   String mobile;
   String gst;
@@ -30,6 +31,7 @@ class Organization {
     this.pin = 0,
     this.city = "",
     this.state = "",
+    this.stateCode = "",
     this.phone = "",
     this.mobile = "",
     this.gst = "",
@@ -52,6 +54,7 @@ class Organization {
         pin = res["pin"],
         city = res["city"],
         state = res["state"],
+        stateCode = res["state_code"],
         phone = res["phone"],
         mobile = res["mobile"],
         gst = res["gst"],
@@ -74,6 +77,7 @@ class Organization {
       "pin": pin,
       "city": city,
       "state": state,
+      "state_code": stateCode,
       "phone": phone,
       "mobile": mobile,
       "gst": gst,

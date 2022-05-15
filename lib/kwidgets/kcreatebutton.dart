@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 
 class KCreateButton extends StatelessWidget {
-  final Color buttonColor = Colors.blue;
+  Color buttonColor = Colors.blue;
   final callFunction;
-  const KCreateButton({Key? key, required this.callFunction}) : super(key: key);
+  late String label;
+  KCreateButton({
+    Key? key,
+    required this.callFunction,
+    this.label = "Create",
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if (label == "Edit") buttonColor = Colors.green;
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -28,11 +34,12 @@ class KCreateButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Icon(
-                Icons.add,
+                label == "Edit"? Icons.edit : Icons.add,
                 color: buttonColor,
+                size: 20,
               ),
               Text(
-                "Create",
+                label,
                 style: TextStyle(
                   color: buttonColor,
                   fontWeight: FontWeight.bold,

@@ -28,6 +28,7 @@ class _CustomerCreateState extends State<CustomerCreate> {
   late final customerIdController;
   late final companyController;
   late final contactPersonController;
+  late final shortCompanyNameController;
   late final contactPhoneController;
   late final addressController;
   late final pinController;
@@ -41,6 +42,8 @@ class _CustomerCreateState extends State<CustomerCreate> {
     MinLengthValidator(4,
         errorText: 'Company Name must be at least 4 digits long'),
   ]);
+  final shortCompanyNameValidator =
+      MaxLengthValidator(10, errorText: "Required Less than 10 charcters");
   final pinValidator =
       PatternValidator(r'\d+?$', errorText: "PIN should be number");
   final gstValidator =
@@ -58,6 +61,7 @@ class _CustomerCreateState extends State<CustomerCreate> {
     super.initState();
     customerIdController = TextEditingController();
     companyController = TextEditingController();
+    shortCompanyNameController = TextEditingController();
     contactPersonController = TextEditingController();
     contactPhoneController = TextEditingController();
     addressController = TextEditingController();
@@ -73,6 +77,10 @@ class _CustomerCreateState extends State<CustomerCreate> {
   _initializeForm() {
     customerIdController.text = widget.customer.id.toString();
     companyController.text = widget.customer.company_name;
+    shortCompanyNameController.text =
+        widget.customer.company_name == widget.customer.shortCompanyName
+            ? ""
+            : widget.customer.shortCompanyName;
     contactPersonController.text = widget.customer.contact_person;
     contactPhoneController.text = widget.customer.contact_phone;
     addressController.text = widget.customer.address;
@@ -172,6 +180,11 @@ class _CustomerCreateState extends State<CustomerCreate> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               DTextField(
+                                label: "Short Company Name",
+                                controller: shortCompanyNameController,
+                                validator: shortCompanyNameValidator,
+                              ),
+                              DTextField(
                                 label: "Contact Person",
                                 controller: contactPersonController,
                               ),
@@ -225,6 +238,9 @@ class _CustomerCreateState extends State<CustomerCreate> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       widget.customer.company_name = companyController.text;
+      widget.customer.shortCompanyName = shortCompanyNameController.text != ""
+          ? shortCompanyNameController.text
+          : companyController.text;
       widget.customer.contact_person = contactPersonController.text;
       widget.customer.contact_phone = contactPhoneController.text;
       widget.customer.address = addressController.text;

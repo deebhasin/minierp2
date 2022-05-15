@@ -151,10 +151,11 @@ class ChallanProvider with ChangeNotifier {
       handleException("Error while fetching Challan List $e", e, s);
       challanList = [];
     }
-    challanList.forEach((challan) async {
+
+    for(Challan challan in challanList){
       challan.challanProductList =
-          await getChallanProductListByChallanId(challan.id);
-    });
+      await  getChallanProductListByChallanId(challan.id);
+    }
     return challanList;
   }
 

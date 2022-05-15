@@ -1,6 +1,4 @@
 import 'package:erpapp/providers/org_provider.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
@@ -62,7 +60,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
 
   List<Customer> _customerList = [];
   List<Challan> _challanList = [];
-  Organization organization = Organization();
+  Organization _organization = Organization();
 
   List<String> _errorMsgList = [];
   bool _hasErrors = false;
@@ -74,23 +72,28 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   double challanAmount = 0;
   List<bool> _isCheckedList = [];
 
+  Customer _customerData = Customer(company_name: "");
   double subtotal = 0;
   double taxTotal = 0;
+  double sgst = 0;
+  double cgst = 0;
+  double igst = 0;
   double invoiceTotal = 0;
 
   @override
   void initState() {
     _getAllLists();
 
+
     if (widget.invoice.id != 0) {
       print(
           "InvoiceCreate ChallanList Length: ${widget.invoice.challanList.length}");
       _companyName = widget.invoice.customerName;
-      _gstNumber = _customerList
+      _customerData = _customerList
           .where(
               (element) => element.company_name == widget.invoice.customerName)
-          .toList()[0]
-          .gst;
+          .toList()[0];
+      _gstNumber = _customerData.gst;
       _dueDate = widget.invoice.invoiceDate!.add(Duration(
           days: _customerList
               .where((element) =>
@@ -120,7 +123,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
             : widget.invoice.taxPayableOnReverseCharges);
     _termsAndConditionsController = TextEditingController(
         text: widget.invoice.id == 0
-            ? organization.termsAndConditions
+            ? _organization.termsAndConditions
             : widget.invoice.termsAndConditions);
 
     _dateFromController = TextEditingController(
@@ -301,19 +304,19 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  KDateTextForm(
-                                    label: "From:",
-                                    dateInputController: _dateFromController,
-                                    onDateChange: _dateSelected,
-                                  ),
-                                  SizedBox(
-                                    width: 50,
-                                  ),
-                                  KDateTextForm(
-                                    label: "To:",
-                                    dateInputController: _dateToController,
-                                    onDateChange: _dateSelected,
-                                  ),
+                                  // KDateTextForm(
+                                  //   label: "From:",
+                                  //   dateInputController: _dateFromController,
+                                  //   onDateChange: _dateSelected,
+                                  // ),
+                                  // SizedBox(
+                                  //   width: 50,
+                                  // ),
+                                  // KDateTextForm(
+                                  //   label: "To:",
+                                  //   dateInputController: _dateToController,
+                                  //   onDateChange: _dateSelected,
+                                  // ),
                                 ],
                               ),
                             ),
@@ -407,7 +410,25 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                           height: 10,
                                         ),
                                         Text(
-                                          "Tax Total",
+                                          "CGST",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          "SGST",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          "IGST",
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold),
@@ -441,11 +462,28 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                           height: 10,
                                         ),
                                         Text(
-                                          "\u{20B9}${currencyFormat.format(widget.invoice.taxAmount)}",
+                                          _customerData.stateCode == _organization.stateCode? "\u{20B9}${currencyFormat.format(cgst)}" : "-",
                                           style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          _customerData.stateCode == _organization.stateCode? "\u{20B9}${currencyFormat.format(sgst)}" : "-",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          _customerData.stateCode == _organization.stateCode? "-" : "\u{20B9}${currencyFormat.format(igst)}",
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold),
                                         ),
                                         // DisplayInvoiceTotal(totalType: "taxTotal"),
                                         const SizedBox(
@@ -488,15 +526,15 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   void _getAllLists() {
     _customerList =
         Provider.of<CustomerProvider>(context, listen: false).customerList;
-    organization = Provider.of<OrgProvider>(context, listen: false).getOrg;
-    print("Organization Terms: ${organization.termsAndConditions}");
+    _organization = Provider.of<OrgProvider>(context, listen: false).getOrg;
+    print("Organization Terms: ${_organization.termsAndConditions}");
   }
 
   void _onCompanyChange(String companyName) {
     setState(() {
       _companyName = companyName;
       print("-ONcompanyChange Company NAme: $companyName");
-      Customer _customerData = _customerList
+      _customerData = _customerList
           .where((element) => element.company_name == companyName)
           .toList()[0];
       _billingAddress = _customerData.address;
@@ -510,6 +548,9 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
 
       subtotal = 0;
       taxTotal = 0;
+      cgst = 0;
+      sgst = 0;
+      igst = 0;
       invoiceTotal = 0;
       print("Company NMae on CHange: $_companyName");
     });
@@ -570,19 +611,19 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                       customerName: _companyName,
                       active: 1,
                       invoiceNo: "Not Assigned",
-                      fromDate: DateFormat("dd-MM-yyyy")
-                          .parse(_dateFromController.text),
-                      toDate: DateFormat("dd-MM-yyyy")
-                          .parse(_dateToController.text),
+                      // fromDate: DateFormat("dd-MM-yyyy")
+                      //     .parse(_dateFromController.text),
+                      // toDate: DateFormat("dd-MM-yyyy")
+                      //     .parse(_dateToController.text),
                     )
                   : provider.getChallanListByParameters(
                       customerName: _companyName,
                       active: 1,
                       invoiceNo: widget.invoice.invoiceNo + "*or",
-                      fromDate: DateFormat("dd-MM-yyyy")
-                          .parse(_dateFromController.text),
-                      toDate: DateFormat("dd-MM-yyyy")
-                          .parse(_dateToController.text),
+                      // fromDate: DateFormat("dd-MM-yyyy")
+                      //     .parse(_dateFromController.text),
+                      // toDate: DateFormat("dd-MM-yyyy")
+                      //     .parse(_dateToController.text),
                     ),
               builder: (context, AsyncSnapshot<List<Challan>> snapshot) {
                 print("Inside fetchGST Function");
@@ -600,9 +641,9 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                     _isCheckedList.clear();
                     challanList.forEach((challan) {
                       print(
-                          "Disco Khisco Challan List Length: ${widget.invoice.challanList.length}");
+                          "Challan List Length: ${widget.invoice.challanList.length}");
                       print(
-                          "DIsco ${challan.id}: ${widget.invoice.challanList.any((invoiceChallan) => challan.id == invoiceChallan.id)}");
+                          "${challan.id}: ${widget.invoice.challanList.any((invoiceChallan) => challan.id == invoiceChallan.id)}");
                       if (widget.invoice.challanList.any((invoiceChallan) =>
                           challan.id == invoiceChallan.id)) {
                         _isCheckedList.add(true);
@@ -649,6 +690,16 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   void _updateTotals() {
     subtotal = widget.invoice.totalBeforeTax;
     taxTotal = widget.invoice.taxAmount;
+    if(_customerData.stateCode == _organization.stateCode){
+      cgst = taxTotal / 2;
+      sgst = taxTotal /2;
+      igst = 0;
+    }
+    else{
+      cgst = 0;
+      sgst = 0;
+      igst = taxTotal;
+    }
     invoiceTotal = widget.invoice.invoiceAmount;
   }
 
@@ -686,14 +737,12 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
       widget.invoice.gst = _gstNumberController.text;
       widget.invoice.transportMode = _transportModeController.text;
       widget.invoice.vehicleNumber = _vehicleNumberController.text;
-      widget.invoice.taxPayableOnReverseCharges = _taxPayableOnReverseChargeController.text;
+      widget.invoice.taxPayableOnReverseCharges =
+          _taxPayableOnReverseChargeController.text;
       widget.invoice.termsAndConditions = _termsAndConditionsController.text;
 
       await Provider.of<InvoiceProvider>(context, listen: false)
           .saveInvoice(widget.invoice);
-      await Provider.of<ChallanProvider>(context, listen: false)
-          .updateInvoiceNumberInChallan(
-              widget.invoice.challanList, widget.invoice.invoiceNo);
       print("Invoice Date: ${_invoiceDateController.text}");
       Navigator.of(context).pop();
     }

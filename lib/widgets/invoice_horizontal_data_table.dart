@@ -257,14 +257,7 @@ class _InvoiceHorizontalDataTableState
         Container(
           width: 50,
           child: InkWell(
-            onTap: () async {
-              await pdfCreate.createPdf(
-                  widget.invoiceList[index],
-                  org,
-                  customerList.firstWhere((element) =>
-                      element.company_name ==
-                      widget.invoiceList[index].customerName));
-            },
+            onTap: () => createPDF(widget.invoiceList[index]),
             child: Icon(
               Icons.picture_as_pdf,
               size: 16,
@@ -290,16 +283,16 @@ class _InvoiceHorizontalDataTableState
                       });
                 },
                 child: Icon(
-                  widget.invoiceList[index].invoiceNo == ""
+                  widget.invoiceList[index].pdfFileLocation != ""
                       ? Icons.remove_red_eye_outlined
                       : Icons.edit,
                   size: 16,
-                  color: widget.invoiceList[index].invoiceNo == ""
+                  color: widget.invoiceList[index].pdfFileLocation != ""
                       ? Colors.blue
                       : Colors.green,
                 ),
               ),
-              widget.invoiceList[index].invoiceNo == ""
+              widget.invoiceList[index].pdfFileLocation != ""
                   ? Icon(
                       Icons.no_cell_outlined,
                       size: 16,
@@ -426,6 +419,23 @@ class _InvoiceHorizontalDataTableState
     return InvoiceCreate(
       invoice: invoice,
     );
+  }
+
+  void createPDF(Invoice invoice) async {
+    await pdfCreate.createPdf(
+      invoice,
+      await Provider.of<InvoiceProvider>(context, listen: false)
+          .getInvoiceProductList(invoice.id),
+      org,
+      customerList.firstWhere(
+          (element) => element.company_name == invoice.customerName),
+      onPdfCreate,
+    );
+  }
+
+  void onPdfCreate(Invoice invoice) async {
+    await Provider.of<InvoiceProvider>(context, listen: false)
+        .updateInvoice(invoice);
   }
 
   @override

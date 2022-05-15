@@ -1,9 +1,11 @@
+import 'package:erpapp/providers/invoice_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../kwidgets/k_popup_alert.dart';
+import '../model/invoice.dart';
 import '../providers/challan_provider.dart';
 import '../providers/customer_provider.dart';
 import '../providers/product_provider.dart';
@@ -21,6 +23,7 @@ import '../kwidgets/KDateTextForm.dart';
 import '../kwidgets/ksubmitresetbuttons.dart';
 import '../kwidgets/ktextfield.dart';
 import '../kwidgets/kvalidator.dart';
+import 'invoicecreate.dart';
 
 class ChallanCreate extends StatefulWidget {
   Challan challan;
@@ -177,12 +180,15 @@ class _ChallanCreateState extends State<ChallanCreate> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (_isInvoice)
-                      KTextField(
-                        label: "Invoice #",
-                        width: 150,
-                        controller: challanInvoiceNoController,
-                        isDisabled: _isInvoice,
-                        valueUpdated: (String) {},
+                      InkWell(
+                        onTap: () => invoiceCreate(context),
+                        child: KTextField(
+                          label: "Invoice #",
+                          width: 150,
+                          controller: challanInvoiceNoController,
+                          isDisabled: _isInvoice,
+                          valueUpdated: (String) {},
+                        ),
                       ),
                     KTextField(
                       label: "Challan # ",
@@ -559,6 +565,18 @@ class _ChallanCreateState extends State<ChallanCreate> {
         builder: (BuildContext context) {
           return KPopupAlert(
             errorMsgList: _errorMsgList,
+          );
+        });
+  }
+
+  invoiceCreate(BuildContext context) async{
+    Invoice invoice = await Provider.of<InvoiceProvider>(context, listen: false).getInvoiceByInvoiceNo(widget.challan.invoiceNo);
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return InvoiceCreate(
+            invoice: invoice,
           );
         });
   }

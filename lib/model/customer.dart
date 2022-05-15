@@ -1,6 +1,7 @@
 class Customer{
   int id;
   String company_name;
+  String shortCompanyName;
   String contact_person;
   String contact_phone;
   String address;
@@ -14,6 +15,7 @@ class Customer{
   Customer({
     this.id = 0,
     required this.company_name,
+    this.shortCompanyName = "",
     this.contact_person = "",
     this.contact_phone = "",
     this.address = "",
@@ -35,6 +37,7 @@ class Customer{
       : id = res["id"],
         company_name = res["company_name"],
         contact_person = res["contact_person"],
+        shortCompanyName = res["short_company_name"],
         contact_phone = res["contact_phone"],
         address = res["address"],
         pin = res["PIN"],
@@ -51,6 +54,7 @@ class Customer{
         // 'id':id,
         'company_name': company_name,
         'contact_person': contact_person,
+        'short_company_name': shortCompanyName,
         'contact_phone': contact_phone,
         'address': address,
         'PIN': pin,

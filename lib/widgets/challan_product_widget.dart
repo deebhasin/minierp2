@@ -207,6 +207,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
           .toList()[0];
       widget.challanProduct.productName = product.name;
       widget.challanProduct.productUnit = product.unit;
+      widget.challanProduct.hsnCode = product.HSN;
       pricePerUnitController.text = currencyFormat.format(product.pricePerUnit);
       unitController.text = product.unit;
       productGstPercentController.text = product.GST;

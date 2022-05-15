@@ -9,10 +9,12 @@ import 'package:provider/provider.dart';
 class OrganizationCreate extends StatefulWidget {
   final Organization org;
   final Function reFresh;
+  final isDisabled;
   OrganizationCreate({
     Key? key,
     required this.org,
     required this.reFresh,
+    this.isDisabled = false,
   }) : super(key: key);
 
   @override
@@ -21,7 +23,6 @@ class OrganizationCreate extends StatefulWidget {
 
 class _OrganizationCreateState extends State<OrganizationCreate> {
   final _formKey = GlobalKey<FormState>();
-
   late double width;
   late double height;
 
@@ -36,6 +37,7 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
   late TextEditingController _addressController;
   late TextEditingController _cityController;
   late TextEditingController _stateController;
+  late TextEditingController _stateCodeController;
   late TextEditingController _pinController;
 
   late TextEditingController _bankAccountNameController;
@@ -64,6 +66,7 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
     _addressController = TextEditingController(text: widget.org.address);
     _cityController = TextEditingController(text: widget.org.city);
     _stateController = TextEditingController(text: widget.org.state);
+    _stateCodeController = TextEditingController(text: widget.org.stateCode);
     _pinController = TextEditingController(
         text: widget.org.pin == 0 ? "" : widget.org.pin.toString());
 
@@ -101,6 +104,7 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
     _addressController.dispose();
     _cityController.dispose();
     _stateController.dispose();
+    _stateCodeController.dispose();
     _pinController.dispose();
 
     _bankAccountNameController.dispose();
@@ -119,191 +123,228 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
-    height = MediaQuery.of(context).size.height;
+    height = widget.isDisabled? MediaQuery.of(context).size.height -200 : MediaQuery.of(context).size.height;
+    height = (widget.org.id != 0 && !widget.isDisabled)? MediaQuery.of(context).size.height -200 : height;
     _setDesktopFullScreen();
     return Form(
       key: _formKey,
       child: Container(
         width: width,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Text(
-                "Create Organization",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
+        height: height,
+        child: Column(
+          children: [
+            Text(
+              widget.org.id == 0 ? "Create Organization" : "View Organization",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+            const SizedBox(
+              height: 50,
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            KTextField(
+                              label: "Company Name",
+                              controller: _nameController,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "Tag Line",
+                              controller: _tagLineController,
+                              width: 400,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "Contact Person",
+                              controller: _contactPersonController,
+                              width: 250,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "GST #",
+                              controller: _gstController,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "PAN",
+                              controller: _panController,
+                              width: 250,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "Phone",
+                              controller: _phoneController,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "Mobile",
+                              controller: _mobileController,
+                              width: 250,
+                              isDisabled: widget.isDisabled,
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            KTextField(
+                              label: "Address",
+                              controller: _addressController,
+                              multiLine: 5,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "City",
+                              controller: _cityController,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "State",
+                              controller: _stateController,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "State Code",
+                              controller: _stateCodeController,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "Pin",
+                              controller: _pinController,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _pinValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            KTextField(
+                              label: "Bank Accout Name",
+                              controller: _bankAccountNameController,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "Bank Account No.",
+                              controller: _bankAccountNoController,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "Bank Name",
+                              controller: _bankNameController,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "IFSC Code",
+                              controller: _bankIfscCodeController,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "Branch",
+                              controller: _bankBranchController,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                            KTextField(
+                              label: "Logo",
+                              controller: _logoController,
+                              width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
+                              isDisabled: widget.isDisabled,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        KTextField(
+                          label: "Terms And Conditions",
+                          controller: _termsAndConditionsController,
+                          multiLine: 5,
+                          width: 500,
+                          isMandatory: true,
+                          validator: _requiredValidator,
+                          isDisabled: widget.isDisabled,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          width: 200,
+                          child: widget.isDisabled
+                              ? Container()
+                              : ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.green,
+                                  ),
+                                  child: Text("Submit"),
+                                  onPressed: _submitForm,
+                                ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(
-                height: 50,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      KTextField(
-                        label: "Company Name",
-                        controller: _nameController,
-                        width: 250,
-                        isMandatory: true,
-                        validator: _requiredValidator,
-                      ), KTextField(
-                        label: "Tag Line",
-                        controller: _tagLineController,
-                        width: 400,
-                      ),
-                      KTextField(
-                        label: "Contact Person",
-                        controller: _contactPersonController,
-                        width: 250,
-                      ),
-                      KTextField(
-                        label: "GST #",
-                        controller: _gstController,
-                        width: 250,
-                        isMandatory: true,
-                        validator: _requiredValidator,
-                      ),
-                      KTextField(
-                        label: "PAN",
-                        controller: _panController,
-                        width: 250,
-                      ),
-                      KTextField(
-                        label: "Phone",
-                        controller: _phoneController,
-                        width: 250,
-                        isMandatory: true,
-                        validator: _requiredValidator,
-                      ),
-                      KTextField(
-                        label: "Mobile",
-                        controller: _mobileController,
-                        width: 250,
-                      ),
-                    ],
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      KTextField(
-                        label: "Address",
-                        controller: _addressController,
-                        multiLine: 5,
-                        width: 250,
-                        isMandatory: true,
-                        validator: _requiredValidator,
-                      ),
-                      KTextField(
-                        label: "City",
-                        controller: _cityController,
-                        width: 250,
-                        isMandatory: true,
-                        validator: _requiredValidator,
-                      ),
-                      KTextField(
-                        label: "State",
-                        controller: _stateController,
-                        width: 250,
-                        isMandatory: true,
-                        validator: _requiredValidator,
-                      ),
-                      KTextField(
-                        label: "Pin",
-                        controller: _pinController,
-                        width: 250,
-                        isMandatory: true,
-                        validator: _pinValidator,
-                      ),
-                    ],
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      KTextField(
-                        label: "Bank Accout Name",
-                        controller: _bankAccountNameController,
-                        width: 250,
-                        isMandatory: true,
-                        validator: _requiredValidator,
-                      ),
-                      KTextField(
-                        label: "Bank Account No.",
-                        controller: _bankAccountNoController,
-                        width: 250,
-                        isMandatory: true,
-                        validator: _requiredValidator,
-                      ),
-                      KTextField(
-                        label: "Bank Name",
-                        controller: _bankNameController,
-                        width: 250,
-                        isMandatory: true,
-                        validator: _requiredValidator,
-                      ),
-                      KTextField(
-                        label: "IFSC Code",
-                        controller: _bankIfscCodeController,
-                        width: 250,
-                        isMandatory: true,
-                        validator: _requiredValidator,
-                      ),
-                      KTextField(
-                        label: "Branch",
-                        controller: _bankBranchController,
-                        width: 250,
-                        isMandatory: true,
-                        validator: _requiredValidator,
-                      ),
-                      KTextField(
-                        label: "Logo",
-                        controller: _logoController,
-                        width: 250,
-                        isMandatory: true,
-                        validator: _requiredValidator,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  KTextField(
-                    label: "Terms And Conditions",
-                    controller: _termsAndConditionsController,
-                    multiLine: 5,
-                    width: 500,
-                    isMandatory: true,
-                    validator: _requiredValidator,
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    width: 200,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.green,
-                      ),
-                      child: Text("Submit"),
-                      onPressed: _submitForm,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -322,6 +363,7 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
       widget.org.address = _addressController.text;
       widget.org.city = _cityController.text;
       widget.org.state = _stateController.text;
+      widget.org.stateCode = _stateCodeController.text;
       widget.org.pin =
           _pinController.text == "" ? 0 : int.parse(_pinController.text);
 
@@ -335,8 +377,9 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
       widget.org.termsAndConditions = _termsAndConditionsController.text;
 
       await Provider.of<OrgProvider>(context, listen: false)
-          .createOrganization(widget.org);
+          .saveOrganization(widget.org);
       widget.reFresh();
+      if(widget.org.id != "" && !widget.isDisabled) Navigator.of(context).pop();
     }
   }
 

@@ -30,12 +30,12 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.0.2
-  overlay_support: ^1.2.1
+  overlay_support: ^2.0.0
   logging: ^1.0.2
   desktop_window: ^0.4.0
   intl: ^0.17.0
   charts_flutter: ^0.12.0
-  dropdown_search: ^2.0.1
+  dropdown_search: ^3.0.1
   form_field_validator: ^1.1.0
 
   path: ^1.8.0
@@ -44,6 +44,7 @@ dependencies:
   horizontal_data_table: ^3.6.1+1
   after_layout: ^1.1.0
   pdf: ^3.7.4
+  file_picker: ^4.5.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

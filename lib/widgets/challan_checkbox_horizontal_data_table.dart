@@ -99,7 +99,7 @@ class _ChallanCheckboxHorizontalDataTableState
         },
         htdRefreshController: _hdtRefreshController,
       ),
-      height: 185,
+      height: (35 * (widget.challanList.length - 1)) + 101,
     );
   }
 

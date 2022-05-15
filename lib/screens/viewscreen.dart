@@ -1,4 +1,5 @@
 import 'package:desktop_window/desktop_window.dart';
+import 'package:erpapp/screens/organization_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,8 +13,6 @@ import '../model/organization.dart';
 import '../providers/org_provider.dart';
 import '../screens/productview.dart';
 import '../screens/invoiceview.dart';
-import '../providers/customer_provider.dart';
-import '../providers/product_provider.dart';
 
 import '../widgets/sidebar.dart';
 import 'organization_create.dart';
@@ -32,15 +31,26 @@ class _ViewScreenState extends State<ViewScreen> {
   late Organization _org;
   String displayPage = "Dashboard";
   static const int _sidebarWidth = 200;
+
+  @override
+  void initState() {
+    _getOrg();
+    super.initState();
+  }
+
+  void _getOrg() async{
+    _org = Provider.of<OrgProvider>(context, listen: false).getOrg;
+    setState(() {
+
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    Provider.of<CustomerProvider>(context, listen: false).cacheCustomer();
-    Provider.of<ProductProvider>(context, listen: false).cacheProductList();
-    Provider.of<OrgProvider>(context, listen: false).cacheOrg();
-
-    _org = Provider.of<OrgProvider>(context, listen: false).getOrg;
-
-    return _org.id == 0? OrganizationCreate(org: _org, reFresh: _refreshPage,) : body();
+      return  _org.id == 0? OrganizationCreate(org: _org, reFresh: _refreshPage,) : body();
+    // return OrganizationCreate(org: _org, reFresh: _refreshPage,);
+    // return body();
   }
 
   Widget body() {
@@ -92,6 +102,15 @@ class _ViewScreenState extends State<ViewScreen> {
             );
           }
           break;
+
+        case "Organization":
+          {
+            displayWidget = OrganizationView(
+              width: (MediaQuery.of(context).size.width - _sidebarWidth),
+            );
+          }
+          break;
+
         default:
           displayWidget = Center(
             child: Text(

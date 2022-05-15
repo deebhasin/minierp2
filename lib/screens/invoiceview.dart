@@ -102,7 +102,9 @@ class _InvoiceViewState extends State<InvoiceView> {
             textBaseline: TextBaseline.alphabetic,
           ),
         ),
-        const SizedBox(height: 10,),
+        const SizedBox(
+          height: 10,
+        ),
         InvoiceHorizontalDataTable(
           leftHandSideColumnWidth: 0,
           rightHandSideColumnWidth: containerWidth * 1.01,

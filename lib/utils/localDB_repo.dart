@@ -66,10 +66,11 @@ class LocalDBRepo {
     await db.delete("CUSTOMER_PRODUCT");
     await db.delete("ESTIMATE");
     await db.delete("INVOICE");
+    await db.delete("INVOICE_PRODUCT");
     await db.delete("PAYMENT");
     await db.delete("PRODUCT");
     await db.delete("CHALLAN");
-    await db.delete("CHALLAN_PRODUCTS");
+    await db.delete("CHALLAN_PRODUCT");
   }
 
   Future<String> _getDBDirectoryPath() async {
@@ -265,6 +266,7 @@ class LocalDBRepo {
         "pin INTEGER,"
         "city TEXT,"
         "state TEXT,"
+        "state_code TEXT,"
         "phone TEXT,"
         "mobile TEXT,"
         "gst TEXT,"
@@ -281,6 +283,7 @@ class LocalDBRepo {
     await db.execute("CREATE TABLE CUSTOMER ("
         "id INTEGER PRIMARY KEY AUTOINCREMENT,"
         "company_name TEXT,"
+        "short_company_name TEXT,"
         "contact_person TEXT,"
         "contact_phone TEXT,"
         "address TEXT,"
@@ -309,6 +312,21 @@ class LocalDBRepo {
         "vehicle_number TEXT,"
         "tax_payable_on_reverse_charges TEXT,"
         "terms_and_conditions TEXT,"
+        "active TINYINT(1)"
+        ")");
+
+    await db.execute("CREATE TABLE INVOICE_PRODUCT("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "invoice_id INT,"
+        "product_name TEXT,"
+        "hsn TEXT,"
+        "gst_percent REAL,"
+        "price_per_unit REAL,"
+        "product_unit TEXT,"
+        "quantity REAL,"
+        "product_total REAL,"
+        "product_tax REAL,"
+        "product_amount REAL,"
         "active TINYINT(1)"
         ")");
 

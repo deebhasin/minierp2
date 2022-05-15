@@ -47,9 +47,11 @@ class Challan {
 
   double get total {
     double val = 0;
+    print("dee challan product list Length: ${challanProductList.length}");
     challanProductList.forEach((challanProduct) {
       val += challanProduct.totalBeforeTax;
     });
+    print("deee challan Total Before Tax Value = $val");
     return val;
   }
 
