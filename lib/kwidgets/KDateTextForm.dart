@@ -6,6 +6,7 @@ class KDateTextForm extends StatelessWidget {
   final TextEditingController dateInputController;
   final Function? onDateChange;
   DateTime? lastDate;
+  final isDisabled;
 
   KDateTextForm({
     Key? key,
@@ -13,6 +14,7 @@ class KDateTextForm extends StatelessWidget {
     required this.dateInputController,
     this.onDateChange,
     this.lastDate,
+    this.isDisabled = false,
   }) : super(key: key);
 
   @override
@@ -29,7 +31,7 @@ class KDateTextForm extends StatelessWidget {
           icon: Icon(Icons.calendar_today), //icon of text field
           labelText: label, //label text of field
         ),
-        onTap: () => selectDate(context, onDateChange?? (){}),
+        onTap: isDisabled? (){} : () => selectDate(context, onDateChange?? (){}),
       ),
     );
   }

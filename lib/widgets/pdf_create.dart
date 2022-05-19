@@ -1,8 +1,8 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:erpapp/model/invoice_product.dart';
 import 'package:erpapp/model/organization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -32,9 +32,9 @@ class PDFCreate {
     String address2 = "";
     print("PDF Created");
 
-    final Uint8List fontData =
-        File('asset/fonts/OpenSans-Regular.ttf').readAsBytesSync();
-    final ttf = pw.Font.ttf(fontData.buffer.asByteData());
+    // final Uint8List fontData =
+    //     File('asset/fonts/OpenSans-Regular.ttf').readAsBytesSync();
+    // final ttf = pw.Font.ttf(fontData.buffer.asByteData());
 
     pdf.addPage(
       pw.Page(
@@ -1123,16 +1123,21 @@ class PDFCreate {
         ),
       ),
     );
+    String pdfMsg = "";
+    if(invoice.pdfFileLocation == "") {
+      Directory documentsDirectory = await getApplicationDocumentsDirectory();
+      String filePath = join(documentsDirectory.path, "invoices/",
+          "${invoice.invoiceNo}-${customer.shortCompanyName}-${DateFormat('dd-MM-yyyy').format(invoice.invoiceDate!)}.pdf");
+      final file = await File(filePath).create(recursive: true);
 
-    // final file = File('example.pdf');
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String filePath = join(documentsDirectory.path, "invoices/",
-        "${invoice.invoiceNo}-${customer.shortCompanyName}-${DateFormat('dd-MM-yyyy').format(invoice.invoiceDate!)}.pdf");
-    final file = await File(filePath).create(recursive: true);
-
-    invoice.pdfFileLocation = filePath;
-    await file.writeAsBytes(await pdf.save());
-    onPdfCreate(invoice);
+      invoice.pdfFileLocation = filePath;
+      await file.writeAsBytes(await pdf.save());
+    }
+    else{
+      pdfMsg = "PDF File Exists";
+    }
+    print("PDF Message: $pdfMsg");
+    onPdfCreate(invoice, pdfMsg);
   }
 
   List<pw.Widget> _getInvoiceProductList(

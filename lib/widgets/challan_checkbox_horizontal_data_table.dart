@@ -14,6 +14,7 @@ class ChallanCheckboxHorizontalDataTable extends StatefulWidget {
   final double rightHandSideColumnWidth;
   final List<bool> isCheckedList;
   final Function checkboxChanged;
+  final bool isPdf;
   ChallanCheckboxHorizontalDataTable({
     Key? key,
     required this.leftHandSideColumnWidth,
@@ -21,6 +22,7 @@ class ChallanCheckboxHorizontalDataTable extends StatefulWidget {
     required this.challanList,
     required this.isCheckedList,
     required this.checkboxChanged,
+    this.isPdf = false,
   }) : super(key: key);
 
   @override
@@ -106,7 +108,7 @@ class _ChallanCheckboxHorizontalDataTableState
   List<Widget> _getTitleWidget() {
     return [
       Row(),
-      _getTitleItemWidget(
+      if(!widget.isPdf) _getTitleItemWidget(
         'Select',
         80,
       ),
@@ -188,7 +190,7 @@ class _ChallanCheckboxHorizontalDataTableState
   Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
     return Row(
       children: [
-        Container(
+        if(!widget.isPdf) Container(
           width: 80,
           child: Checkbox(
               value: widget.isCheckedList[index],

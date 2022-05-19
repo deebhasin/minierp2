@@ -7,6 +7,7 @@ import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../kwidgets/k_popup_alert.dart';
 import '../model/customer.dart';
 import '../model/invoice.dart';
 import '../providers/invoice_provider.dart';
@@ -31,6 +32,7 @@ class InvoiceHorizontalDataTable extends StatefulWidget {
 
 class _InvoiceHorizontalDataTableState
     extends State<InvoiceHorizontalDataTable> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   HDTRefreshController _hdtRefreshController = HDTRefreshController();
 
   // final currencyFormat = NumberFormat("#,##0.00", "en_US");
@@ -62,6 +64,7 @@ class _InvoiceHorizontalDataTableState
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: _scaffoldKey,
       color: Colors.green,
       width: MediaQuery.of(context).size.width * 0.835,
       child: HorizontalDataTable(
@@ -433,9 +436,32 @@ class _InvoiceHorizontalDataTableState
     );
   }
 
-  void onPdfCreate(Invoice invoice) async {
-    await Provider.of<InvoiceProvider>(context, listen: false)
-        .updateInvoice(invoice);
+  void onPdfCreate(Invoice invoice, String pdfFileName) async {
+    List<String> _errorMsgList = [];
+
+    if(pdfFileName != ""){
+      _errorMsgList.add("Pdf File already Exists");
+      _errorMsgList.add("${invoice.pdfFileLocation}");
+      _popupAlert(_errorMsgList);
+    }
+    else {
+      _errorMsgList.add("Pdf Created");
+      _errorMsgList.add("${invoice.pdfFileLocation}");
+      _popupAlert(_errorMsgList);
+      await Provider.of<InvoiceProvider>(context, listen: false)
+          .updateInvoice(invoice);
+    }
+  }
+
+  void _popupAlert(List<String> _errorMsgList) {
+    showDialog(
+        context: _scaffoldKey.currentContext!,
+        barrierDismissible: false,
+        builder: (BuildContext ctx) {
+          return KPopupAlert(
+            errorMsgList: _errorMsgList,
+          );
+        });
   }
 
   @override

@@ -536,16 +536,19 @@ class _ChallanCreateState extends State<ChallanCreate> {
     _isChallanNo = false;
     _isChallanNo = await Provider.of<ChallanProvider>(context, listen: false)
         .checkChallanNumber(challanNumberController.text);
-    // setState(() {
+
     if (widget.challan.id == 0) {
       _hasErrors = _isChallanNo;
+      _challanNumberErrorMessage = _hasErrors ? "Challan Number exists" : "";
+      _errorMsgList.add(_challanNumberErrorMessage);
     } else {
       if (challanNumberController.text != widget.challan.challanNo) {
-        _hasErrors = _isChallanNo;
-        _challanNumberErrorMessage = _hasErrors ? "Challan Number exists" : "";
-        print("Error in Edit: $_hasErrors");
+        _hasErrors = true;
+        _challanNumberErrorMessage = _hasErrors ? "Challan Number has been Changed" : "";
+        _errorMsgList.add(_challanNumberErrorMessage);
       }
     }
+    print("Error in Edit: $_challanNumberErrorMessage");
   }
 
   void _checkLineItemError() {

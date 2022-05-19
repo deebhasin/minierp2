@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:desktop_window/desktop_window.dart';
 import 'package:erpapp/kwidgets/ktextfield.dart';
 import 'package:erpapp/model/organization.dart';
 import 'package:erpapp/providers/org_provider.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:provider/provider.dart';
@@ -294,14 +297,21 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
                               validator: _requiredValidator,
                               isDisabled: widget.isDisabled,
                             ),
-                            KTextField(
-                              label: "Logo",
-                              controller: _logoController,
+                            widget.isDisabled? Container() : Container(
                               width: 250,
-                              isMandatory: true,
-                              validator: _requiredValidator,
-                              isDisabled: widget.isDisabled,
+                              child: ElevatedButton(
+                                onPressed: _logoUpload,
+                                child: Text("Upload Logo"),
+                              ),
                             ),
+                            // KTextField(
+                            //   label: "Logo",
+                            //   controller: _logoController,
+                            //   width: 250,
+                            //   isMandatory: true,
+                            //   validator: _requiredValidator,
+                            //   isDisabled: widget.isDisabled,
+                            // ),
                           ],
                         ),
                       ],
@@ -380,6 +390,17 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
           .saveOrganization(widget.org);
       widget.reFresh();
       if(widget.org.id != "" && !widget.isDisabled) Navigator.of(context).pop();
+    }
+  }
+
+  void _logoUpload() async{
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      File file = File(result.files.single.path!);
+      print("${file.toString()}");
+    } else {
+      // User canceled the picker
     }
   }
 

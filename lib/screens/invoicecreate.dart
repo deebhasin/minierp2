@@ -64,6 +64,9 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
 
   List<String> _errorMsgList = [];
   bool _hasErrors = false;
+  late bool _isInvoiceNo;
+  String _invoiceNumberErrorMessage = "";
+  bool _isPdf = false;
 
   String _companyName = "";
 
@@ -84,7 +87,6 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   void initState() {
     _getAllLists();
 
-
     if (widget.invoice.id != 0) {
       print(
           "InvoiceCreate ChallanList Length: ${widget.invoice.challanList.length}");
@@ -101,6 +103,10 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
               .toList()[0]
               .creditPeriod));
       _updateTotals();
+    }
+
+    if (widget.invoice.pdfFileLocation != "") {
+      _isPdf = true;
     }
 
     _invoiceNumberController =
@@ -186,9 +192,11 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            widget.invoice.id != 0
-                                ? "Edit Invoice"
-                                : "New Invoice",
+                            widget.invoice.id == 0
+                                ? "New Invoice"
+                                : _isPdf
+                                    ? "View Invoice"
+                                    : "Edit Invoice",
                             style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
@@ -201,19 +209,30 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              KDropdown(
-                                dropDownList: _customerList
-                                    .map((item) => item.company_name.toString())
-                                    .toList(),
-                                label: "Customer Name",
-                                width: 300,
-                                initialValue: widget.invoice.id == 0
-                                    ? "-----"
-                                    : widget.invoice.customerName,
-                                onChangeDropDown: _onCompanyChange,
-                                isShowSearchBox: false,
-                                isMandatory: true,
-                              ),
+                              _isPdf
+                                  ? KTextField(
+                                      label: "Customer Name",
+                                      controller: TextEditingController(
+                                          text: widget.invoice.customerName),
+                                      width: 300,
+                                      validator: _billingAddressValidator,
+                                      isMandatory: true,
+                                      isDisabled: _isPdf,
+                                    )
+                                  : KDropdown(
+                                      dropDownList: _customerList
+                                          .map((item) =>
+                                              item.company_name.toString())
+                                          .toList(),
+                                      label: "Customer Name",
+                                      width: 300,
+                                      initialValue: widget.invoice.id == 0
+                                          ? "-----"
+                                          : widget.invoice.customerName,
+                                      onChangeDropDown: _onCompanyChange,
+                                      isShowSearchBox: false,
+                                      isMandatory: true,
+                                    ),
                               const SizedBox(
                                 height: 10,
                               ),
@@ -224,6 +243,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                 multiLine: 5,
                                 validator: _billingAddressValidator,
                                 isMandatory: true,
+                                isDisabled: _isPdf,
                               ),
                             ],
                           ),
@@ -236,10 +256,12 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                 width: 200,
                                 validator: _invoiceNumberValidator,
                                 isMandatory: true,
+                                isDisabled: _isPdf,
                               ),
                               KDateTextForm(
                                 label: "Invoice Date:",
                                 dateInputController: _invoiceDateController,
+                                isDisabled: _isPdf,
                               ),
                               const SizedBox(
                                 height: 10,
@@ -249,6 +271,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                 dateInputController: _dueDateController,
                                 lastDate:
                                     DateTime.now().add(Duration(days: 365)),
+                                isDisabled: _isPdf,
                               ),
                               const SizedBox(
                                 height: 10,
@@ -259,6 +282,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                 width: 200,
                                 validator: _gstValidator,
                                 isMandatory: true,
+                                isDisabled: _isPdf,
                               ),
                             ],
                           ),
@@ -270,6 +294,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                 width: 200,
                                 validator: _transportModeValidator,
                                 isMandatory: true,
+                                isDisabled: _isPdf,
                               ),
                               KTextField(
                                 label: "Vehicle Number",
@@ -277,6 +302,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                 width: 200,
                                 validator: _vehicleNumberValidator,
                                 isMandatory: true,
+                                isDisabled: _isPdf,
                               ),
                               KTextField(
                                 label: "Tax payable on reverse charge",
@@ -286,6 +312,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                 validator:
                                     _taxPayableOnReverseChargeCoValidator,
                                 isMandatory: true,
+                                isDisabled: _isPdf,
                               ),
                             ],
                           ),
@@ -462,7 +489,10 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                           height: 10,
                                         ),
                                         Text(
-                                          _customerData.stateCode == _organization.stateCode? "\u{20B9}${currencyFormat.format(cgst)}" : "-",
+                                          _customerData.stateCode ==
+                                                  _organization.stateCode
+                                              ? "\u{20B9}${currencyFormat.format(cgst)}"
+                                              : "-",
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold),
@@ -471,7 +501,10 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                           height: 10,
                                         ),
                                         Text(
-                                          _customerData.stateCode == _organization.stateCode? "\u{20B9}${currencyFormat.format(sgst)}" : "-",
+                                          _customerData.stateCode ==
+                                                  _organization.stateCode
+                                              ? "\u{20B9}${currencyFormat.format(sgst)}"
+                                              : "-",
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold),
@@ -480,7 +513,10 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                                           height: 10,
                                         ),
                                         Text(
-                                          _customerData.stateCode == _organization.stateCode? "-" : "\u{20B9}${currencyFormat.format(igst)}",
+                                          _customerData.stateCode ==
+                                                  _organization.stateCode
+                                              ? "-"
+                                              : "\u{20B9}${currencyFormat.format(igst)}",
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold),
@@ -639,6 +675,11 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                     challanList = snapshot.data!;
 
                     _isCheckedList.clear();
+
+                    if(_isPdf){
+                      challanList = challanList.where((challan) => challan.invoiceNo != "").toList();
+                    }
+
                     challanList.forEach((challan) {
                       print(
                           "Challan List Length: ${widget.invoice.challanList.length}");
@@ -674,6 +715,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
             challanList: challanList,
             isCheckedList: _isCheckedList,
             checkboxChanged: checkboxChanged,
+            isPdf: _isPdf,
           );
   }
 
@@ -690,12 +732,11 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   void _updateTotals() {
     subtotal = widget.invoice.totalBeforeTax;
     taxTotal = widget.invoice.taxAmount;
-    if(_customerData.stateCode == _organization.stateCode){
+    if (_customerData.stateCode == _organization.stateCode) {
       cgst = taxTotal / 2;
-      sgst = taxTotal /2;
+      sgst = taxTotal / 2;
       igst = 0;
-    }
-    else{
+    } else {
       cgst = 0;
       sgst = 0;
       igst = taxTotal;
@@ -721,7 +762,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     print("Submit Form");
     _hasErrors = false;
     _errorMsgList.clear();
-    _checkInvoiceNumberError();
+    if (_invoiceNumberController.text != "") await _checkInvoiceNumberError();
     _checkLineItemError();
 
     if (_hasErrors) _popupAlert(_errorMsgList);
@@ -749,19 +790,21 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   }
 
   Future<void> _checkInvoiceNumberError() async {
-    bool _isInvoiceNo = false;
+    _isInvoiceNo = false;
     _isInvoiceNo = await Provider.of<InvoiceProvider>(context, listen: false)
         .checkInvoiceNumber(_invoiceNumberController.text);
     if (widget.invoice.id == 0) {
-      _hasErrors = _isInvoiceNo;
-      _errorMsgList.add("The Invoice Number Exists");
+      _hasErrors = true;
+      _invoiceNumberErrorMessage = "Invoice Number exists";
+      _errorMsgList.add(_invoiceNumberErrorMessage);
     } else {
       if (_invoiceNumberController.text != widget.invoice.invoiceNo) {
-        _hasErrors = _isInvoiceNo;
-        _errorMsgList.add("The Invoice Number Cannot be changed");
-        print("Error in _checkInvoiceNumberError: $_hasErrors");
+        _hasErrors = true;
+        _invoiceNumberErrorMessage = "Invoice Number has Changed";
+        _errorMsgList.add(_invoiceNumberErrorMessage);
       }
     }
+    print("Invoice Number Error Message: $_invoiceNumberErrorMessage.");
   }
 
   void _checkLineItemError() {
