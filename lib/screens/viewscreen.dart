@@ -27,7 +27,6 @@ class ViewScreen extends StatefulWidget {
 }
 
 class _ViewScreenState extends State<ViewScreen> {
-  late OrgProvider _orgProvider;
   late Organization _org;
   String displayPage = "Dashboard";
   static const int _sidebarWidth = 200;
@@ -36,6 +35,13 @@ class _ViewScreenState extends State<ViewScreen> {
   void initState() {
     _getOrg();
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    _getOrg();
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
   }
 
   void _getOrg() async{
@@ -54,8 +60,10 @@ class _ViewScreenState extends State<ViewScreen> {
   }
 
   Widget body() {
+    _getOrg();
     String _companyName = _org.name;
     String _companyLogo = _org.logo;
+    print("View Screen REfresh: ${_companyLogo}");
     _setDesktopFullScreen();
 
     Widget dynamicPage() {
@@ -107,6 +115,7 @@ class _ViewScreenState extends State<ViewScreen> {
           {
             displayWidget = OrganizationView(
               width: (MediaQuery.of(context).size.width - _sidebarWidth),
+              reFresh: _refreshPage,
             );
           }
           break;

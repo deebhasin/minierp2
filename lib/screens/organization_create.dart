@@ -7,6 +7,8 @@ import 'package:erpapp/providers/org_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class OrganizationCreate extends StatefulWidget {
@@ -126,8 +128,12 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
-    height = widget.isDisabled? MediaQuery.of(context).size.height -200 : MediaQuery.of(context).size.height;
-    height = (widget.org.id != 0 && !widget.isDisabled)? MediaQuery.of(context).size.height -200 : height;
+    height = widget.isDisabled
+        ? MediaQuery.of(context).size.height - 200
+        : MediaQuery.of(context).size.height;
+    height = (widget.org.id != 0 && !widget.isDisabled)
+        ? MediaQuery.of(context).size.height - 200
+        : height;
     _setDesktopFullScreen();
     return Form(
       key: _formKey,
@@ -297,11 +303,23 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
                               validator: _requiredValidator,
                               isDisabled: widget.isDisabled,
                             ),
-                            widget.isDisabled? Container() : Container(
+                            Container(
                               width: 250,
-                              child: ElevatedButton(
-                                onPressed: _logoUpload,
-                                child: Text("Upload Logo"),
+                              child: Column(
+                                children: [
+                                  KTextField(
+                                    label: "Logo",
+                                    controller: _logoController,
+                                    width: 250,
+                                    isDisabled: widget.isDisabled,
+                                  ),
+                                  widget.isDisabled
+                                      ? Container()
+                                      : ElevatedButton(
+                                          onPressed: _logoUpload,
+                                          child: Text("Upload Logo"),
+                                        ),
+                                ],
                               ),
                             ),
                             // KTextField(
@@ -389,16 +407,26 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
       await Provider.of<OrgProvider>(context, listen: false)
           .saveOrganization(widget.org);
       widget.reFresh();
-      if(widget.org.id != "" && !widget.isDisabled) Navigator.of(context).pop();
+      if (widget.org.id != "" && !widget.isDisabled)
+        Navigator.of(context).pop();
     }
   }
 
-  void _logoUpload() async{
+  void _logoUpload() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
     if (result != null) {
       File file = File(result.files.single.path!);
-      print("${file.toString()}");
+
+      List<String> fileStr = file.path.split("\\");
+
+      Directory documentsDirectory = await getApplicationDocumentsDirectory();
+      String filePath = path.join(documentsDirectory.path, "Org\\",
+          fileStr[fileStr.length - 1]);
+      _logoController.text = filePath;
+      await file.copySync(filePath);
+
+      print("${filePath}");
     } else {
       // User canceled the picker
     }

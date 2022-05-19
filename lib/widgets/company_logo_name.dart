@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class CompanyLogoName extends StatelessWidget {
@@ -20,10 +22,11 @@ class CompanyLogoName extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(30, 8, 8, 8),
-            child: Image.asset(
-              companyLogo,
-              height: double.infinity,
-            ),
+            child: Image.file(File(companyLogo)),
+            // child: Image.(
+            //   companyLogo,
+            //   height: double.infinity,
+            // ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
