@@ -1,3 +1,4 @@
+import 'package:erpapp/model/report_open_challan.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -152,9 +153,9 @@ class ChallanProvider with ChangeNotifier {
       challanList = [];
     }
 
-    for(Challan challan in challanList){
+    for (Challan challan in challanList) {
       challan.challanProductList =
-      await  getChallanProductListByChallanId(challan.id);
+          await getChallanProductListByChallanId(challan.id);
     }
     return challanList;
   }
@@ -253,6 +254,26 @@ class ChallanProvider with ChangeNotifier {
 
   void challanSave(Challan challan) {
     challan.id == 0 ? _createChallan(challan) : _updateChallan(challan);
+  }
+
+  Future<List<ReportOpenChallan>> getOpenChallanReportChallanList() async {
+    List<ReportOpenChallan> reportOpenChallanList = [];
+    print("In Challan Provider getOpenChallanReportChallanList Start");
+
+    try {
+      final List<
+          Map<String,
+              Object?>> queryResult = await LocalDBRepo().db.rawQuery(
+          "select customer_name, count(id) challan_count, sum(total) sum_total, sum(tax_amount) sum_tax_amount, sum(challan_amount) sum_challan_amount from CHALLAN  where invoice_number = '' group by customer_name;");
+      reportOpenChallanList =
+          queryResult.map((e) => ReportOpenChallan.fromMap(e)).toList();
+      print(
+          "getOpenChallanReportChallanList Length: ${reportOpenChallanList.length}");
+    } on Exception catch (e, s) {
+      handleException(
+          "Error while fetching getOpenChallanReportChallanList $e", e, s);
+    }
+    return reportOpenChallanList;
   }
 
   Future<int> _createChallan(Challan challan) async {

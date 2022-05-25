@@ -74,8 +74,9 @@ class LocalDBRepo {
   }
 
   Future<String> _getDBDirectoryPath() async {
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    Directory documentsDirectory = await getApplicationSupportDirectory();
     return join(documentsDirectory.path, "minierp.db");
+    // return "asset/db/minierp.db";
   }
 
 // 	Future<int> insertParam(String key, String value) async {

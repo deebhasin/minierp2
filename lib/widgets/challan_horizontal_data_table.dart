@@ -99,7 +99,7 @@ class _ChallanHorizontalDataTableState
         },
         htdRefreshController: _hdtRefreshController,
       ),
-      height: MediaQuery.of(context).size.height - 200,
+      height: MediaQuery.of(context).size.height - 250,
     );
   }
 

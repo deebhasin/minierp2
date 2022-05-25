@@ -1,7 +1,11 @@
+import 'package:erpapp/kwidgets/kdropdown.dart';
 import 'package:erpapp/model/challan.dart';
+import 'package:erpapp/providers/customer_provider.dart';
+import 'package:erpapp/providers/home_screen_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../model/customer.dart';
 import '../widgets/challan_horizontal_data_table.dart';
 import 'challancreate.dart';
 import '../kwidgets/kcreatebutton.dart';
@@ -19,11 +23,15 @@ class _ViewChallanState extends State<ViewChallan> {
   late List<Challan> _challanList;
   late double containerWidth;
 
+  late String _reportCustomerName;
+  late bool _isChallanReport;
+
   @override
   void initState() {
     containerWidth = widget.width * 0.95;
     super.initState();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +100,11 @@ class _ViewChallanState extends State<ViewChallan> {
   }
 
   Widget _displayChallan(BuildContext context) {
+    List<Customer> _customerList  = Provider.of<CustomerProvider>(context, listen: false).customerList;
+    Map selectionMap = Provider.of<HomeScreenProvider>(context,listen: false).getdisplayMap;
+    _reportCustomerName = selectionMap["customerName"];
+    _isChallanReport = selectionMap["isChallanReport"];
+
     return Container(
       child: Column(
         children: [
@@ -106,6 +119,20 @@ class _ViewChallanState extends State<ViewChallan> {
               letterSpacing: 2,
               textBaseline: TextBaseline.alphabetic,
             ),
+          ),
+          const SizedBox(height: 10,),
+          Row(
+            children: [
+              KDropdown(
+                dropDownList:
+                _customerList.map((customer) => customer.company_name).toList(),
+                label: "Customer",
+                initialValue: "-----",
+                width: 250,
+                onChangeDropDown: (){}, // _onCustomerChange,
+                isShowSearchBox: false,
+              ),
+            ],
           ),
           const SizedBox(height: 10,),
           // const Divider(),

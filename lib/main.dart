@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import './screens/loadscreen.dart';
-import './screens/viewscreen.dart';
-import './screens/home_page.dart';
+import './screens/home_screen.dart';
+import './screens/startup_screen.dart';
 
 void main() {
   runApp(

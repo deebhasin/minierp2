@@ -13,12 +13,10 @@ import 'package:provider/provider.dart';
 
 class OrganizationCreate extends StatefulWidget {
   final Organization org;
-  final Function reFresh;
   final isDisabled;
   OrganizationCreate({
     Key? key,
     required this.org,
-    required this.reFresh,
     this.isDisabled = false,
   }) : super(key: key);
 
@@ -30,6 +28,9 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
   final _formKey = GlobalKey<FormState>();
   late double width;
   late double height;
+
+  late String filePath;
+  File file = File("");
 
   late TextEditingController _nameController;
   late TextEditingController _tagLineController;
@@ -311,7 +312,7 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
                                     label: "Logo",
                                     controller: _logoController,
                                     width: 250,
-                                    isDisabled: widget.isDisabled,
+                                    isDisabled: true,
                                   ),
                                   widget.isDisabled
                                       ? Container()
@@ -322,14 +323,6 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
                                 ],
                               ),
                             ),
-                            // KTextField(
-                            //   label: "Logo",
-                            //   controller: _logoController,
-                            //   width: 250,
-                            //   isMandatory: true,
-                            //   validator: _requiredValidator,
-                            //   isDisabled: widget.isDisabled,
-                            // ),
                           ],
                         ),
                       ],
@@ -404,27 +397,30 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
 
       widget.org.termsAndConditions = _termsAndConditionsController.text;
 
+      if(file.path != "") await file.copySync(filePath);
+
       await Provider.of<OrgProvider>(context, listen: false)
           .saveOrganization(widget.org);
-      widget.reFresh();
       if (widget.org.id != "" && !widget.isDisabled)
         Navigator.of(context).pop();
     }
   }
 
   void _logoUpload() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'png', 'jpeg', 'gif'],
+    );
 
     if (result != null) {
-      File file = File(result.files.single.path!);
+      file = File(result.files.single.path!);
 
       List<String> fileStr = file.path.split("\\");
 
       Directory documentsDirectory = await getApplicationDocumentsDirectory();
-      String filePath = path.join(documentsDirectory.path, "Org\\",
+      filePath = path.join(documentsDirectory.path, "Org\\",
           fileStr[fileStr.length - 1]);
       _logoController.text = filePath;
-      await file.copySync(filePath);
 
       print("${filePath}");
     } else {

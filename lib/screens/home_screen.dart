@@ -1,5 +1,8 @@
 import 'package:desktop_window/desktop_window.dart';
+import 'package:erpapp/providers/home_screen_provider.dart';
 import 'package:erpapp/screens/organization_view.dart';
+import 'package:erpapp/screens/report_view.dart';
+import 'package:erpapp/screens/test_db.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,50 +20,37 @@ import '../screens/invoiceview.dart';
 import '../widgets/sidebar.dart';
 import 'organization_create.dart';
 
-class ViewScreen extends StatefulWidget {
-  const ViewScreen({
+class HomeScreen extends StatefulWidget {
+  String displayPage;
+
+  HomeScreen({
     Key? key,
+    this.displayPage = "Report",
   }) : super(key: key);
 
   @override
-  State<ViewScreen> createState() => _ViewScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _ViewScreenState extends State<ViewScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   late Organization _org;
-  String displayPage = "Dashboard";
+  late String _selection;
   static const int _sidebarWidth = 200;
 
-  @override
-  void initState() {
-    _getOrg();
-    super.initState();
-  }
 
-  @override
-  void didChangeDependencies() {
-    _getOrg();
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-  }
-
-  void _getOrg() async{
-    _org = Provider.of<OrgProvider>(context, listen: false).getOrg;
-    setState(() {
-
-    });
-  }
 
 
   @override
   Widget build(BuildContext context) {
-      return  _org.id == 0? OrganizationCreate(org: _org, reFresh: _refreshPage,) : body();
+    _org = Provider.of<OrgProvider>(context, listen: true).getOrg;
+    _selection = Provider.of<HomeScreenProvider>(context).getDisplayPage;
+      // return  _org.id == 0? OrganizationCreate(org: _org) : body();
+    // return  TestDB(title: "Test DB",);
     // return OrganizationCreate(org: _org, reFresh: _refreshPage,);
-    // return body();
+    return body();
   }
 
   Widget body() {
-    _getOrg();
     String _companyName = _org.name;
     String _companyLogo = _org.logo;
     print("View Screen REfresh: ${_companyLogo}");
@@ -68,7 +58,7 @@ class _ViewScreenState extends State<ViewScreen> {
 
     Widget dynamicPage() {
       Widget displayWidget;
-      switch (displayPage) {
+      switch (_selection) {
         case "Dashboard":
           {
             displayWidget = const KTabBar(
@@ -94,6 +84,7 @@ class _ViewScreenState extends State<ViewScreen> {
           //   {
           //     displayWidget = const ViewChallan();
           //   }
+
           break;
         case "Customers":
           {
@@ -115,7 +106,14 @@ class _ViewScreenState extends State<ViewScreen> {
           {
             displayWidget = OrganizationView(
               width: (MediaQuery.of(context).size.width - _sidebarWidth),
-              reFresh: _refreshPage,
+            );
+          }
+          break;
+
+        case "Reports":
+          {
+            displayWidget = ReportView(
+              width: (MediaQuery.of(context).size.width - _sidebarWidth),
             );
           }
           break;
@@ -123,7 +121,7 @@ class _ViewScreenState extends State<ViewScreen> {
         default:
           displayWidget = Center(
             child: Text(
-              "No Selection Made OR Page for $displayPage not Created",
+              "No Selection Made OR Page for $_selection not Created",
               style: const TextStyle(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
@@ -135,11 +133,7 @@ class _ViewScreenState extends State<ViewScreen> {
       return displayWidget;
     }
 
-    void setDisplayPage(String selection) {
-      setState(() {
-        displayPage = selection;
-      });
-    }
+
 
     return Row(
       children: [
@@ -149,7 +143,7 @@ class _ViewScreenState extends State<ViewScreen> {
           children: [
             Sidebar(
               sidebarWidth: _sidebarWidth,
-              setDisplayPage: setDisplayPage,
+              selection: _selection,
             ),
           ],
         ),
@@ -181,12 +175,6 @@ class _ViewScreenState extends State<ViewScreen> {
         ),
       ],
     );
-  }
-
-  void _refreshPage(){
-    setState(() {
-      print("Refreshing View Screen");
-    });
   }
 
   _setDesktopFullScreen() {

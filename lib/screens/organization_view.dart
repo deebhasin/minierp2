@@ -13,12 +13,10 @@ import 'organization_create.dart';
 class OrganizationView extends StatefulWidget {
   final double width;
   late double containerWidth;
-  late Function reFresh;
 
   OrganizationView({
     Key? key,
     required this.width,
-    required this.reFresh,
   }) : super(key: key) {
     containerWidth = width * 0.95;
   }
@@ -138,7 +136,6 @@ class _OrganizationViewState extends State<OrganizationView> {
         ),
         OrganizationCreate(
           org: _org,
-          reFresh: widget.reFresh,
           isDisabled: true,
         ),
       ],
@@ -173,7 +170,6 @@ class _OrganizationViewState extends State<OrganizationView> {
                 ),
                 OrganizationCreate(
                   org: _org,
-                  reFresh: widget.reFresh,
                 ),
               ],
             ),

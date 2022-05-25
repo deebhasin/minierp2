@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -5,14 +8,12 @@ import '../model/organization.dart';
 import '../providers/customer_provider.dart';
 import '../providers/product_provider.dart';
 import '/screens/loadscreen.dart';
-import '/screens/viewscreen.dart';
+import '/screens/home_screen.dart';
 
 import '../providers/org_provider.dart';
 import '../utils/localDB_repo.dart';
 
 class HomePage extends StatelessWidget {
-  late OrgProvider _OrgProvider;
-  Organization organization = Organization();
 
   Future<void> initApp(BuildContext context) async {
     bool newDb = await LocalDBRepo().init(forceRebuild: false);
@@ -27,6 +28,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     // _getOrg();
     return Scaffold(
       // appBar: AppBar(),
@@ -35,12 +37,16 @@ class HomePage extends StatelessWidget {
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             // if(snapshot.hasData){
-            return ViewScreen();
+            return HomeScreen();
             // }
           }
+          _setDesktopFullScreen();
           return LoadScreen();
         },
       ),
     );
+  }
+  _setDesktopFullScreen() {
+    DesktopWindow.setFullScreen(true);
   }
 }

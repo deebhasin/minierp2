@@ -1,3 +1,4 @@
+import 'package:erpapp/providers/home_screen_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -19,6 +20,7 @@ class AppProvider {
 			ChangeNotifierProvider<ProductProvider>(create: (_) => ProductProvider()),
 			ChangeNotifierProvider<ChallanProvider>(create: (_) => ChallanProvider()),
 			ChangeNotifierProvider<InvoiceProvider>(create: (_) => InvoiceProvider()),
+			ChangeNotifierProvider<HomeScreenProvider>(create: (_) => HomeScreenProvider()),
 	];
 	}
 }

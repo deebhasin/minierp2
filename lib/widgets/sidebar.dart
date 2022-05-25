@@ -1,15 +1,19 @@
 import 'package:erpapp/model/challan.dart';
+import 'package:erpapp/providers/home_screen_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../kwidgets/ksidebar_row.dart';
 import '../screens/challancreate.dart';
 
 class Sidebar extends StatefulWidget {
   final int sidebarWidth;
-  final Function setDisplayPage;
-  const Sidebar(
-      {Key? key, this.sidebarWidth = 50, required this.setDisplayPage})
-      : super(key: key);
+  final String selection;
+  const Sidebar({
+    Key? key,
+    this.sidebarWidth = 50,
+    this.selection = "Reports",
+  }) : super(key: key);
 
   @override
   State<Sidebar> createState() => _SidebarState();
@@ -26,8 +30,8 @@ class _SidebarState extends State<Sidebar> {
   late bool reportsSelected;
 
   menuSelected(String selectionText) {
-    widget.setDisplayPage(selectionText);
-    setState(() {
+    Provider.of<HomeScreenProvider>(context, listen: false).setDisplayPage = selectionText == ""? "Reports" : selectionText;
+    // setState(() {
       switch (selectionText) {
         case "Dashboard":
           {
@@ -127,7 +131,7 @@ class _SidebarState extends State<Sidebar> {
           break;
         // default: ;
       }
-    });
+    // });
   }
 
   void popup() {
@@ -156,6 +160,7 @@ class _SidebarState extends State<Sidebar> {
 
   @override
   Widget build(BuildContext context) {
+    // menuSelected(widget.selection);
     return Container(
       margin: EdgeInsets.zero,
       width: widget.sidebarWidth.toDouble(),
