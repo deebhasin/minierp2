@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../model/challan_product.dart';
 import '../utils/localDB_repo.dart';
 import '../model/challan.dart';
+import '../utils/logfile.dart';
 
 class ChallanProvider with ChangeNotifier {
   String _sortType = "";
@@ -30,7 +31,7 @@ class ChallanProvider with ChangeNotifier {
   int active = 1;
   Future<List<Challan>> getChallanList() async {
     late List<Challan> challanList;
-    print("In Challan Provider GetChallanList Start");
+    LogFile().logEntry("In Challan Provider GetChallanList Start");
 
     try {
       final List<Map<String, Object?>> queryResult =
@@ -42,7 +43,7 @@ class ChallanProvider with ChangeNotifier {
         challan.challanProductList =
             await getChallanProductListByChallanId(challan.id);
       });
-      print("Challan List Length: ${challanList.length}");
+      LogFile().logEntry("Challan List Length: ${challanList.length}");
     } on Exception catch (e, s) {
       handleException("Error while fetching Challan List $e", e, s);
       challanList = [];
@@ -97,7 +98,7 @@ class ChallanProvider with ChangeNotifier {
       }
       var split = invoiceNo.split("*");
       invoiceNo = split[0];
-      print(":InvoiceNo Contains * $invoiceNo");
+      LogFile().logEntry(":InvoiceNo Contains * $invoiceNo");
       whereClause += "invoice_number in (?, ?)";
       whereArgs.add(invoiceNo);
       whereArgs.add("");
@@ -135,9 +136,9 @@ class ChallanProvider with ChangeNotifier {
     whereArgs.add(DateFormat("yyyy-MM-dd").format(toDate));
     argsFlag = true;
 
-    print("In Challan Provider GetChallanListTest Start");
-    print("Where: $whereClause");
-    print("Where Args: $whereArgs");
+    LogFile().logEntry("In Challan Provider GetChallanListTest Start");
+    LogFile().logEntry("Where: $whereClause");
+    LogFile().logEntry("Where Args: $whereArgs");
 
     try {
       final List<Map<String, Object?>> queryResult =
@@ -147,7 +148,7 @@ class ChallanProvider with ChangeNotifier {
                 whereArgs: whereArgs,
               );
       challanList = queryResult.map((e) => Challan.fromMap(e)).toList();
-      print("Challan List Length: ${challanList.length}");
+      LogFile().logEntry("Challan List Length: ${challanList.length}");
     } on Exception catch (e, s) {
       handleException("Error while fetching Challan List $e", e, s);
       challanList = [];
@@ -163,7 +164,7 @@ class ChallanProvider with ChangeNotifier {
   Future<List<String>> getChallanListwithGSTbyCompanyName(
       String customerName) async {
     late List<String> gstList;
-    print("In Challan Provider getChallanListwithGSTbyCompanyName Start");
+    LogFile().logEntry("In Challan Provider getChallanListwithGSTbyCompanyName Start");
 
     try {
       final List<
@@ -176,7 +177,7 @@ class ChallanProvider with ChangeNotifier {
       gstList = queryResult.map((e) => e["GST"].toString()).toList();
       // gstList = queryResult;
 
-      print("Challan List GST Length: ${gstList.length}");
+      LogFile().logEntry("Challan List GST Length: ${gstList.length}");
     } on Exception catch (e, s) {
       handleException("Error while fetching Challan List $e", e, s);
       gstList = [];
@@ -186,14 +187,14 @@ class ChallanProvider with ChangeNotifier {
 
   Future<Challan> getChallanById(int id) async {
     late Challan challan;
-    print("In Challan Provider GetChallanById Start");
+    LogFile().logEntry("In Challan Provider GetChallanById Start");
 
     try {
       final List<Map<String, Object?>> queryResult = await LocalDBRepo()
           .db
           .query('CHALLAN', where: "id = ?", whereArgs: [id]);
       challan = queryResult.map((e) => Challan.fromMap(e)).toList()[0];
-      print("getting Challan with Id: $id in Challan Provider}");
+      LogFile().logEntry("getting Challan with Id: $id in Challan Provider}");
       List<ChallanProduct> challanProductList =
           await getChallanProductListByChallanId(id);
       challan.challanProductList = challanProductList;
@@ -206,7 +207,7 @@ class ChallanProvider with ChangeNotifier {
   Future<List<ChallanProduct>> getChallanProductListByChallanId(
       int challanId) async {
     List<ChallanProduct> challanProductList = [];
-    print("In Challan Product getChallanProductListByChallanNumber");
+    LogFile().logEntry("In Challan Product getChallanProductListByChallanNumber");
 
     try {
       final List<Map<String, Object?>> queryResult =
@@ -217,7 +218,7 @@ class ChallanProvider with ChangeNotifier {
       );
       challanProductList =
           queryResult.map((e) => ChallanProduct.fromMap(e)).toList();
-      print(
+      LogFile().logEntry(
           "Challan Product List Length in getChallanProductListByChallanNumber: ${challanProductList.length}");
     } on Exception catch (e, s) {
       handleException(
@@ -231,7 +232,7 @@ class ChallanProvider with ChangeNotifier {
 
   Future<bool> checkChallanNumber(String challanNo) async {
     bool _isChallanNo = false;
-    print("In Challan Provider checkChallanNumber Start");
+    LogFile().logEntry("In Challan Provider checkChallanNumber Start");
 
     try {
       final List<Map<String, Object?>> queryResult = await LocalDBRepo()
@@ -239,12 +240,12 @@ class ChallanProvider with ChangeNotifier {
           .query('CHALLAN', where: "challan_no = ?", whereArgs: [challanNo]);
       List<Challan> _challanList =
           queryResult.map((e) => Challan.fromMap(e)).toList();
-      print(
+      LogFile().logEntry(
           "getting Challan List with Challan No: $challanNo in Challan Provider}");
 
       _isChallanNo = _challanList.length > 0 ? true : false;
 
-      print("IN Challan PRovider _isChallan: $_isChallanNo");
+      LogFile().logEntry("IN Challan PRovider _isChallan: $_isChallanNo");
     } on Exception catch (e, s) {
       handleException(
           "Error while fetching Challan with ChallanNo $challanNo $e", e, s);
@@ -258,7 +259,7 @@ class ChallanProvider with ChangeNotifier {
 
   Future<List<ReportOpenChallan>> getOpenChallanReportChallanList() async {
     List<ReportOpenChallan> reportOpenChallanList = [];
-    print("In Challan Provider getOpenChallanReportChallanList Start");
+    LogFile().logEntry("In Challan Provider getOpenChallanReportChallanList Start");
 
     try {
       final List<
@@ -267,7 +268,7 @@ class ChallanProvider with ChangeNotifier {
           "select customer_name, count(id) challan_count, sum(total) sum_total, sum(tax_amount) sum_tax_amount, sum(challan_amount) sum_challan_amount from CHALLAN  where invoice_number = '' group by customer_name;");
       reportOpenChallanList =
           queryResult.map((e) => ReportOpenChallan.fromMap(e)).toList();
-      print(
+      LogFile().logEntry(
           "getOpenChallanReportChallanList Length: ${reportOpenChallanList.length}");
     } on Exception catch (e, s) {
       handleException(
@@ -278,10 +279,10 @@ class ChallanProvider with ChangeNotifier {
 
   Future<int> _createChallan(Challan challan) async {
     int id = 0;
-    print("In Challan Provider Create Challan Start");
+    LogFile().logEntry("In Challan Provider Create Challan Start");
     try {
       id = await LocalDBRepo().db.insert("CHALLAN", challan.toMap());
-      print("Creating Challan with Id: $id in Challan Provider}");
+      LogFile().logEntry("Creating Challan with Id: $id in Challan Provider}");
 
       await _createChallanProduct(id, challan.challanProductList);
       notifyListeners();
@@ -295,7 +296,7 @@ class ChallanProvider with ChangeNotifier {
       int challanId, List<ChallanProduct> challanProductList) async {
     int id = 0;
 
-    print("In Challan Product Provider Create Challan Product Start");
+    LogFile().logEntry("In Challan Product Provider Create Challan Product Start");
     try {
       challanProductList.forEach((challanProduct) async {
         if (challanProduct.productName != "") {
@@ -306,7 +307,7 @@ class ChallanProvider with ChangeNotifier {
         }
       });
 
-      print(
+      LogFile().logEntry(
           "Creating Challan Product with Id: $id in Challan Product Provider}");
     } on Exception catch (e, s) {
       handleException("Error while Creating Challan Product $e", e, s);
@@ -315,15 +316,15 @@ class ChallanProvider with ChangeNotifier {
   }
 
   Future<void> _updateChallan(Challan challan) async {
-    print("In Challan Provider Update Challan Start");
+    LogFile().logEntry("In Challan Provider Update Challan Start");
     try {
       await LocalDBRepo().db.update("CHALLAN", challan.toMap(),
           where: "id = ?", whereArgs: [challan.id]);
-      print("Updating Challan with Id: ${challan.id} in Challan Provider}");
+      LogFile().logEntry("Updating Challan with Id: ${challan.id} in Challan Provider}");
 
-      print(
+      LogFile().logEntry(
           "Challan Update Challan Product Length: ${challan.challanProductList.length}");
-      print(
+      LogFile().logEntry(
           "Challan Update Challan Product Length after Delete: ${challan.challanProductList.length}");
 
       _updateChallanProduct(challan.id, challan.challanProductList);
@@ -340,12 +341,12 @@ class ChallanProvider with ChangeNotifier {
   }
 
   Future<void> removeInvoiceNumberInChallan(String invoiceNumber) async {
-    print(
+    LogFile().logEntry(
         "In Update of invoice in Challan in Challan Provider Update Challan Start");
     try {
       await LocalDBRepo().db.rawQuery(
           "UPDATE CHALLAN SET invoice_number = '' where invoice_number = '$invoiceNumber';");
-      print(
+      LogFile().logEntry(
           "Updating Invoice Number in Challan with InvoiceNo: $invoiceNumber Challan Provider}");
       notifyListeners();
     } on Exception catch (e, s) {
@@ -357,7 +358,7 @@ class ChallanProvider with ChangeNotifier {
       List<Challan> challanList, String invoiceNumber) async {
     removeInvoiceNumberInChallan(invoiceNumber);
 
-    print(
+    LogFile().logEntry(
         "In Update of invoice in Challan in Challan Provider Update Challan Start");
     try {
       challanList.forEach((challan) async {
@@ -368,7 +369,7 @@ class ChallanProvider with ChangeNotifier {
       //     "UPDATE CHALLAN SET invoice_number = '$invoiceNumber' where id in ($whereArgs);");
       // await LocalDBRepo().db.update("CHALLAN",invoiceMap,
       //     where: "id in (?)", whereArgs: idList);
-      print(
+      LogFile().logEntry(
           "Updating Invoice Number in Challan with Invoice No: $invoiceNumber Challan Provider}");
       notifyListeners();
     } on Exception catch (e, s) {
@@ -377,12 +378,12 @@ class ChallanProvider with ChangeNotifier {
   }
 
   Future<void> deleteChallan(int id) async {
-    print("In Challan Provider Delete Challan Start");
+    LogFile().logEntry("In Challan Provider Delete Challan Start");
     try {
       await LocalDBRepo()
           .db
           .delete("CHALLAN", where: "id = ?", whereArgs: [id]);
-      print("Deleting Challan with Id: $id in Challan Provider}");
+      LogFile().logEntry("Deleting Challan with Id: $id in Challan Provider}");
       await _deleteChallanProductbyChallanId(id);
       notifyListeners();
     } on Exception catch (e, s) {
@@ -391,12 +392,12 @@ class ChallanProvider with ChangeNotifier {
   }
 
   Future<void> _deleteChallanProductbyChallanId(int id) async {
-    print("In Challan Product Provider deleteChallanProductbyChallanId Start");
+    LogFile().logEntry("In Challan Product Provider deleteChallanProductbyChallanId Start");
     try {
       await LocalDBRepo()
           .db
           .delete("CHALLAN_PRODUCT", where: "challan_id = ?", whereArgs: [id]);
-      print(
+      LogFile().logEntry(
           "Deleting Challan Product in deleteChallanProductbyChallanId with Id: $id in Challan Product Provider}");
       notifyListeners();
     } on Exception catch (e, s) {
@@ -406,7 +407,7 @@ class ChallanProvider with ChangeNotifier {
 
   Future<ChallanProduct> getChallanProductById(int id) async {
     late ChallanProduct challanProduct;
-    print("In Challan Product Provider GetChallanById Start");
+    LogFile().logEntry("In Challan Product Provider GetChallanById Start");
 
     try {
       final List<Map<String, Object?>> queryResult = await LocalDBRepo()
@@ -414,7 +415,7 @@ class ChallanProvider with ChangeNotifier {
           .query('CHALLAN_PRODUCT', where: "id = ?", whereArgs: [id]);
       challanProduct =
           queryResult.map((e) => ChallanProduct.fromMap(e)).toList()[0];
-      print(
+      LogFile().logEntry(
           "getting Challan Product with Id: $id in Challan Product Provider}");
     } on Exception catch (e, s) {
       handleException(
@@ -424,11 +425,11 @@ class ChallanProvider with ChangeNotifier {
   }
 
   Future<void> updateChallanProduct(ChallanProduct challanProduct) async {
-    print("In Challan Product Provider Update Challan Product Start");
+    LogFile().logEntry("In Challan Product Provider Update Challan Product Start");
     try {
       await LocalDBRepo().db.update("CHALLAN_PRODUCT", challanProduct.toMap(),
           where: "id = ?", whereArgs: [challanProduct.id]);
-      print(
+      LogFile().logEntry(
           "Updating Challan Product with Id: ${challanProduct.id} in Challan Product Provider}");
       notifyListeners();
     } on Exception catch (e, s) {
@@ -437,12 +438,12 @@ class ChallanProvider with ChangeNotifier {
   }
 
   Future<void> deleteChallanProduct(int id) async {
-    print("In Challan Product Provider Delete Challan Product Start");
+    LogFile().logEntry("In Challan Product Provider Delete Challan Product Start");
     try {
       await LocalDBRepo()
           .db
           .delete("CHALLAN_PRODUCT", where: "id = ?", whereArgs: [id]);
-      print(
+      LogFile().logEntry(
           "Deleting Challan Product with Id: $id in Challan Product Provider}");
       notifyListeners();
     } on Exception catch (e, s) {
@@ -452,7 +453,7 @@ class ChallanProvider with ChangeNotifier {
 
   Future<void> deleteChallanProductNotInList(
       List<ChallanProduct> _challanProductList, int _challanId) async {
-    print("In Challan Product Provider Delete Challan Product Start");
+    LogFile().logEntry("In Challan Product Provider Delete Challan Product Start");
 
     String _notInCheck = "";
 
@@ -465,7 +466,7 @@ class ChallanProvider with ChangeNotifier {
       await LocalDBRepo().db.rawQuery(
           "DELETE FROM CHALLAN_PRODUCT WHERE challan_id = $_challanId AND id not in (${_notInCheck});");
       // .query("CHALLAN_PRODUCT", where: "challan_id = ? AND id not in (?)", whereArgs: [_challanId, _notInCheck]);
-      print(
+      LogFile().logEntry(
           "Deleting Challan Product with Id: $_challanProductList in Challan Product Provider}");
       notifyListeners();
     } on Exception catch (e, s) {
@@ -474,7 +475,7 @@ class ChallanProvider with ChangeNotifier {
   }
 
   void handleException(String message, Exception exception, StackTrace st) {
-    print("Error $message $exception $st");
+    LogFile().logEntry("Error $message $exception $st");
   }
 
   void reset() {

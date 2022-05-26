@@ -6,6 +6,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+import 'logfile.dart';
+
 class LocalDBRepo {
   // Making this class Singleton
   static final LocalDBRepo _singleton = LocalDBRepo._internal();
@@ -40,11 +42,11 @@ class LocalDBRepo {
       version: 1,
       onOpen: (db) {
         _db = db;
-        print("Opening the existing DB $path");
+        LogFile().logEntry("Opening the existing DB $path");
         getLocalDBTableList();
       },
       onCreate: (Database db, int version) async {
-        print("Creating a new local DB at path $path");
+        LogFile().logEntry("Creating a new local DB at path $path");
         _db = db;
         await createTables(db);
         await getLocalDBTableList();
@@ -56,7 +58,7 @@ class LocalDBRepo {
   }
 
   Future<void> deleteDb(String path) async {
-    print("deleting db at $path");
+    LogFile().logEntry("deleting db at $path");
     await deleteDatabase(path);
   }
 
@@ -75,8 +77,8 @@ class LocalDBRepo {
 
   Future<String> _getDBDirectoryPath() async {
     Directory documentsDirectory = await getApplicationSupportDirectory();
-    return join(documentsDirectory.path, "minierp.db");
-    // return "asset/db/minierp.db";
+    return join(documentsDirectory.path, "db", "minierp.db");
+    // return "C:/Users/kunwa/Documents/minierp.db";
   }
 
 // 	Future<int> insertParam(String key, String value) async {
@@ -214,12 +216,12 @@ class LocalDBRepo {
         .map((row) => row['name'] as String)
         .toList(growable: false);
 
-    print("table names : $tableNames");
+    LogFile().logEntry("table names : $tableNames");
     return tableNames;
   }
 
   Future<void> createTables(Database db) async {
-    print("started creating db tables");
+    LogFile().logEntry("started creating db tables");
 
     await db.execute("CREATE TABLE PRODUCT ("
         "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -331,7 +333,7 @@ class LocalDBRepo {
         "active TINYINT(1)"
         ")");
 
-    print("completed creating db tables");
+    LogFile().logEntry("completed creating db tables");
 
     // await db.execute("CREATE TABLE CHALLAN ("
     // 	"id INTEGER PRIMARY KEY AUTOINCREMENT,"

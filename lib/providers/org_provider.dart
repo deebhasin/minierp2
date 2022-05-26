@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../model/organization.dart';
 import '../utils/localDB_repo.dart';
+import '../utils/logfile.dart';
 
 class OrgProvider with ChangeNotifier {
 
@@ -20,7 +21,7 @@ class OrgProvider with ChangeNotifier {
   Future<Organization> getOrganization() async {
     late Organization org;
     try {
-      print("Gettin new org from DB**********");
+      LogFile().logEntry("Gettin new org from DB**********");
       List<Map<String, dynamic>> queryResult =
           await LocalDBRepo().db.query('ORGANIZATION');
       List<Organization> orgList = queryResult.map((e) => Organization.fromMap(e)).toList();
@@ -28,20 +29,20 @@ class OrgProvider with ChangeNotifier {
     } on Exception catch (e, s) {
       handleException("Error while fetching Organization $e", e, s);
     }
-    print("Organization WIth Id : ${org.id}");
+    LogFile().logEntry("Organization WIth Id : ${org.id}");
     return org;
   }
 
-  Future<void> saveOrganization(Organization organization) async{
-    organization.id ==0? await createOrganization(organization) : await editOganization(organization);
+  Future<int> saveOrganization(Organization organization) async{
+    return organization.id ==0? await createOrganization(organization) : await editOganization(organization);
   }
 
   Future<int> createOrganization(Organization organization) async {
     int id = 0;
-    print("In Organization Provider Create Organization Start");
+    LogFile().logEntry("In Organization Provider Create Organization Start");
     try {
       id = await LocalDBRepo().db.insert("ORGANIZATION", organization.toMap());
-      print("Creating Organization with Id: $id in Organization Provider}");
+      LogFile().logEntry("Creating Organization with Id: $id in Organization Provider}");
       await cacheOrg();
       notifyListeners();
     } on Exception catch (e, s) {
@@ -50,20 +51,21 @@ class OrgProvider with ChangeNotifier {
     return id;
   }
 
-  Future<void> editOganization(Organization organization) async {
+  Future<int> editOganization(Organization organization) async {
     int id = 0;
-    print("In Organization Provider Edit Organization Start");
+    LogFile().logEntry("In Organization Provider Edit Organization Start");
     try {
       id = await LocalDBRepo().db.update("ORGANIZATION", organization.toMap(), where: "id = ?", whereArgs: [organization.id]);
-      print("Editing Organization with Id: $id in Organization Provider}");
+      LogFile().logEntry("Editing Organization with Id: $id in Organization Provider}");
       await cacheOrg();
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Editing Organization $e", e, s);
     }
+    return id;
   }
 
   void handleException(String message, Exception exception, StackTrace st) {
-    print("Error $message $exception $st");
+    LogFile().logEntry("Error $message $exception $st");
   }
 }

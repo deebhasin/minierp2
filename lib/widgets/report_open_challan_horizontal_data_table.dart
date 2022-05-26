@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../providers/challan_provider.dart';
 import '../model/report_open_challan.dart';
 import '../providers/home_screen_provider.dart';
+import '../utils/logfile.dart';
 
 class ReportOpenChallanHorizontalDataTable extends StatefulWidget {
   final double mediaQueryWidth;
@@ -242,7 +243,7 @@ class _ReportOpenChallanHorizontalDataTableState
         await Provider.of<ChallanProvider>(context, listen: false).getSortType;
     sortAscDesc = await Provider.of<ChallanProvider>(context, listen: false)
         .getIsAscending;
-    print("SOrt Type in _sortSttus: $sortType");
+    LogFile().logEntry("SOrt Type in _sortSttus: $sortType");
 
     if (sortType == "_sortCustomerName") {
       _isCustomerNameAscending = sortAscDesc;

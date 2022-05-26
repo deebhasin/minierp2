@@ -10,6 +10,7 @@ import '../kwidgets/kvalidator.dart';
 import '../model/product.dart';
 import '../model/challan_product.dart';
 import '../providers/product_provider.dart';
+import '../utils/logfile.dart';
 
 class ChallanProductWidget extends StatefulWidget {
   ChallanProduct challanProduct;
@@ -27,7 +28,7 @@ class ChallanProductWidget extends StatefulWidget {
     this.checkRedundentLineItem,
     this.updateTotals,
   }) : super(key: key) {
-    print(
+    LogFile().logEntry(
         "Challan Product Position: ${challanProduct.productName} : $challanProductListPos");
   }
 
@@ -254,7 +255,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
   }
 
   void _onValuesChanged() {
-    print("Value Changed");
+    LogFile().logEntry("Value Changed");
     widget.challanProduct.pricePerUnit = double.parse(
         currencyFormat.parse(pricePerUnitController.text).toString());
     widget.challanProduct.productUnit = unitController.text;
@@ -284,7 +285,7 @@ class _ChallanProductWidgetState extends State<ChallanProductWidget> {
   }
 
   void _deleteChallanProduct(int id) {
-    print("Line Item in Challan Product ${widget.challanProductListPos}");
+    LogFile().logEntry("Line Item in Challan Product ${widget.challanProductListPos}");
     widget.deleteChallanProductFromList(widget.challanProductListPos);
   }
 

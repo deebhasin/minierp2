@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 
 import '../model/customer.dart';
 import '../utils/localDB_repo.dart';
+import '../utils/logfile.dart';
 
 class CustomerProvider with ChangeNotifier {
 
@@ -19,12 +20,12 @@ class CustomerProvider with ChangeNotifier {
 
   Future<List<Customer>> getCustomerList() async {
      late List<Customer> customerList;
-     print("In Customer Provider GetCustomer Start");
+     LogFile().logEntry("In Customer Provider GetCustomer Start");
 
       try {
         final List<Map<String, Object?>> queryResult = await LocalDBRepo().db.query('CUSTOMER');
         customerList = queryResult.map((e) => Customer.fromMap(e)).toList();
-        print("Customer List Length: ${customerList.length}");
+        LogFile().logEntry("Customer List Length: ${customerList.length}");
       } on Exception catch (e, s) {
         handleException("Error while fetching cust $e", e, s);
         customerList = [];
@@ -34,12 +35,12 @@ class CustomerProvider with ChangeNotifier {
 
   Future<Customer> getCustomerWithId(int id) async {
     late Customer customer;
-    print("In Customer Provider GetCustomer with Id $id Start");
+    LogFile().logEntry("In Customer Provider GetCustomer with Id $id Start");
 
     try {
       final List<Map<String, Object?>> queryResult = await LocalDBRepo().db.query('CUSTOMER',where: "id = ?", whereArgs: [id]);
       customer = queryResult.map((e) => Customer.fromMap(e)).toList()[0];
-      print("Getting Customer with id $id");
+      LogFile().logEntry("Getting Customer with id $id");
     } on Exception catch (e, s) {
       handleException("Error while fetching customer $e", e, s);
     }
@@ -53,13 +54,13 @@ class CustomerProvider with ChangeNotifier {
   Future<int> _createCustomer(Customer customer) async {
     int id = 0;
     try {
-      print("Creating New Customer in Customer Provider");
+      LogFile().logEntry("Creating New Customer in Customer Provider");
       id = await LocalDBRepo().db.insert(
           'CUSTOMER',
           customer.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace
       );
-      print("Inserted new customer with id $id and name ${customer.company_name}");
+      LogFile().logEntry("Inserted new customer with id $id and name ${customer.company_name}");
       await cacheCustomer();
       notifyListeners();
 
@@ -70,7 +71,7 @@ class CustomerProvider with ChangeNotifier {
   }
 
   void handleException(String message, Exception exception, StackTrace st) {
-    print("Error $message $exception $st");
+    LogFile().logEntry("Error $message $exception $st");
   }
 
   void reset() {
@@ -78,7 +79,7 @@ class CustomerProvider with ChangeNotifier {
   }
 
   Future<void> deleteCustomer(int id) async {
-    print("Deleting  Customer with id $id in Customer Provider");
+    LogFile().logEntry("Deleting  Customer with id $id in Customer Provider");
     try {
       await LocalDBRepo().db.delete(
         'CUSTOMER',
@@ -93,7 +94,7 @@ class CustomerProvider with ChangeNotifier {
   }
 
     Future<int> _updateCustomer(Customer customer) async {
-      print("Updating Customer with id ${customer.id} in Customer Provider");
+      LogFile().logEntry("Updating Customer with id ${customer.id} in Customer Provider");
       try {
         await LocalDBRepo().db.update(
           'CUSTOMER',

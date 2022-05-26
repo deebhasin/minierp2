@@ -28,6 +28,7 @@ class _SidebarState extends State<Sidebar> {
   late bool productsSelected;
   late bool organizationSelected;
   late bool reportsSelected;
+  late bool logsSelected;
 
   menuSelected(String selectionText) {
     Provider.of<HomeScreenProvider>(context, listen: false).setDisplayPage = selectionText == ""? "Reports" : selectionText;
@@ -43,6 +44,7 @@ class _SidebarState extends State<Sidebar> {
             productsSelected = false;
             organizationSelected = false;
             reportsSelected = false;
+            logsSelected = false;
           }
           break;
         case "Challan":
@@ -55,6 +57,7 @@ class _SidebarState extends State<Sidebar> {
             productsSelected = false;
             organizationSelected = false;
             reportsSelected = false;
+            logsSelected = false;
           }
           break;
         case "Invoice":
@@ -67,6 +70,7 @@ class _SidebarState extends State<Sidebar> {
             productsSelected = false;
             organizationSelected = false;
             reportsSelected = false;
+            logsSelected = false;
           }
           break;
         case "Payments":
@@ -79,6 +83,7 @@ class _SidebarState extends State<Sidebar> {
             productsSelected = false;
             organizationSelected = false;
             reportsSelected = false;
+            logsSelected = false;
           }
           break;
         case "Customers":
@@ -91,6 +96,7 @@ class _SidebarState extends State<Sidebar> {
             productsSelected = false;
             organizationSelected = false;
             reportsSelected = false;
+            logsSelected = false;
           }
           break;
         case "Products":
@@ -103,6 +109,7 @@ class _SidebarState extends State<Sidebar> {
             productsSelected = true;
             organizationSelected = false;
             reportsSelected = false;
+            logsSelected = false;
           }
           break;
         case "Organization":
@@ -115,6 +122,7 @@ class _SidebarState extends State<Sidebar> {
             productsSelected = false;
             organizationSelected = true;
             reportsSelected = false;
+            logsSelected = false;
           }
           break;
         case "Reports":
@@ -127,6 +135,20 @@ class _SidebarState extends State<Sidebar> {
             productsSelected = false;
             organizationSelected = false;
             reportsSelected = true;
+            logsSelected = false;
+          }
+          break;
+        case "Logs":
+          {
+            dashboardSelected = false;
+            challanSelected = false;
+            invoiceSelected = false;
+            paymentsSelected = false;
+            customersSelected = false;
+            productsSelected = false;
+            organizationSelected = false;
+            reportsSelected = false;
+            logsSelected = true;
           }
           break;
         // default: ;
@@ -155,6 +177,7 @@ class _SidebarState extends State<Sidebar> {
     productsSelected = false;
     organizationSelected = false;
     reportsSelected = false;
+    logsSelected = false;
     super.initState();
   }
 
@@ -265,6 +288,13 @@ class _SidebarState extends State<Sidebar> {
               child: KSidebarRow(
                 text: "Reports",
                 isSelected: reportsSelected,
+              ),
+            ),
+            InkWell(
+              onTap: () => menuSelected("Logs"),
+              child: KSidebarRow(
+                text: "Logs",
+                isSelected: logsSelected,
               ),
             ),
           ],

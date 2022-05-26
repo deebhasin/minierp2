@@ -7,6 +7,7 @@ import '../providers/challan_provider.dart';
 import '../screens/challancreate.dart';
 import '../kwidgets/k_confirmation_popup.dart';
 import '../model/challan.dart';
+import '../utils/logfile.dart';
 
 class ChallanHorizontalDataTable extends StatefulWidget {
   List<Challan> challanList;
@@ -311,7 +312,7 @@ class _ChallanHorizontalDataTableState
         await Provider.of<ChallanProvider>(context, listen: false).getSortType;
     sortAscDesc = await Provider.of<ChallanProvider>(context, listen: false)
         .getIsAscending;
-    print("SOrt Type in _sortSttus: $sortType");
+    LogFile().logEntry("SOrt Type in _sortSttus: $sortType");
 
     if (sortType == "_sortChallanNo") {
       _isChallanNoAscending = sortAscDesc;
@@ -365,7 +366,7 @@ class _ChallanHorizontalDataTableState
     sortType = "_sortChallanNo";
     sortAscDesc = _isChallanDateAscending;
 
-    print("Sort Type Set to: $sortType");
+    LogFile().logEntry("Sort Type Set to: $sortType");
   }
 
   void _sortChallanDate() {

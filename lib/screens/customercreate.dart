@@ -7,6 +7,7 @@ import '../model/customer.dart';
 import '../providers/customer_provider.dart';
 import '../kwidgets/dtextfield.dart';
 import '../kwidgets/ksubmitresetbuttons.dart';
+import '../utils/logfile.dart';
 import '../widgets/alertdialognav.dart';
 
 class CustomerCreate extends StatefulWidget {
@@ -253,12 +254,12 @@ class _CustomerCreateState extends State<CustomerCreate> {
       widget.customer.creditPeriod =
           int.parse(creditPeriodController.text ?? "0");
 
-      print("ID: ${widget.customer.id}");
+      LogFile().logEntry("ID: ${widget.customer.id}");
       Provider.of<CustomerProvider>(context, listen: false)
           .saveCustomer(widget.customer);
       Navigator.of(context).pop();
     } else {
-      print("Validation Failed");
+      LogFile().logEntry("Validation Failed");
     }
   }
 

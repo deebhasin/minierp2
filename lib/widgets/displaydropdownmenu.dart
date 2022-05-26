@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/logfile.dart';
+
 class DisplayDropdownMenu extends StatefulWidget {
   final List<String> dropDownList;
   final bool showdropdownflag;
@@ -28,7 +30,7 @@ class _DisplayDropdownMenuState extends State<DisplayDropdownMenu> {
   void initState() {
     // TODO: implement initState
     _focusNode.addListener(() {
-      print("Has focus: ${_focusNode.hasFocus}");
+      LogFile().logEntry("Has focus: ${_focusNode.hasFocus}");
     });
     for (int i = 0; i < widget.dropDownList.length; i++) {
       hoverOnContainerFlag.add(false);
@@ -69,9 +71,9 @@ class _DisplayDropdownMenuState extends State<DisplayDropdownMenu> {
             },
             /***** onFocusChange NOT WORKING  *****/
             onFocusChange: (hasFocus) {
-              print(hasFocus);
+              LogFile().logEntry(hasFocus);
               if (hasFocus) {
-                print("Focus Set");
+                LogFile().logEntry("Focus Set");
               }
             },
             child: Container(

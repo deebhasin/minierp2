@@ -3,9 +3,11 @@ import 'package:erpapp/providers/home_screen_provider.dart';
 import 'package:erpapp/screens/organization_view.dart';
 import 'package:erpapp/screens/report_view.dart';
 import 'package:erpapp/screens/test_db.dart';
+import 'package:erpapp/screens/view_logs.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../utils/logfile.dart';
 import '../widgets/company_logo_name.dart';
 import '../widgets/top_nav.dart';
 import '../kwidgets/ktabbar.dart';
@@ -44,16 +46,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     _org = Provider.of<OrgProvider>(context, listen: true).getOrg;
     _selection = Provider.of<HomeScreenProvider>(context).getDisplayPage;
-      // return  _org.id == 0? OrganizationCreate(org: _org) : body();
+      return  _org.id == 0? OrganizationCreate(org: _org) : body();
     // return  TestDB(title: "Test DB",);
     // return OrganizationCreate(org: _org, reFresh: _refreshPage,);
-    return body();
+    // return body();
   }
 
   Widget body() {
     String _companyName = _org.name;
     String _companyLogo = _org.logo;
-    print("View Screen REfresh: ${_companyLogo}");
+    LogFile().logEntry("View Screen REfresh: ${_companyLogo}");
     _setDesktopFullScreen();
 
     Widget dynamicPage() {
@@ -113,6 +115,13 @@ class _HomeScreenState extends State<HomeScreen> {
         case "Reports":
           {
             displayWidget = ReportView(
+              width: (MediaQuery.of(context).size.width - _sidebarWidth),
+            );
+          }
+          break;
+        case "Logs":
+          {
+            displayWidget = LogsView(
               width: (MediaQuery.of(context).size.width - _sidebarWidth),
             );
           }

@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-
 
 class TestDB extends StatefulWidget {
   const TestDB({Key? key, required this.title}) : super(key: key);
@@ -10,6 +10,7 @@ class TestDB extends StatefulWidget {
   @override
   State<TestDB> createState() => _TestDBState();
 }
+
 class _TestDBState extends State<TestDB> {
   Future<Directory?>? _tempDirectory;
   Future<Directory?>? _appSupportDirectory;
@@ -19,11 +20,31 @@ class _TestDBState extends State<TestDB> {
   Future<List<Directory>?>? _externalStorageDirectories;
   Future<List<Directory>?>? _externalCacheDirectories;
   Future<Directory?>? _downloadsDirectory;
+
+  String dirPath = "";
+
+  @override
+  void initState() {
+   _getPath();
+    // TODO: implement initState
+    super.initState();
+  }
+
+  void _getPath() async{
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    dirPath = join(documentsDirectory.path, "Org\\KAI Image 2.png");
+    // dirPath = "C:\\Users\\kunwa\\Documents\\Org\\KAI Image 2.png";
+    setState(() {
+      print("Testing Document Directory: $dirPath");
+    });
+  }
+
   void _requestTempDirectory() {
     setState(() {
       _tempDirectory = getTemporaryDirectory();
     });
   }
+
   Widget _buildDirectory(
       BuildContext context, AsyncSnapshot<Directory?> snapshot) {
     Text text = const Text("");
@@ -32,12 +53,14 @@ class _TestDBState extends State<TestDB> {
         text = Text("Error: ${snapshot.error}");
       } else if (snapshot.hasData) {
         text = Text("path: ${snapshot.data!.path}");
+        // dirPath = snapshot.data!.path;
       } else {
         text = const Text("path unavailable");
       }
     }
     return Padding(padding: const EdgeInsets.all(16.0), child: text);
   }
+
   Widget _buildDirectories(
       BuildContext context, AsyncSnapshot<List<Directory>?> snapshot) {
     Text text = const Text("");
@@ -46,7 +69,7 @@ class _TestDBState extends State<TestDB> {
         text = Text("Error: ${snapshot.error}");
       } else if (snapshot.hasData) {
         final String combined =
-        snapshot.data!.map((Directory d) => d.path).join(", ");
+            snapshot.data!.map((Directory d) => d.path).join(", ");
         text = Text("paths: $combined");
       } else {
         text = const Text("path unavailable");
@@ -54,41 +77,49 @@ class _TestDBState extends State<TestDB> {
     }
     return Padding(padding: const EdgeInsets.all(16.0), child: text);
   }
+
   void _requestAppDocumentsDirectory() {
     setState(() {
       _appDocumentsDirectory = getApplicationDocumentsDirectory();
     });
   }
+
   void _requestAppSupportDirectory() {
     setState(() {
       _appSupportDirectory = getApplicationSupportDirectory();
     });
   }
+
   void _requestAppLibraryDirectory() {
     setState(() {
       _appLibraryDirectory = getLibraryDirectory();
     });
   }
+
   void _requestExternalStorageDirectory() {
     setState(() {
       _externalDocumentsDirectory = getExternalStorageDirectory();
     });
   }
+
   void _requestExternalStorageDirectories(StorageDirectory type) {
     setState(() {
       _externalStorageDirectories = getExternalStorageDirectories(type: type);
     });
   }
+
   void _requestExternalCacheDirectories() {
     setState(() {
       _externalCacheDirectories = getExternalCacheDirectories();
     });
   }
+
   void _requestDownloadsDirectory() {
     setState(() {
       _downloadsDirectory = getDownloadsDirectory();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,7 +136,7 @@ class _TestDBState extends State<TestDB> {
                   child: ElevatedButton(
                     onPressed: _requestTempDirectory,
                     child: const Text(
-                    "Get Temporary Directory",
+                      "Get Temporary Directory",
                     ),
                   ),
                 ),
@@ -117,12 +148,20 @@ class _TestDBState extends State<TestDB> {
             ),
             Column(
               children: <Widget>[
+                Container(
+                  color: Colors.cyan,
+                  width: 1000,
+                  height: 50,
+                  child:
+                  // Image.file(File("C:\\Users\\kunwa\\Documents\\Org\\KAI Image 2.png")),
+                      Image.file(File(dirPath)),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: ElevatedButton(
                     onPressed: _requestAppDocumentsDirectory,
                     child: const Text(
-                    "Get Application Documents Directory",
+                      "Get Application Documents Directory",
                     ),
                   ),
                 ),
@@ -139,7 +178,7 @@ class _TestDBState extends State<TestDB> {
                   child: ElevatedButton(
                     onPressed: _requestAppSupportDirectory,
                     child: const Text(
-                    "Get Application Support Directory",
+                      "Get Application Support Directory",
                     ),
                   ),
                 ),
@@ -155,11 +194,11 @@ class _TestDBState extends State<TestDB> {
                   padding: const EdgeInsets.all(16.0),
                   child: ElevatedButton(
                     onPressed:
-                    Platform.isAndroid ? null : _requestAppLibraryDirectory,
+                        Platform.isAndroid ? null : _requestAppLibraryDirectory,
                     child: Text(
                       Platform.isAndroid
                           ? "Application Library Directory unavailable"
-                        : "Get Application Library Directory",
+                          : "Get Application Library Directory",
                     ),
                   ),
                 ),
@@ -180,7 +219,7 @@ class _TestDBState extends State<TestDB> {
                     child: Text(
                       !Platform.isAndroid
                           ? "External storage is unavailable"
-                        : "Get External Storage Directory",
+                          : "Get External Storage Directory",
                     ),
                   ),
                 ),
@@ -198,14 +237,14 @@ class _TestDBState extends State<TestDB> {
                     onPressed: !Platform.isAndroid
                         ? null
                         : () {
-                      _requestExternalStorageDirectories(
-                        StorageDirectory.music,
-                      );
-                    },
+                            _requestExternalStorageDirectories(
+                              StorageDirectory.music,
+                            );
+                          },
                     child: Text(
                       !Platform.isAndroid
                           ? "External directories are unavailable"
-                        : "Get External Storage Directories",
+                          : "Get External Storage Directories",
                     ),
                   ),
                 ),
@@ -226,7 +265,7 @@ class _TestDBState extends State<TestDB> {
                     child: Text(
                       !Platform.isAndroid
                           ? "External directories are unavailable"
-                        : "Get External Cache Directories",
+                          : "Get External Cache Directories",
                     ),
                   ),
                 ),
@@ -247,7 +286,7 @@ class _TestDBState extends State<TestDB> {
                     child: Text(
                       Platform.isAndroid || Platform.isIOS
                           ? "Downloads directory is unavailable"
-                      : "Get Downloads Directory",
+                          : "Get Downloads Directory",
                     ),
                   ),
                 ),

@@ -9,6 +9,7 @@ import '../model/invoice.dart';
 import '../providers/challan_provider.dart';
 import '../providers/customer_provider.dart';
 import '../providers/product_provider.dart';
+import '../utils/logfile.dart';
 import '../widgets/alertdialognav.dart';
 import '../widgets/challan_product_widget.dart';
 
@@ -89,16 +90,16 @@ class _ChallanCreateState extends State<ChallanCreate> {
   void initState() {
     _isInvoice = widget.challan.invoiceNo != "" ? true : false;
     _challanProductList = widget.challan.challanProductList;
-    print("Challan Product List Length in Init: ${_challanProductList.length}");
+    LogFile().logEntry("Challan Product List Length in Init: ${_challanProductList.length}");
 
     if (widget.challan.id == 0) {
       for (int i = _challanProductList.length; i < 3; i++) {
         _challanProductList.add(ChallanProduct());
-        print("List Counter: $i");
+        LogFile().logEntry("List Counter: $i");
       }
     }
 
-    print("Challan Product List Length in Init: ${_challanProductList.length}");
+    LogFile().logEntry("Challan Product List Length in Init: ${_challanProductList.length}");
     _buildForm();
     _updateTotals();
     _getdropdownList();
@@ -111,7 +112,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
     containerWidth =
         (MediaQuery.of(context).size.width - KVariables.sidebarWidth);
 
-    print("CHallan create bui;d ca;;ed");
+    LogFile().logEntry("CHallan create bui;d ca;;ed");
     return _challanCreate();
   }
 
@@ -406,9 +407,9 @@ class _ChallanCreateState extends State<ChallanCreate> {
         Provider.of<CustomerProvider>(context, listen: false).customerList;
     _productList =
         Provider.of<ProductProvider>(context, listen: false).productList;
-    print("CHallanProductList Length: ${_challanProductList.length}");
+    LogFile().logEntry("CHallanProductList Length: ${_challanProductList.length}");
     setState(() {});
-    print(
+    LogFile().logEntry(
         "Customer List: ${customerList.length} and Product List: ${_productList.length}");
   }
 
@@ -437,7 +438,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
 
     _dateInputController = TextEditingController(
         text: DateFormat('dd-MM-yyyy').format(widget.challan.challanDate!));
-    print('_dateInputController ${_dateInputController.text}');
+    LogFile().logEntry('_dateInputController ${_dateInputController.text}');
 
     challanNumberValidator = MultiValidator([
       RequiredValidator(errorText: 'Challan Number is required'),
@@ -459,7 +460,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
     _checkLineItemError();
 
     if (_hasErrors) _popupAlert(_errorMsgList);
-    print("Check Errors Has Errors: $_challanNumberErrorMessage");
+    LogFile().logEntry("Check Errors Has Errors: $_challanNumberErrorMessage");
 
     if (_formKey.currentState!.validate() && !_hasErrors) {
       // if (_formKey.currentState!.validate()) {
@@ -468,7 +469,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
       widget.challan.challanDate =
           DateFormat('dd-MM-yyyy').parse(_dateInputController.text);
 
-      print("Customer Name: ${widget.challan.customerName}");
+      LogFile().logEntry("Customer Name: ${widget.challan.customerName}");
       widget.challan.challanProductList = List.from(_challanProductList);
 
       Provider.of<ChallanProvider>(context, listen: false)
@@ -476,7 +477,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
 
       Navigator.of(context).pop();
     } else {
-      print("Validation Failed");
+      LogFile().logEntry("Validation Failed");
     }
   }
 
@@ -514,7 +515,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
     setState(() {
       _challanProductList.removeAt((pos));
       _updateTotals();
-      print("Position in List ${pos.toString()}");
+      LogFile().logEntry("Position in List ${pos.toString()}");
     });
   }
 
@@ -523,11 +524,11 @@ class _ChallanCreateState extends State<ChallanCreate> {
     checkStatus = _challanProductList.any((element) =>
         element.productName == _productNameCheck &&
         _challanProductList.indexOf(element) != index);
-    print("REdundency Statussss: $checkStatus");
-    print("Challan Product List Length: ${_challanProductList.length}");
-    print("Index: $index");
+    LogFile().logEntry("REdundency Statussss: $checkStatus");
+    LogFile().logEntry("Challan Product List Length: ${_challanProductList.length}");
+    LogFile().logEntry("Index: $index");
     _challanProductList.forEach((element) {
-      print(element.productName);
+      LogFile().logEntry(element.productName);
     });
     return checkStatus;
   }
@@ -548,7 +549,7 @@ class _ChallanCreateState extends State<ChallanCreate> {
         _errorMsgList.add(_challanNumberErrorMessage);
       }
     }
-    print("Error in Edit: $_challanNumberErrorMessage");
+    LogFile().logEntry("Error in Edit: $_challanNumberErrorMessage");
   }
 
   void _checkLineItemError() {

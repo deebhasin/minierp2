@@ -13,6 +13,7 @@ import '../model/invoice.dart';
 import '../providers/invoice_provider.dart';
 import '../kwidgets/k_confirmation_popup.dart';
 import '../screens/invoicecreate.dart';
+import '../utils/logfile.dart';
 
 class InvoiceHorizontalDataTable extends StatefulWidget {
   List<Invoice> invoiceList;
@@ -342,7 +343,7 @@ class _InvoiceHorizontalDataTableState
         await Provider.of<InvoiceProvider>(context, listen: false).getSortType;
     sortAscDesc = await Provider.of<InvoiceProvider>(context, listen: false)
         .getIsAscending;
-    print("SOrt Type in _sortSttus: $sortType");
+    LogFile().logEntry("SOrt Type in _sortSttus: $sortType");
 
     if (sortType == "_sortChallanNo") {
       _isChallanNoAscending = sortAscDesc;

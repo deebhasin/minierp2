@@ -6,6 +6,7 @@ import '../model/product.dart';
 import '../kwidgets/ktextfield.dart';
 import '../kwidgets/kvariables.dart';
 import '../providers/product_provider.dart';
+import '../utils/logfile.dart';
 import '../widgets/alertdialognav.dart';
 import '../kwidgets/kdropdown.dart';
 import '../kwidgets/ksubmitresetbuttons.dart';
@@ -191,12 +192,12 @@ class _ProductCreateState extends State<ProductCreate> {
   void _getProductsList() async {
     _productList = await Provider.of<ProductProvider>(context, listen: false)
         .getProductList();
-    print("Product List Length in getProuductList: ${_productList.length}");
+    LogFile().logEntry("Product List Length in getProuductList: ${_productList.length}");
   }
 
   void _onActiveChanged(String status) {
     _isActiveInitialValue = status == "true" ? true : false;
-    print("_onActiveChanged: $_isActiveInitialValue");
+    LogFile().logEntry("_onActiveChanged: $_isActiveInitialValue");
   }
 
   void _resetForm() {
@@ -210,7 +211,7 @@ class _ProductCreateState extends State<ProductCreate> {
       _hsnController.text = widget.product.HSN;
       _gstController.text = widget.product.GST;
       _isActiveInitialValue = widget.product.isActive;
-      print("Is Active in Product Reset: $_isActiveInitialValue");
+      LogFile().logEntry("Is Active in Product Reset: $_isActiveInitialValue");
     });
   }
 
@@ -225,14 +226,14 @@ class _ProductCreateState extends State<ProductCreate> {
       widget.product.GST = _gstController.text;
       widget.product.isActive = _isActiveInitialValue;
 
-      print("ID: ${widget.product.id}");
+      LogFile().logEntry("ID: ${widget.product.id}");
 
       Provider.of<ProductProvider>(context, listen: false)
           .saveProduct(widget.product);
 
       Navigator.of(context).pop();
     } else {
-      print("Product Validation Failed");
+      LogFile().logEntry("Product Validation Failed");
     }
   }
 }

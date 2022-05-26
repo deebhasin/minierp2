@@ -12,6 +12,7 @@ import 'package:pdf/widgets.dart' as pw;
 import '../model/challan.dart';
 import '../model/customer.dart';
 import '../model/invoice.dart';
+import '../utils/logfile.dart';
 
 class PDFCreate {
   PDFCreate();
@@ -24,13 +25,13 @@ class PDFCreate {
     Customer customer,
     Function onPdfCreate,
   ) async {
-    print(
+    LogFile().logEntry(
         "in PDF Create invoice Product List Length: ${invoiceProductList.length}");
 
     final pdf = pw.Document();
     const double width = 1200;
     String address2 = "";
-    print("PDF Created");
+    LogFile().logEntry("PDF Created");
 
     // final Uint8List fontData =
     //     File('asset/fonts/OpenSans-Regular.ttf').readAsBytesSync();
@@ -1126,7 +1127,7 @@ class PDFCreate {
     String pdfMsg = "";
     if(invoice.pdfFileLocation == "") {
       Directory documentsDirectory = await getApplicationDocumentsDirectory();
-      String filePath = join(documentsDirectory.path, "invoices/",
+      String filePath = join(documentsDirectory.path, "Invoices",
           "${invoice.invoiceNo}-${customer.shortCompanyName}-${DateFormat('dd-MM-yyyy').format(invoice.invoiceDate!)}.pdf");
       final file = await File(filePath).create(recursive: true);
 
@@ -1136,7 +1137,7 @@ class PDFCreate {
     else{
       pdfMsg = "PDF File Exists";
     }
-    print("PDF Message: $pdfMsg");
+    LogFile().logEntry("PDF Message: $pdfMsg");
     onPdfCreate(invoice, pdfMsg);
   }
 
@@ -1376,7 +1377,7 @@ class PDFCreate {
     String oneToNinetyNine(int val) {
       String oneToNinetyNineWords = "";
       if (val >= 20 && val <= 99) {
-        print(val);
+        LogFile().logEntry(val);
         // temp = temp ~/ 10;
         if (val > 0) {
           oneToNinetyNineWords += multipleoftens[val ~/ 10] + " ";
@@ -1384,7 +1385,7 @@ class PDFCreate {
         val = val.remainder(10);
       }
       if (val >= 10 && val <= 19) {
-        print(val);
+        LogFile().logEntry(val);
         // temp = temp ~/ 10;
         if (val > 0) {
           oneToNinetyNineWords += twodigits[val.remainder(10)] + " ";
@@ -1392,7 +1393,7 @@ class PDFCreate {
         // val = val.remainder(10);
       }
       if (val >= 1 && val <= 9) {
-        print(val);
+        LogFile().logEntry(val);
         // temp = temp ~/ 10;
         if (val > 0) {
           oneToNinetyNineWords += onedigit[val] + " ";
@@ -1402,34 +1403,34 @@ class PDFCreate {
     }
 
     if (temp >= 10000000 && temp <= 999999999) {
-      print("Actual Value of TEmp $temp");
+      LogFile().logEntry("Actual Value of TEmp $temp");
       int remainder = temp.remainder(10000000);
       temp = temp ~/ 10000000;
-      print("Temp ~/10000000 $temp");
+      LogFile().logEntry("Temp ~/10000000 $temp");
       words += "${oneToNinetyNine(temp)}${poweroftens[3]} ";
       temp = remainder;
-      print("Remainder MOd 10000000 multipleoftens: $temp");
+      LogFile().logEntry("Remainder MOd 10000000 multipleoftens: $temp");
     }
     if (temp >= 100000 && temp <= 9999999) {
-      print("Actual Value of TEmp $temp");
+      LogFile().logEntry("Actual Value of TEmp $temp");
       int remainder = temp.remainder(100000);
       temp = temp ~/ 100000;
-      print("Temp ~/100000 $temp");
+      LogFile().logEntry("Temp ~/100000 $temp");
       words += "${oneToNinetyNine(temp)}${poweroftens[2]} ";
       temp = remainder;
-      print("Remainder MOd 100000 multipleoftens: $temp");
+      LogFile().logEntry("Remainder MOd 100000 multipleoftens: $temp");
     }
     if (temp >= 1000 && temp <= 99999) {
-      print("Actual Value of TEmp $temp");
+      LogFile().logEntry("Actual Value of TEmp $temp");
       int remainder = temp.remainder(1000);
       temp = temp ~/ 1000;
-      print("Temp ~/1000 $temp");
+      LogFile().logEntry("Temp ~/1000 $temp");
       words += "${oneToNinetyNine(temp)}${poweroftens[1]} ";
       temp = remainder;
-      print("Remainder MOd 1000 multipleoftens: $temp");
+      LogFile().logEntry("Remainder MOd 1000 multipleoftens: $temp");
     }
     if (temp >= 100 && temp <= 999) {
-      print(temp);
+      LogFile().logEntry(temp);
       int remainder = temp.remainder(100);
       temp = temp ~/ 100;
       if (temp > 0) {
@@ -1446,7 +1447,7 @@ class PDFCreate {
 
     words += "only";
 
-    print("Number to Words: ${words}");
+    LogFile().logEntry("Number to Words: ${words}");
 
     return words;
   }

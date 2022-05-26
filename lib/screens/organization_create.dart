@@ -11,6 +11,8 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../utils/logfile.dart';
+
 class OrganizationCreate extends StatefulWidget {
   final Organization org;
   final isDisabled;
@@ -211,6 +213,8 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
                               label: "Mobile",
                               controller: _mobileController,
                               width: 250,
+                              isMandatory: true,
+                              validator: _requiredValidator,
                               isDisabled: widget.isDisabled,
                             ),
                           ],
@@ -399,10 +403,11 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
 
       if(file.path != "") await file.copySync(filePath);
 
-      await Provider.of<OrgProvider>(context, listen: false)
+      int id = await Provider.of<OrgProvider>(context, listen: false)
           .saveOrganization(widget.org);
-      if (widget.org.id != "" && !widget.isDisabled)
+      if (widget.org.id != 0 && !widget.isDisabled) {
         Navigator.of(context).pop();
+      }
     }
   }
 
@@ -417,12 +422,12 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
 
       List<String> fileStr = file.path.split("\\");
 
-      Directory documentsDirectory = await getApplicationDocumentsDirectory();
-      filePath = path.join(documentsDirectory.path, "Org\\",
+      Directory documentsDirectory = await getApplicationSupportDirectory();
+      filePath = path.join(documentsDirectory.path, "Org", "Images",
           fileStr[fileStr.length - 1]);
       _logoController.text = filePath;
 
-      print("${filePath}");
+      LogFile().logEntry("${filePath}");
     } else {
       // User canceled the picker
     }

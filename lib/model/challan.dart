@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 
 import '../model/challan_product.dart';
+import '../utils/logfile.dart';
 
 class Challan {
   int id;
@@ -47,11 +48,11 @@ class Challan {
 
   double get total {
     double val = 0;
-    print("dee challan product list Length: ${challanProductList.length}");
+    LogFile().logEntry("dee challan product list Length: ${challanProductList.length}");
     challanProductList.forEach((challanProduct) {
       val += challanProduct.totalBeforeTax;
     });
-    print("deee challan Total Before Tax Value = $val");
+    LogFile().logEntry("deee challan Total Before Tax Value = $val");
     return val;
   }
 

@@ -8,6 +8,7 @@ import '../model/challan.dart';
 import '../model/invoice_product.dart';
 import '../utils/localDB_repo.dart';
 import '../providers/challan_provider.dart';
+import '../utils/logfile.dart';
 
 class InvoiceProvider with ChangeNotifier {
 
@@ -33,13 +34,13 @@ class InvoiceProvider with ChangeNotifier {
 
   Future<List<Invoice>> getInvoiceList() async {
     late List<Invoice> invoiceList;
-    print("In Invoice Provider GetInvoiceList Start");
+    LogFile().logEntry("In Invoice Provider GetInvoiceList Start");
 
     try {
       final List<Map<String, Object?>> queryResult =
           await LocalDBRepo().db.query('INVOICE');
       invoiceList = queryResult.map((e) => Invoice.fromMap(e)).toList();
-      print("Invoice List Length: ${invoiceList.length}");
+      LogFile().logEntry("Invoice List Length: ${invoiceList.length}");
     } on Exception catch (e, s) {
       handleException("Error while fetching Invoice List $e", e, s);
       invoiceList = [];
@@ -54,14 +55,14 @@ class InvoiceProvider with ChangeNotifier {
 
   Future<Invoice> getInvoiceById(int id) async {
     late Invoice invoice;
-    print("In Invoice Provider GetInvoiceById Start");
+    LogFile().logEntry("In Invoice Provider GetInvoiceById Start");
 
     try {
       final List<Map<String, Object?>> queryResult = await LocalDBRepo()
           .db
           .query('INVOICE', where: "id = ?", whereArgs: [id]);
       invoice = queryResult.map((e) => Invoice.fromMap(e)).toList()[0];
-      print("getting Invoice with Id: $id in Invoice Provider}");
+      LogFile().logEntry("getting Invoice with Id: $id in Invoice Provider}");
     } on Exception catch (e, s) {
       handleException("Error while fetching Invoice with Id $id $e", e, s);
     }
@@ -70,14 +71,14 @@ class InvoiceProvider with ChangeNotifier {
 
   Future<Invoice> getInvoiceByInvoiceNo(String invoiceNo) async {
     late Invoice invoice;
-    print("In Invoice Provider getInvoiceByInvoiceNo Start");
+    LogFile().logEntry("In Invoice Provider getInvoiceByInvoiceNo Start");
 
     try {
       final List<Map<String, Object?>> queryResult = await LocalDBRepo()
           .db
           .query('INVOICE', where: "invoice_no = ?", whereArgs: [invoiceNo]);
       invoice = queryResult.map((e) => Invoice.fromMap(e)).toList()[0];
-      print("getting Invoice with Invoice Number: $invoiceNo in Invoice Provider}");
+      LogFile().logEntry("getting Invoice with Invoice Number: $invoiceNo in Invoice Provider}");
     } on Exception catch (e, s) {
       handleException("Error while fetching Invoice with Invoice Number $invoiceNo $e", e, s);
     }
@@ -89,14 +90,14 @@ class InvoiceProvider with ChangeNotifier {
   Future<List<InvoiceProduct>> getInvoiceProductList(int invoiceId) async{
     List<InvoiceProduct> invoiceProductList = [];
 
-    print("In Invoice Provider getInvoiceProductList Start");
+    LogFile().logEntry("In Invoice Provider getInvoiceProductList Start");
 
     try {
       final List<Map<String, Object?>> queryResult = await LocalDBRepo()
           .db
           .query('INVOICE_PRODUCT', where: "invoice_id = ?", whereArgs: [invoiceId]);
       invoiceProductList = queryResult.map((e) => InvoiceProduct.fromMap(e)).toList();
-      print("getting getInvoiceProductList with Invoice Id: $invoiceId in Invoice Provider}");
+      LogFile().logEntry("getting getInvoiceProductList with Invoice Id: $invoiceId in Invoice Provider}");
     } on Exception catch (e, s) {
       handleException("Error while fetching getInvoiceProductList with Invoice Id $invoiceId $e", e, s);
     }
@@ -112,12 +113,12 @@ class InvoiceProvider with ChangeNotifier {
     int id = 0;
     List<InvoiceProduct> invoiceProductListTemp = [];
 
-    print("In Invoice Provider Create Invoice Start");
+    LogFile().logEntry("In Invoice Provider Create Invoice Start");
     try {
       id = await LocalDBRepo().db.insert("INVOICE", invoice.toMap());
-      print("Creating Invoice with Id: $id in Invoice Provider}");
+      LogFile().logEntry("Creating Invoice with Id: $id in Invoice Provider}");
 
-      print("CHallanlist Length in CInvoice Create: ${invoice.challanList.length}");
+      LogFile().logEntry("CHallanlist Length in CInvoice Create: ${invoice.challanList.length}");
 
       invoice.challanList.forEach((challan){
         challan.challanProductList.forEach((challanProduct) async{
@@ -131,7 +132,7 @@ class InvoiceProvider with ChangeNotifier {
           }
         });
       });
-      print("invoiceProductListTemp Length in Invoice Create: ${invoiceProductListTemp.length}");
+      LogFile().logEntry("invoiceProductListTemp Length in Invoice Create: ${invoiceProductListTemp.length}");
       await updateInvoiceNumberInChallan(invoice.challanList, invoice.invoiceNo);
       await _createInvoiceProductInDB(invoiceProductListTemp);
       notifyListeners();
@@ -156,7 +157,7 @@ class InvoiceProvider with ChangeNotifier {
 
   Future<void> _createInvoiceProductInDB(List<InvoiceProduct> invoiceProductList)async{
 
-    print("In Invoice Product Provider Create INvoice Product Start");
+    LogFile().logEntry("In Invoice Product Provider Create INvoice Product Start");
     try {
 
       invoiceProductList.forEach((invoiceProduct) async{
@@ -164,7 +165,7 @@ class InvoiceProvider with ChangeNotifier {
             .db
             .insert("INVOICE_PRODUCT", invoiceProduct.toMap());
       });
-      print(
+      LogFile().logEntry(
           "Creating Invoice Product with invoiceProductList LEngth: ${invoiceProductList.length} in Invoice Product Provider}");
     } on Exception catch (e, s) {
       handleException("Error while Creating Invoice Product $e", e, s);
@@ -175,12 +176,12 @@ class InvoiceProvider with ChangeNotifier {
     ip.quantity += cp.quantity;
   }
   Future<void> _deleteInvoiceProduct(int invoiceId)async{
-    print("In Invoice Provider Delete Invoice Product Start");
+    LogFile().logEntry("In Invoice Provider Delete Invoice Product Start");
     try {
       await LocalDBRepo()
           .db
           .delete("INVOICE_PRODUCT", where: "invoice_id = ?", whereArgs: [invoiceId]);
-      print("Deleting Invoice Product with Id: $invoiceId in Invoice Provider}");
+      LogFile().logEntry("Deleting Invoice Product with Id: $invoiceId in Invoice Provider}");
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Deleting Invoice $e", e, s);
@@ -191,11 +192,11 @@ class InvoiceProvider with ChangeNotifier {
   Future<void> updateInvoice(Invoice invoice) async {
     List<InvoiceProduct> invoiceProductListTemp = [];
 
-    print("In Invoice Provider Update Invoice Start");
+    LogFile().logEntry("In Invoice Provider Update Invoice Start");
     try {
       await LocalDBRepo().db.update("INVOICE", invoice.toMap(),
           where: "id = ?", whereArgs: [invoice.id]);
-      print("Updating Invoice with Id: ${invoice.id} in Invoice Provider}");
+      LogFile().logEntry("Updating Invoice with Id: ${invoice.id} in Invoice Provider}");
 
       invoice.challanList.forEach((challan){
         challan.challanProductList.forEach((challanProduct) async{
@@ -222,7 +223,7 @@ class InvoiceProvider with ChangeNotifier {
       List<Challan> challanList, String invoiceNumber) async {
     removeInvoiceNumberInChallan(invoiceNumber);
 
-    print(
+    LogFile().logEntry(
         "In Update of invoice in Challan in Challan Provider Update Challan Start");
     try {
       challanList.forEach((challan) async {
@@ -233,7 +234,7 @@ class InvoiceProvider with ChangeNotifier {
       //     "UPDATE CHALLAN SET invoice_number = '$invoiceNumber' where id in ($whereArgs);");
       // await LocalDBRepo().db.update("CHALLAN",invoiceMap,
       //     where: "id in (?)", whereArgs: idList);
-      print(
+      LogFile().logEntry(
           "Updating Invoice Number in Challan with Invoice No: $invoiceNumber Challan Provider}");
       notifyListeners();
     } on Exception catch (e, s) {
@@ -242,13 +243,13 @@ class InvoiceProvider with ChangeNotifier {
   }
 
   Future<void> deleteInvoice(int id) async {
-    print("In Invoice Provider Delete Invoice Start");
+    LogFile().logEntry("In Invoice Provider Delete Invoice Start");
     Invoice invoice = await getInvoiceById(id);
     try {
       await LocalDBRepo()
           .db
           .delete("INVOICE", where: "id = ?", whereArgs: [id]);
-      print("Deleting Invoice with Id: $id in Invoice Provider}");
+      LogFile().logEntry("Deleting Invoice with Id: $id in Invoice Provider}");
       _deleteInvoiceProduct(id);
       removeInvoiceNumberInChallan(invoice.invoiceNo);
       notifyListeners();
@@ -258,13 +259,13 @@ class InvoiceProvider with ChangeNotifier {
   }
 
   Future<void> removeInvoiceNumberInChallan(String invoiceNumber) async {
-    print(
+    LogFile().logEntry(
         "In Update of invoice in Challan in Challan Provider Update Challan Start");
     try {
       await LocalDBRepo().db.rawQuery(
           "UPDATE CHALLAN SET invoice_number = '' where invoice_number = '$invoiceNumber';");
 
-      print(
+      LogFile().logEntry(
           "Updating Invoice Number in Challan with InvoiceNo: $invoiceNumber Challan Provider}");
       notifyListeners();
     } on Exception catch (e, s) {
@@ -274,7 +275,7 @@ class InvoiceProvider with ChangeNotifier {
 
   Future<bool> checkInvoiceNumber(String invoiceNo) async {
     bool _isInvoiceNo = false;
-    print("In Invoice Provider checkInvoiceNumber Start");
+    LogFile().logEntry("In Invoice Provider checkInvoiceNumber Start");
 
     try {
       final List<Map<String, Object?>> queryResult = await LocalDBRepo()
@@ -282,12 +283,12 @@ class InvoiceProvider with ChangeNotifier {
           .query('INVOICE', where: "invoice_no = ?", whereArgs: [invoiceNo]);
       List<Invoice> _invoiceList =
       queryResult.map((e) => Invoice.fromMap(e)).toList();
-      print(
+      LogFile().logEntry(
           "getting Invoice List with Invoice No: $invoiceNo in Invoice Provider}");
 
       _isInvoiceNo = _invoiceList.length > 0 ? true : false;
 
-      print("IN Invoice PRovider _isInvoiceNo: $_isInvoiceNo");
+      LogFile().logEntry("IN Invoice PRovider _isInvoiceNo: $_isInvoiceNo");
     } on Exception catch (e, s) {
       handleException(
           "Error while fetching Invoice with InvoiceNo $invoiceNo $e", e, s);
@@ -296,7 +297,7 @@ class InvoiceProvider with ChangeNotifier {
   }
 
   void handleException(String message, Exception exception, StackTrace st) {
-    print("Error $message $exception $st");
+    LogFile().logEntry("Error $message $exception $st");
   }
 
   void reset() {

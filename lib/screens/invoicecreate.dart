@@ -15,6 +15,7 @@ import '../model/invoice.dart';
 import '../model/organization.dart';
 import '../providers/challan_provider.dart';
 import '../providers/customer_provider.dart';
+import '../utils/logfile.dart';
 import '../widgets/alertdialognav.dart';
 import '../providers/invoice_provider.dart';
 import '../widgets/challan_checkbox_horizontal_data_table.dart';
@@ -88,7 +89,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     _getAllLists();
 
     if (widget.invoice.id != 0) {
-      print(
+      LogFile().logEntry(
           "InvoiceCreate ChallanList Length: ${widget.invoice.challanList.length}");
       _companyName = widget.invoice.customerName;
       _customerData = _customerList
@@ -563,13 +564,13 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     _customerList =
         Provider.of<CustomerProvider>(context, listen: false).customerList;
     _organization = Provider.of<OrgProvider>(context, listen: false).getOrg;
-    print("Organization Terms: ${_organization.termsAndConditions}");
+    LogFile().logEntry("Organization Terms: ${_organization.termsAndConditions}");
   }
 
   void _onCompanyChange(String companyName) {
     setState(() {
       _companyName = companyName;
-      print("-ONcompanyChange Company NAme: $companyName");
+      LogFile().logEntry("-ONcompanyChange Company NAme: $companyName");
       _customerData = _customerList
           .where((element) => element.company_name == companyName)
           .toList()[0];
@@ -588,7 +589,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
       sgst = 0;
       igst = 0;
       invoiceTotal = 0;
-      print("Company NMae on CHange: $_companyName");
+      LogFile().logEntry("Company NMae on CHange: $_companyName");
     });
   }
 
@@ -609,7 +610,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
               // return noData(context);
             } else if (snapshot.hasData) {
               challan = snapshot.data!;
-              // customer.forEach((row) => print(row));
+              // customer.forEach((row) => LogFile().logEntry(row));
               // return displayCustomer(context);
               return ChallanCreate(
                 challan: challan,
@@ -662,7 +663,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                       //     .parse(_dateToController.text),
                     ),
               builder: (context, AsyncSnapshot<List<Challan>> snapshot) {
-                print("Inside fetchGST Function");
+                LogFile().logEntry("Inside fetchGST Function");
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
                 } else {
@@ -681,9 +682,9 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                     }
 
                     challanList.forEach((challan) {
-                      print(
+                      LogFile().logEntry(
                           "Challan List Length: ${widget.invoice.challanList.length}");
-                      print(
+                      LogFile().logEntry(
                           "${challan.id}: ${widget.invoice.challanList.any((invoiceChallan) => challan.id == invoiceChallan.id)}");
                       if (widget.invoice.challanList.any((invoiceChallan) =>
                           challan.id == invoiceChallan.id)) {
@@ -692,7 +693,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
                         _isCheckedList.add(false);
                       }
                     });
-                    print(
+                    LogFile().logEntry(
                         "_isCheckedList Length in Invoice Create: ${_isCheckedList.length}");
                     return _displayChallans(
                         challanList, context, _isCheckedList);
@@ -759,7 +760,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
   }
 
   void _submitForm() async {
-    print("Submit Form");
+    LogFile().logEntry("Submit Form");
     _hasErrors = false;
     _errorMsgList.clear();
     if (_invoiceNumberController.text != "") await _checkInvoiceNumberError();
@@ -784,7 +785,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
 
       await Provider.of<InvoiceProvider>(context, listen: false)
           .saveInvoice(widget.invoice);
-      print("Invoice Date: ${_invoiceDateController.text}");
+      LogFile().logEntry("Invoice Date: ${_invoiceDateController.text}");
       Navigator.of(context).pop();
     }
   }
@@ -794,7 +795,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
     _isInvoiceNo = await Provider.of<InvoiceProvider>(context, listen: false)
         .checkInvoiceNumber(_invoiceNumberController.text);
     if (widget.invoice.id == 0) {
-      _hasErrors = true;
+      _hasErrors = _isInvoiceNo;
       _invoiceNumberErrorMessage = "Invoice Number exists";
       _errorMsgList.add(_invoiceNumberErrorMessage);
     } else {
@@ -804,7 +805,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
         _errorMsgList.add(_invoiceNumberErrorMessage);
       }
     }
-    print("Invoice Number Error Message: $_invoiceNumberErrorMessage.");
+    LogFile().logEntry("Invoice Number Error Message: $_invoiceNumberErrorMessage.");
   }
 
   void _checkLineItemError() {

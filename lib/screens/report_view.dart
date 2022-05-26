@@ -77,7 +77,7 @@ class _ReportViewState extends State<ReportView> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Customer does Not Exist",
+              "Open Challans do Not Exist",
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

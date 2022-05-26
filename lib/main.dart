@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (ctx) => HomePage(),
+        '/': (ctx) => StartupScreen(),
         // '/': (ctx) => _loadFlag ? const LoadScreen(): const ViewScreen(),
         // 'viewscreen': (ctx) => const ViewScreen(),
       },
