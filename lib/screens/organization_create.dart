@@ -4,6 +4,7 @@ import 'package:desktop_window/desktop_window.dart';
 import 'package:erpapp/kwidgets/ktextfield.dart';
 import 'package:erpapp/model/organization.dart';
 import 'package:erpapp/providers/org_provider.dart';
+import 'package:erpapp/utils/localDB_repo.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -403,11 +404,27 @@ class _OrganizationCreateState extends State<OrganizationCreate> {
 
       if(file.path != "") await file.copySync(filePath);
 
-      int id = await Provider.of<OrgProvider>(context, listen: false)
-          .saveOrganization(widget.org);
-      if (widget.org.id != 0 && !widget.isDisabled) {
-        Navigator.of(context).pop();
+      bool newDB = await Provider.of<OrgProvider>(context, listen: false).createInMaster(widget.org.name);
+
+      try {
+        bool newDb = await LocalDBRepo().initDB(dbName: widget.org.name, forceRebuild: false);
+        newDb
+            ? LogFile().logEntry("Database Created.")
+            : LogFile().logEntry("Database Exists.");
+
+        // await Provider.of<OrgProvider>(context).createInMaster(name);
+
+      } catch (e) {
+        LogFile().logEntry("Error: $e");
       }
+
+       int id =  await Provider.of<OrgProvider>(context, listen: false)
+          .saveOrganization(widget.org);
+      // if (widget.org.id != 0 && !widget.isDisabled) {
+      //   Navigator.of(context).pop();
+      // }
+      Navigator.of(context).pop();
+      Navigator.pushNamed(context, "homeScreen");
     }
   }
 

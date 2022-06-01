@@ -1,8 +1,9 @@
 import 'package:desktop_window/desktop_window.dart';
+import 'package:erpapp/model/master_organization.dart';
 import 'package:erpapp/providers/home_screen_provider.dart';
+import 'package:erpapp/screens/organization_create.dart';
 import 'package:erpapp/screens/organization_view.dart';
 import 'package:erpapp/screens/report_view.dart';
-import 'package:erpapp/screens/test_db.dart';
 import 'package:erpapp/screens/view_logs.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,22 +21,16 @@ import '../screens/productview.dart';
 import '../screens/invoiceview.dart';
 
 import '../widgets/sidebar.dart';
-import 'organization_create.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   String displayPage;
 
   HomeScreen({
     Key? key,
     this.displayPage = "Report",
   }) : super(key: key);
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  late Organization _org;
+  Organization _org = Organization();
+  late List<Organization> _orgList;
   late String _selection;
   static const int _sidebarWidth = 200;
 
@@ -44,18 +39,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _org = Provider.of<OrgProvider>(context, listen: true).getOrg;
     _selection = Provider.of<HomeScreenProvider>(context).getDisplayPage;
-      return  _org.id == 0? OrganizationCreate(org: _org) : body();
-    // return  TestDB(title: "Test DB",);
-    // return OrganizationCreate(org: _org, reFresh: _refreshPage,);
-    // return body();
+    _org = Provider.of<OrgProvider>(context, listen: false).getOrg;
+    return _org.id != 0? Scaffold(body: body(context)) : Scaffold(body: OrganizationCreate(org: _org));
   }
 
-  Widget body() {
+  Widget body(BuildContext context) {
     String _companyName = _org.name;
     String _companyLogo = _org.logo;
-    LogFile().logEntry("View Screen REfresh: ${_companyLogo}");
+    LogFile().logEntry("Home Screen REfresh: ${_companyLogo}");
     _setDesktopFullScreen();
 
     Widget dynamicPage() {

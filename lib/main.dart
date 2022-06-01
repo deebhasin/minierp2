@@ -2,7 +2,6 @@ import 'package:erpapp/providers/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import './screens/loadscreen.dart';
 import './screens/home_screen.dart';
 import './screens/startup_screen.dart';
 
@@ -30,6 +29,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (ctx) => StartupScreen(),
+        "homeScreen": (ctx) => HomeScreen(),
         // '/': (ctx) => _loadFlag ? const LoadScreen(): const ViewScreen(),
         // 'viewscreen': (ctx) => const ViewScreen(),
       },

@@ -17,12 +17,7 @@ class LocalDBRepo {
   }
   LocalDBRepo._internal();
 
-  late Database _masterDB;
   late Database _db;
-
-  Database get masterDB {
-    return _masterDB;
-  }
 
   Database get db {
     return _db;
@@ -30,7 +25,7 @@ class LocalDBRepo {
 
   final Logger _log = Logger("LocalDBRepo");
 
-  Future<bool> initMasterDB({bool forceRebuild = false}) async {
+  Future<bool> init({bool forceRebuild = false}) async {
     bool newDB = false;
     if (Platform.isWindows || Platform.isLinux) {
       // Initialize FFI
@@ -39,75 +34,10 @@ class LocalDBRepo {
       databaseFactory = databaseFactoryFfi;
     }
 
-    String path = await _getDBDirectoryPath("minierpmaster.db");
+    String path = await _getDBDirectoryPath();
     if (forceRebuild) await deleteDb(path);
-    newDB = await createOpenMasterDB(path);
-    return newDB;
-  }
 
-  Future<bool> initDB({String dbName = "", bool forceRebuild = false}) async {
-    bool newDB = false;
-    if (Platform.isWindows || Platform.isLinux) {
-      // Initialize FFI
-      sqfliteFfiInit();
-      // Change the default factory
-      databaseFactory = databaseFactoryFfi;
-    }
-
-    String path = await _getDBDirectoryPath("$dbName.db");
-    if (forceRebuild) await deleteDb(path);
-    newDB = await createOpenDB(path);
-
-    // path = await _getDBDirectoryPath("minierp.db");
-    // if (forceRebuild) await deleteDb(path);
-    //
-    // newDB = await createOpenDB(path);
-
-    // await openDatabase(
-    //   path,
-    //   version: 1,
-    //   onOpen: (db) {
-    //     _db = db;
-    //     LogFile().logEntry("Opening the existing DB $path");
-    //     getLocalDBTableList();
-    //   },
-    //   onCreate: (Database db, int version) async {
-    //     LogFile().logEntry("Creating a new local DB at path $path");
-    //     _db = db;
-    //     await createTables(db);
-    //     await getLocalDBTableList();
-    //     newDB = true;
-    //   },
-    // );
-
-    return newDB;
-  }
-
-  Future<bool> createOpenMasterDB(String path) async {
-  bool newDB = false;
     await openDatabase(
-      path,
-      version: 1,
-      onOpen: (db) {
-        _masterDB = db;
-        LogFile().logEntry("Opening the existing Master DB $path");
-        getMasterDBTableList();
-      },
-      onCreate: (Database db, int version) async {
-        LogFile().logEntry("Creating a new Master DB at path $path");
-        _masterDB = db;
-        print("Master Database: ${_masterDB}");
-        await createMasterDBTables(_masterDB);
-        await getMasterDBTableList();
-        newDB = true;
-      },
-    );
-    return newDB;
-  }
-
-  Future<bool> createOpenDB(String path) async {
-    bool newDB =false;
-   await openDatabase(
       path,
       version: 1,
       onOpen: (db) {
@@ -123,6 +53,7 @@ class LocalDBRepo {
         newDB = true;
       },
     );
+
     return newDB;
   }
 
@@ -130,7 +61,6 @@ class LocalDBRepo {
     LogFile().logEntry("deleting db at $path");
     await deleteDatabase(path);
   }
-
 
   Future<void> clearDb() async {
     await db.delete("ORGANIZATION");
@@ -145,9 +75,9 @@ class LocalDBRepo {
     await db.delete("CHALLAN_PRODUCT");
   }
 
-  Future<String> _getDBDirectoryPath(String databaseName) async {
+  Future<String> _getDBDirectoryPath() async {
     Directory documentsDirectory = await getApplicationSupportDirectory();
-    return join(documentsDirectory.path, "db", databaseName);
+    return join(documentsDirectory.path, "db", "minierp.db");
     // return "C:/Users/kunwa/Documents/minierp.db";
   }
 
@@ -282,30 +212,11 @@ class LocalDBRepo {
 
   Future<List<dynamic>> getLocalDBTableList() async {
     List<dynamic> tableNames = (await _db
-            .query('sqlite_master', where: 'type = ?', whereArgs: ['table']))
-        .map((row) => row['name'] as String)
-        .toList(growable: false);
-
-    LogFile().logEntry("table names : $tableNames");
-    return tableNames;
-  }
-
-  Future<void> createMasterDBTables(Database db) async{
-    LogFile().logEntry("started creating Master DB tables");
-    await db.execute("CREATE TABLE ORGANIZATION ("
-        "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-        "org_name TEXT,"
-        "active TINYINT(1)"
-        ")");
-  }
-
-  Future<List<dynamic>> getMasterDBTableList() async {
-    List<dynamic> tableNames = (await _masterDB
         .query('sqlite_master', where: 'type = ?', whereArgs: ['table']))
         .map((row) => row['name'] as String)
         .toList(growable: false);
 
-    LogFile().logEntry("Master DB Table names : $tableNames");
+    LogFile().logEntry("table names : $tableNames");
     return tableNames;
   }
 
