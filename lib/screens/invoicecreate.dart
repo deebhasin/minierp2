@@ -785,6 +785,7 @@ class _InvoiceCreateState extends State<InvoiceCreate> {
 
       await Provider.of<InvoiceProvider>(context, listen: false)
           .saveInvoice(widget.invoice);
+      print("ChallanLIst Length on Submit of Create Invoice: ${widget.invoice.challanList.length}");
       LogFile().logEntry("Invoice Date: ${_invoiceDateController.text}");
       Navigator.of(context).pop();
     }

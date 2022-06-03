@@ -15,6 +15,7 @@ import '../kwidgets/ktabbar.dart';
 import '../widgets/footer.dart';
 import '../screens/challanview.dart';
 import '../screens/customersview.dart';
+import '../screens/dashboard.dart';
 import '../model/organization.dart';
 import '../providers/org_provider.dart';
 import '../screens/productview.dart';
@@ -55,8 +56,9 @@ class HomeScreen extends StatelessWidget {
       switch (_selection) {
         case "Dashboard":
           {
-            displayWidget = const KTabBar(
-              sidebar: _sidebarWidth,
+            // displayWidget = const KTabBar(
+            displayWidget = Dashboard(
+              sidebar: _sidebarWidth.toDouble(),
             );
           }
           break;

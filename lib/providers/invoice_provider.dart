@@ -122,7 +122,7 @@ class InvoiceProvider with ChangeNotifier {
 
       invoice.challanList.forEach((challan){
         challan.challanProductList.forEach((challanProduct) async{
-          InvoiceProduct ip = await _createInvoiceProduct(id, challanProduct);
+          InvoiceProduct ip = await _createInvoiceProduct(invoice.id, challanProduct);
           if(invoiceProductListTemp.contains(ip)){
             InvoiceProduct iptemp = invoiceProductListTemp.firstWhere((ipt) => ipt.productName == ip.productName);
             _incrementInvoiceProduct(iptemp, challanProduct);
@@ -134,7 +134,8 @@ class InvoiceProvider with ChangeNotifier {
       });
       LogFile().logEntry("invoiceProductListTemp Length in Invoice Create: ${invoiceProductListTemp.length}");
       await updateInvoiceNumberInChallan(invoice.challanList, invoice.invoiceNo);
-      await _createInvoiceProductInDB(invoiceProductListTemp);
+      await _deleteInvoiceProduct(invoice.id);
+      await _createInvoiceProductInDB(invoiceProductListTemp, id);
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Creating Invoice $e", e, s);
@@ -155,12 +156,13 @@ class InvoiceProvider with ChangeNotifier {
     );
   }
 
-  Future<void> _createInvoiceProductInDB(List<InvoiceProduct> invoiceProductList)async{
+  Future<void> _createInvoiceProductInDB(List<InvoiceProduct> invoiceProductList, int id)async{
 
     LogFile().logEntry("In Invoice Product Provider Create INvoice Product Start");
     try {
 
       invoiceProductList.forEach((invoiceProduct) async{
+        invoiceProduct.invoiceId = id;
         await LocalDBRepo()
             .db
             .insert("INVOICE_PRODUCT", invoiceProduct.toMap());
@@ -212,7 +214,7 @@ class InvoiceProvider with ChangeNotifier {
       });
       await updateInvoiceNumberInChallan(invoice.challanList, invoice.invoiceNo);
       await _deleteInvoiceProduct(invoice.id);
-      await _createInvoiceProductInDB(invoiceProductListTemp);
+      await _createInvoiceProductInDB(invoiceProductListTemp, invoice.id);
       notifyListeners();
     } on Exception catch (e, s) {
       handleException("Error while Updating Invoice $e", e, s);
@@ -223,10 +225,12 @@ class InvoiceProvider with ChangeNotifier {
       List<Challan> challanList, String invoiceNumber) async {
     removeInvoiceNumberInChallan(invoiceNumber);
 
+
     LogFile().logEntry(
         "In Update of invoice in Challan in Challan Provider Update Challan Start");
     try {
       challanList.forEach((challan) async {
+        challan.invoiceNo = invoiceNumber;
         await LocalDBRepo().db.update("CHALLAN", challan.toMap(),
             where: "id = ?", whereArgs: [challan.id]);
       });
