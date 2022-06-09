@@ -205,64 +205,7 @@ class ChallanProvider with ChangeNotifier {
     return challan;
   }
 
-  Future<DashboardChallanData> getDashboardChallanData() async{
-    DashboardChallanData dashboardChallanData = DashboardChallanData();
-    String _mtdFrom = "${DateFormat('yyyy').format(DateTime.now())}-${DateFormat('MM').format(DateTime.now())}-01";
-    String _ytdFrom = "${DateFormat('yyyy').format(DateTime.now())}-04-01";
-    // _mtdFrom = "2022-05-01";
-    String _mtdTo = "${DateFormat('yyyy').format(DateTime.now())}-${DateFormat('MM').format(DateTime.now())}-31";
-    String _ytdTo = "${int.parse(DateFormat('yyyy').format(DateTime.now()))+1}-03-31";
-    // _mtdTo = "2022-06-31";
-    print ("YTD From: $_ytdFrom");
-    LogFile().logEntry("In Challan Provider getChallanData Start");
-    try {
-      List<Map<String, Object?>> queryResult = await LocalDBRepo()
-          .db
-          .rawQuery("SELECT count(id) totalChallans, sum(challan_amount) totalChallanAmount from CHALLAN where challan_date between '${_mtdFrom}' and '${_mtdTo}';");
-      dashboardChallanData.mtdTotalChallans = int.parse(queryResult[0]["totalChallans"].toString());
-      dashboardChallanData.mtdTotalChallanAmount = queryResult[0]["totalChallanAmount"] == null? 0 : double.parse(queryResult[0]["totalChallanAmount"].toString());
 
-      queryResult = await LocalDBRepo()
-          .db
-          .rawQuery("SELECT count(id) totalPendingChallans, sum(challan_amount) totalPendingChallanAmount from CHALLAN where invoice_number = '' and challan_date between '${_mtdFrom}' and '${_mtdTo}';");
-      dashboardChallanData.mtdTotalPendingChallans = int.parse(queryResult[0]["totalPendingChallans"].toString());
-      dashboardChallanData.mtdTotalPendingChallanAmount = queryResult[0]["totalPendingChallanAmount"] == null? 0 : double.parse(queryResult[0]["totalPendingChallanAmount"].toString());
-
-      queryResult = await LocalDBRepo()
-          .db
-          .rawQuery("SELECT count(id) totalInvoices, sum(invoice_total) totalInvoiceAmount from INVOICE where invoice_date between '${_mtdFrom}' and '${_mtdTo}';");
-      dashboardChallanData.mtdTotalInvoices = int.parse(queryResult[0]["totalInvoices"].toString());
-      dashboardChallanData.mtdTotalInvoiceAmount = queryResult[0]["totalInvoiceAmount"] == null? 0: double.parse(queryResult[0]["totalInvoiceAmount"].toString());
-
-
-      queryResult = await LocalDBRepo()
-          .db
-          .rawQuery("SELECT count(id) totalChallans, sum(challan_amount) totalChallanAmount from CHALLAN where challan_date >= '${_ytdFrom}' and  challan_date <= '${_ytdTo}';");
-      dashboardChallanData.ytdTotalChallans = int.parse(queryResult[0]["totalChallans"].toString());
-      dashboardChallanData.ytdTotalChallanAmount = queryResult[0]["totalChallanAmount"] == null? 0 : double.parse(queryResult[0]["totalChallanAmount"].toString());
-
-      queryResult = await LocalDBRepo()
-          .db
-          .rawQuery("SELECT count(id) totalPendingChallans, sum(challan_amount) totalPendingChallanAmount from CHALLAN where invoice_number = '' and challan_date between '${_ytdFrom}' and '${_ytdTo}';");
-      dashboardChallanData.ytdTotalPendingChallans = int.parse(queryResult[0]["totalPendingChallans"].toString());
-      dashboardChallanData.ytdTotalPendingChallanAmount = queryResult[0]["totalPendingChallanAmount"] == null? 0 : double.parse(queryResult[0]["totalPendingChallanAmount"].toString());
-
-      queryResult = await LocalDBRepo()
-          .db
-          .rawQuery("SELECT count(id) totalInvoices, sum(invoice_total) totalInvoiceAmount from INVOICE where invoice_date between '${_ytdFrom}' and '${_ytdTo}';");
-      dashboardChallanData.ytdTotalInvoices = int.parse(queryResult[0]["totalInvoices"].toString());
-      dashboardChallanData.ytdTotalInvoiceAmount = queryResult[0]["totalInvoiceAmount"] == null? 0: double.parse(queryResult[0]["totalInvoiceAmount"].toString());
-
-      print("ytdTotalPendingChallans: ${dashboardChallanData.ytdTotalPendingChallans} for dates between $_ytdFrom and $_ytdTo");
-
-      LogFile().logEntry("getting Dashbaord Challan Data getChallanData in Challan Provider}");
-
-    } on Exception catch (e, s) {
-      handleException("Error while fetching Dashboard Challan Data getChallanData $e", e, s);
-    }
-    return dashboardChallanData;
-
-  }
 
   Future<List<ChallanProduct>> getChallanProductListByChallanId(
       int challanId) async {

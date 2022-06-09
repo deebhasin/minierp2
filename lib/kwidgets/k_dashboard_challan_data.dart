@@ -3,26 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/challan_provider.dart';
+import '../providers/dashboard_provider.dart';
 
-class KDashboardChallanData extends StatefulWidget {
+class KDashboardChallanData extends StatelessWidget {
   final double width;
   KDashboardChallanData({
     Key? key,
     this.width = 100,
   }) : super(key: key);
-
-  @override
-  State<KDashboardChallanData> createState() => _KDashboardChallanDataState();
-}
-
-class _KDashboardChallanDataState extends State<KDashboardChallanData> {
-  bool _isMtd = true;
+  late bool _isMtd;
   late DashboardChallanData _dashboardChallanData;
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ChallanProvider>(builder: (ctx, provider, child) {
+    _isMtd = Provider.of<DashboardProvider>(context).isMtd;
+    return Consumer<DashboardProvider>(builder: (ctx, provider, child) {
       return FutureBuilder(
         future: provider.getDashboardChallanData(),
         builder: (context, AsyncSnapshot<DashboardChallanData> snapshot) {
@@ -36,15 +31,15 @@ class _KDashboardChallanDataState extends State<KDashboardChallanData> {
               _dashboardChallanData = snapshot.data!;
             }
           }
-          return publishData();
+          return publishData(context);
         },
       );
     });
   }
 
-  Widget publishData() {
+  Widget publishData(BuildContext context) {
     return Container(
-      width: widget.width,
+      width: width,
       // height: 500,
       decoration: BoxDecoration(
         color: Color.fromRGBO(247, 247, 247, 1),
@@ -61,9 +56,7 @@ class _KDashboardChallanDataState extends State<KDashboardChallanData> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               InkWell(
-                onTap: () => setState(() {
-                  _isMtd = true;
-                }),
+                onTap: () => setMtdStatus(!_isMtd, context),
                 child: Row(
                   children: [
                     Container(
@@ -91,9 +84,7 @@ class _KDashboardChallanDataState extends State<KDashboardChallanData> {
                 ),
               ),
               InkWell(
-                onTap: () => setState(() {
-                  _isMtd = false;
-                }),
+                onTap: () => setMtdStatus(!_isMtd, context),
                 child: Row(
                   children: [
                     Container(
@@ -127,12 +118,12 @@ class _KDashboardChallanDataState extends State<KDashboardChallanData> {
             height: 10,
           ),
           Container(
-            width: widget.width * 0.9,
+            width: width * 0.9,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
-                  width: widget.width * 0.6,
+                  width: width * 0.6,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -176,7 +167,7 @@ class _KDashboardChallanDataState extends State<KDashboardChallanData> {
                 //   width: 10,
                 // ),
                 Container(
-                  width: widget.width * 0.3,
+                  width: width * 0.3,
                   child: Column(
                     children: [
                       _isMtd
@@ -261,4 +252,9 @@ class _KDashboardChallanDataState extends State<KDashboardChallanData> {
           color: Color.fromRGBO(57, 129, 202, 1)),
     );
   }
+
+  void setMtdStatus(bool status, BuildContext context){
+    Provider.of<DashboardProvider>(context, listen: false).isMtd = status;
+  }
+
 }
